@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.TagMapper">
+
+	<sql id="selectTags">
+		SELECT
+			tags.id AS tag_id,
+			tags.name AS tag_name,
+			tags.used AS tag_used,			
+			tags.creation AS tag_creation,
+			tags.modified AS tag_modified,
+			tagslinked.linked AS linked_name,
+			tagscategory.type AS category_type,
+			tagscategory.category AS category 
+		FROM tags 
+		LEFT OUTER JOIN tagslinked
+			ON tags.name = tagslinked.tag
+		INNER JOIN tagscategory
+			ON tags.name = tagscategory.tag
+	</sql>
+	
+	<resultMap id="tagItemResults" type="TagItem"> 		
+  		<id property="name" column="tag_name"/>
+  		<result property="id" column="tag_id"/>  		
+  		<result property="used" column="tag_used"/>   
+  		<result property="category" column="tag_category"/>
+  		<result property="creation" column="tag_creation"/>  
+  		<result property="modified" column="tag_modified"/>   		
+  		<collection property="linkedTagNames" ofType="String"> 
+  			<id column="linked_name"/>     	
+  		</collection> 
+  		<collection property="category" ofType="CategoryItem">   			
+  			<id property="typeName" column="category_type"/>
+  			<id property="name" column="category"/>
+  		</collection> 
+	</resultMap> 
+
+	<select id="getTagsById" parameterType="Integer" resultMap="tagItemResults">
+		<include refid="selectTags"/>
+		WHERE tags.id IN
+		<foreach item="item" index="i" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getTagsByName" parameterType="String" resultMap="tagItemResults">
+		<include refid="selectTags"/>
+		WHERE tags.name IN
+		<foreach item="item" index="i" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="getTagsByCategory" parameterType="CategoryItem" resultMap="tagItemResults">		
+		<include refid="selectTags"/>
+		WHERE tagscategory.type = #{typeName} AND tagscategory.category = #{name}
+	</select>
+	
+	<select id="getTagsByNameQuery" parameterType="String" resultMap="tagItemResults">
+		<include refid="selectTags"/>
+		WHERE tags.name LIKE #{name}
+	</select>
+	
+	<select id="getAllTags" resultMap="tagItemResults">
+		<include refid="selectTags"/>
+	</select>
+				
+	<insert id="insertTag" parameterType="TagItem">
+		INSERT INTO tags (name, used, creation) VALUES (#{name}, #{used}, NULL)
+	</insert>
+	
+	<update id="updateTag" parameterType="TagItem">
+		UPDATE tags SET name = #{name}, used = #{used} WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteTag" parameterType="String">
+		DELETE FROM tags WHERE name = #{name}
+	</delete>
+	
+	<insert id="setTagLinked" parameterType="Map">
+		INSERT IGNORE INTO tagslinked (tag, linked) VALUES (#{tag}, #{linked}) 	
+	</insert>
+	
+	<delete id="deleteTagLinked" parameterType="Map">
+		DELETE FROM tagslinked WHERE tag = #{tag} AND linked = #{linked} 	
+	</delete>
+	
+	<insert id="setTagCategory" parameterType="Map">
+		INSERT IGNORE INTO tagscategory (tag, category, type) VALUES (#{tag}, #{category}, #{type}) 	
+	</insert>
+	
+	<delete id="deleteTagCategory" parameterType="Map">
+		DELETE FROM tagscategory WHERE tag = #{tag} AND type = #{type} AND category = #{category} 	
+	</delete>
+	
+	<select id="getParentTags" parameterType="Map" resultMap="tagItemResults">
+		SELECT
+			temp.id AS tag_id,
+			temp.name AS tag_name,
+			temp.used AS tag_used,			
+			temp.creation AS tag_creation,
+			temp.modified AS tag_modified,
+			tagslinked.linked AS linked_name,
+			tagscategory.type AS category_type,
+			tagscategory.category AS category 
+		FROM 
+			(SELECT tags.*
+					from tags
+				LEFT OUTER JOIN tagslinked
+					ON tags.name = tagslinked.tag
+				WHERE
+					tagslinked.linked IN
+					<foreach item="item" index="i" collection="children" separator="," open="(" close=")">
+						#{item}
+					</foreach>			
+				GROUP BY
+					tags.name
+				HAVING 
+					COUNT(*) = #{size}) as temp
+		LEFT OUTER JOIN tagslinked
+			ON temp.name = tagslinked.tag				
+		INNER JOIN tagscategory
+			ON temp.name = tagscategory.tag
+	</select>
+			
+	<insert id="setTagImage" parameterType="TagImageItem">
+		INSERT INTO tagsImage (tag, mimeType, sizeBytes, imageData) VALUES (#{tag}, #{mimeType}, #{sizeBytes}, #{imageData})
+		ON DUPLICATE KEY UPDATE mimeType = #{mimeType}, sizeBytes = #{sizeBytes}, imageData = #{imageData} 	
+	</insert>			
+				
+	<select id="getTagImage" parameterType="String" resultType="TagImageItem">
+		SELECT * FROM tagsImage WHERE tag = #{tag}
+	</select>			
+			
+	<select id="hasTagImage" parameterType="String" resultType="Integer">
+		SELECT EXISTS(SELECT 1 FROM tagsImage WHERE tag = #{tag})		
+	</select>
+	
+</mapper>

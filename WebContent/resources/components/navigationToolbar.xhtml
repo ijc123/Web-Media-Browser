@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:rich="http://richfaces.org/rich">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+
+</composite:interface>
+<composite:implementation>
+	<h:form>
+        <rich:toolbar height="26px">
+        	  <rich:dropDownMenu mode="ajax">
+                <f:facet name="label">
+                    <h:panelGrid cellpadding="0" cellspacing="0" columns="2" style="vertical-align:middle">
+                        <h:outputText value="File" />
+                    </h:panelGrid>
+                </f:facet>
+                <rich:menuItem submitMode="client"
+                    onclick="document.location.href='createtype.jsf'">
+                        <h:outputText value="Create Type" />
+                </rich:menuItem>             
+                <rich:menuItem submitMode="client"
+                    onclick="document.location.href='settings.jsf'">
+                        <h:outputText value="Settings" />
+                </rich:menuItem> 
+            </rich:dropDownMenu>
+            <rich:dropDownMenu mode="ajax">
+                <f:facet name="label">
+                    <h:panelGrid cellpadding="0" cellspacing="0" columns="2" style="vertical-align:middle">
+                        <h:outputText value="Tags" />
+                    </h:panelGrid>
+                </f:facet>     
+                <rich:menuItem submitMode="client"
+                    onclick="document.location.href='modifycategories.jsf'">
+                        <h:outputText value="Categories" />
+                </rich:menuItem>       
+                 <rich:menuItem submitMode="client"
+                    onclick="document.location.href='createtag.jsf'">
+                        <h:outputText value="Create" />
+                </rich:menuItem> 
+                <rich:menuItem submitMode="client"
+                    onclick="document.location.href='addtags.jsf'">
+                        <h:outputText value="Add" />
+                </rich:menuItem> 
+                  <rich:menuItem submitMode="client"
+                    onclick="document.location.href='tagsearch.jsf'">
+                        <h:outputText value="Search" />
+                </rich:menuItem> 
+            </rich:dropDownMenu>
+        </rich:toolbar>
+   </h:form>
+</composite:implementation>
+</body>
+</html>

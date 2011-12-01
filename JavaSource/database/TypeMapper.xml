@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.TypeMapper">
+		
+	<select id="getTypeByName" parameterType="String" resultType="TypeItem">
+		SELECT * FROM type WHERE name = #{name}
+	</select>
+
+	<select id="getAllTypes" resultType="TypeItem">
+		SELECT * FROM type 
+	</select>
+
+	<insert id="insertType" parameterType="TypeItem">
+		INSERT IGNORE INTO type (name, creation, modified) VALUES (#{name}, #{creation}, null) 	
+	</insert>
+
+	<update id="modifyType" parameterType="HashMap">
+		UPDATE type
+		SET name = #{newName}
+		WHERE name = #{name}
+	</update>
+	
+	<delete id="deleteType" parameterType="TypeItem">
+		DELETE FROM type WHERE name = #{name}
+	</delete>
+</mapper>
+
+

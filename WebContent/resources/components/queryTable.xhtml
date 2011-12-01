@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="mediaList" type="java.util.List" required="false"/>
+	<composite:attribute name="id" required="false"/>
+</composite:interface>
+<composite:implementation>
+ <h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
+ <h:outputScript library="components" name="queryTable.js" target="head"/>
+ <h:outputStylesheet library="css" name="querytable.css"/>
+ <my:dataTable value="#{queryTableBean.mediaList}" var="media" id="table" 
+ columnClasses="tdCheckboxStyle, tdStyle1, tdStyle2, tdStyle2, tdStyle2" 
+ styleClass="tableStyle" rows="10">
+ 	<h:column>
+ 		<f:facet name="header">
+        	<a4j:commandLink value="Select" onclick="toggleSelectAll('#{cc.clientId}');return false;"/>
+        </f:facet>
+        <h:selectBooleanCheckbox id="selected" value="#{media.selected}"/>
+    </h:column> 
+    <h:column>
+        <f:facet name="header">
+        	<a4j:commandLink value="FileName" render="table" action="#{queryTableBean.sortByFileName}" />
+        </f:facet>
+        <cc:mediaInfo media="#{media}"/>
+    </h:column>
+    <h:column>
+        <f:facet name="header">
+            <a4j:commandLink value="Size" render="table" action="#{queryTableBean.sortBySizeBytes}" />
+        </f:facet>
+        <h:outputText value="#{media.sizeBytes}" converter="converters.SizeBytesConverter"/>
+    </h:column>
+    <h:column>
+        <f:facet name="header">
+              <a4j:commandLink value="Creation" render="table" action="#{queryTableBean.sortByCreation}" />
+        </f:facet>
+        <h:outputText value="#{media.creation}" />
+    </h:column>
+    <h:column>
+        <f:facet name="header">
+             <a4j:commandLink value="Modified" render="table" action="#{queryTableBean.sortByModified}" />
+        </f:facet>
+        <h:outputText value="#{media.modified}" />
+    </h:column>   
+</my:dataTable>
+ <my:pager id="pager" dataTableId="table" showpages="19"/>
+</composite:implementation>
+</body>
+</html>

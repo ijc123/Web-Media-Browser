@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+</composite:interface>
+<composite:implementation>
+	<h:outputStylesheet library="css" name="querytable.css"/>
+	<rich:dataTable id="typeTable" value="#{createTypeBean.dataModel}" 
+	var="type" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
+	<h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="name"/>
+        </f:facet>
+        <rich:inplaceInput value="#{createTypeBean.name}" showControls="true" 
+        editEvent="dblclick">
+        	<f:ajax event="change" execute="@form" render="@form" />			
+		</rich:inplaceInput>       	
+    </h:column> 
+    <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="creation"/>
+        </f:facet>      
+        <h:outputText value="#{type.creation}" converter="converters.TimestampConverter"/>							
+    </h:column>  
+     <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="modified"/>
+        </f:facet>      
+        <h:outputText value="#{type.modified}" converter="converters.TimestampConverter"/>							
+    </h:column>  
+    <h:column>  
+    	<f:facet name="header">
+        	<a4j:commandButton execute="@this" render="typeTable"
+        	action="#{createTypeBean.addType}" value="add"/>        		
+        </f:facet>   
+    	<a4j:commandButton execute="@this" render="typeTable" 
+    	action="#{createTypeBean.deleteType}" value="delete"/>         
+    </h:column>  
+	</rich:dataTable>
+	
+</composite:implementation>
+</body>
+</html>

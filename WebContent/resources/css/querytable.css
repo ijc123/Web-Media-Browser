@@ -1,0 +1,5 @@
+@CHARSET "ISO-8859-1";
+.tableStyle { border-collapse: collapse; border: 1px solid #C0C0C0; width:100%; }
+.tdCheckboxStyle { border: 1px solid #C0C0C0; text-align: center;}
+.tdStyle1 { border: 1px solid #C0C0C0;}
+.tdStyle2 { border: 1px solid #C0C0C0;  text-align: center;}

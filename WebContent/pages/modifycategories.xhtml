@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<h:head>
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Modify Categories</title>
+	<h:outputStylesheet library="css" name="modifyCategories.css" />
+</h:head>
+<h:body>	
+	<cc:navigationToolbar/>
+	<h:form>
+		<rich:panel id="modifyCategoriesPanel" header="Modify Categories">
+			<rich:panel style="height:150px; width: 100%; overflow:auto;">
+				<rich:tree id="modifyCategoriesTree" toggleType="ajax" var="item"
+					selectionType="ajax"
+					selectionChangeListener="#{modifyCategoriesBean.selectionChanged}">			
+					<rich:treeModelRecursiveAdaptor
+						roots="#{modifyCategoriesBean.rootNodes}" nodes="#{item.nodes}">
+						<rich:treeNode>
+							<rich:inplaceInput value="#{item.shortName}" showControls="true"
+								editEvent="dblclick" rendered="#{!item.rootNode}">
+								<f:ajax event="change" execute="@form" render="@form" />
+							</rich:inplaceInput>
+							<h:outputText value="#{item.shortName}" rendered="#{item.rootNode}"/>
+						</rich:treeNode>
+					</rich:treeModelRecursiveAdaptor>
+				</rich:tree>
+			</rich:panel>
+			<h:commandButton value="Add" style="margin: 10px;"
+				action="#{modifyCategoriesBean.createCategory}" />
+			<h:commandButton value="Delete" style="margin: 10px;"
+				action="#{modifyCategoriesBean.deleteCategory}" />				
+		</rich:panel>	
+	</h:form>
+</h:body>
+</html>

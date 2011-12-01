@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.MediaMapper">
+
+	<sql id="selectMedia">
+		SELECT
+			media.uri AS media_uri,
+			media.filename AS media_filename,
+			media.sizebytes AS media_sizebytes,
+			media.creation AS media_creation,
+			media.modified AS media_modified,
+			mediatype.type AS type_name,
+			mediatag.tag AS tag_name
+		FROM media 
+		INNER JOIN mediatype 
+			ON media.uri = mediatype.uri
+		LEFT OUTER JOIN mediatag
+			ON media.uri = mediatag.uri
+	</sql>
+	
+	<resultMap id="mediaItemResults" type="MediaItem"> 		
+  		<id property="uri" column="media_uri"/>
+  		<result property="fileName" column="media_filename"/>   
+  		<result property="sizeBytes" column="media_sizebytes"/> 
+  		<result property="creation" column="media_creation"/>  
+  		<result property="modified" column="media_modified"/>  
+  		<collection property="typeNames" ofType="String"> 
+    		<id column="type_name"/> 
+  		</collection>  		
+  		<collection property="tagNames" ofType="String"> 
+  			<id column="tag_name"/>     	
+  		</collection> 
+	</resultMap> 
+
+	<!-- 
+		This is the easy way of doing the tagQuery, however MySQL performs horribly
+		on this. So I'll just keep it here in case it gets fixed in the future
+		
+		<include refid="selectMedia"/>
+		WHERE media.uri IN (
+			SELECT
+				uri
+			FROM mediatag 
+			WHERE
+			<foreach item="item" index="i" collection="tags" separator=" OR ">
+				tag = #{item}
+			</foreach>
+			GROUP BY uri
+			HAVING count(*) = #{size}
+		)	-->	
+	<select id="getMediaByTagQuery" parameterType="hashmap" resultMap="mediaItemResults">
+		SELECT 
+			temp.uri AS media_uri,
+			temp.filename AS media_filename,
+			temp.sizebytes AS media_sizebytes,
+			temp.creation AS media_creation,
+			temp.modified AS media_modified,
+			mediatype.type AS type_name,
+			mediatag.tag AS tag_name 
+		FROM
+			(SELECT media.*
+				from media
+			INNER JOIN mediatag
+				ON mediatag.uri = media.uri
+			WHERE
+				<foreach item="item" index="i" collection="tags" separator=" OR ">
+					mediatag.tag = #{item}
+				</foreach>				
+			GROUP BY
+				media.uri
+			HAVING 
+				COUNT(*) = #{size}) as temp
+		INNER JOIN mediatag
+			ON mediatag.uri = temp.uri
+		INNER JOIN mediatype
+			ON mediatype.uri = temp.uri	
+	</select>
+
+	<select id="getMediaByFilenameQuery" parameterType="map" resultMap="mediaItemResults">
+		<include refid="selectMedia"/> 
+		WHERE 
+		<choose>
+			<when test="query != null and timeStamp != null">
+				media.filename LIKE '%' #{query} '%' AND media.creation > #{timeStamp}		
+			</when>
+			<when test="query != null">
+				media.filename LIKE '%' #{query} '%'					
+			</when>			
+			<otherwise>
+				media.creation > #{timeStamp}
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getMediaByUri" parameterType="string" resultMap="mediaItemResults">
+		<include refid="selectMedia"/>
+		WHERE media.uri = #{uri}	
+	</select>
+
+	<select id="getAllMedia" parameterType="string" resultMap="mediaItemResults">
+		<include refid="selectMedia"/>	
+	</select>
+
+	<insert id="setMedia" parameterType="mediaItem">
+		INSERT INTO media (uri, sizeBytes, fileName, modified) VALUES (#{uri}, #{sizeBytes}, #{fileName}, null) 
+		ON DUPLICATE KEY UPDATE sizeBytes = #{sizeBytes}, fileName = #{fileName}	
+	</insert>
+	
+	<insert id="setMediaTag" parameterType="Map">
+		INSERT IGNORE INTO mediatag (uri, tag) VALUES (#{uri}, #{tag}) 	
+	</insert>
+	
+	<delete id="deleteMediaTag" parameterType="Map">
+		DELETE FROM mediatag WHERE uri = #{uri} AND tag = #{tag} 	
+	</delete>
+	
+	<insert id="setMediaType" parameterType="Map">
+		INSERT IGNORE INTO mediatype (uri, type) VALUES (#{uri}, #{type}) 	
+	</insert>
+	
+	<delete id="deleteMediaType" parameterType="Map">
+		DELETE FROM mediatype WHERE uri = #{uri} AND type = #{type} 	
+	</delete>
+
+	<update id="dropTempTable">
+		DROP TEMPORARY TABLE IF EXISTS diskmedia
+	</update>
+	
+	<update id="createTempTable">
+		CREATE TEMPORARY TABLE diskmedia (uri VARCHAR(512) NOT NULL, fileName VARCHAR(512) NOT NULL,
+		sizeBytes BIGINT UNSIGNED NOT NULL, typeName VARCHAR(64) NOT NULL)
+	</update>
+
+	<insert id="setMediaTempTable" parameterType="HashMap">
+		INSERT INTO diskmedia (uri, fileName, sizeBytes, typeName) VALUES (#{uri}, #{fileName}, #{sizeBytes}, #{typeName})
+	</insert>
+
+	<update id="synchronize">
+		CALL synchronize();	
+	</update>
+	
+	<select id="nrRowsInMedia" resultType="Integer">
+		SELECT COUNT(*) FROM media
+	</select>
+	
+</mapper>
+

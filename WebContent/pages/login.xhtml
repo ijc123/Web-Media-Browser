@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<h:head>
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Login</title>
+</h:head>
+<h:body>	
+	<h:form>
+		<rich:panel id="settingsPanel" header="Login">
+			<h:panelGrid columns="2">
+								
+				<h:outputText value="User Name:"/>
+				<h:inputText value="#{credentialsBean.username}"/>
+				
+				<h:outputText value="Password:"/>
+				<h:inputSecret value="#{credentialsBean.password}"/>				 										
+			</h:panelGrid>	
+			<h:commandButton value="Login" action="#{loginBean.login}"  type="submit" 
+				style="margin: 10px;"/>			
+		</rich:panel>
+	</h:form>
+</h:body>
+</html>

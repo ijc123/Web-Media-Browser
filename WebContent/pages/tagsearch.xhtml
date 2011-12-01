@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j">
+<h:head>
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Tag Search</title>
+	<h:outputStylesheet>
+		.smallHeader {
+		    background-color: #FF0000;
+		    height: 9px;
+		    text-align: center;
+		    vertical-align: middle;
+		    color: #FF0000;
+		    padding: 1px 0;
+		}
+	</h:outputStylesheet>	
+</h:head>
+<h:body>
+	<h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
+	<h:outputScript library="javascript" name="jquery.json-2.2.js" target="head"/>
+	<h:outputScript library="javascript" name="tagSearch.js" target="head"/>
+	<cc:navigationToolbar/>
+	<h:form id="tagSearchForm">
+	
+		<rich:panel> 	
+			<f:facet name="header">
+			   <h:outputText value="Select Tags"/>          
+			</f:facet>
+			
+			
+				<rich:panel style="float: left"> 	
+				<h:selectOneMenu id="type" value="#{tagSearchBean.typeName}">
+					<f:selectItems value="#{typeBean.allTypeNames}" /> 
+					<f:ajax render="tagCategory tabPanel" event="change" execute="type"/>
+		 		</h:selectOneMenu>
+			
+				<h:selectOneMenu id="tagCategory" value="#{tagSearchBean.category}">
+					<f:selectItems value="#{tagSearchBean.categoryList}" /> 
+					<f:ajax render="tabPanel" event="change" execute="tagCategory"/>
+		 		</h:selectOneMenu>
+		 		</rich:panel>
+		 			
+		 		<rich:panel style="float: right"> 	 	
+		 		<h:selectOneRadio id="sortOrder" value="#{tagSearchBean.sortMode}">
+	  				<f:selectItem itemLabel="Alphabethical" itemValue="0" />
+	  				<f:selectItem itemLabel="Results" itemValue="1" />
+	  				<f:ajax render="sortOrder tabPanel" event="change" execute="sortOrder" />
+				</h:selectOneRadio>	
+				</rich:panel> 	
+				
+				<rich:panel style="float: right"> 
+				<h:selectOneRadio id="searchMode" value="#{tagSearchBean.searchMode}">
+	  				<f:selectItem itemLabel="Media" itemValue="0" />
+	  				<f:selectItem itemLabel="Tags" itemValue="1" />
+	  				<f:ajax render="searchMode tabPanel" event="change" execute="searchMode" />
+				</h:selectOneRadio>		 		
+	   			</rich:panel> 
+			   
+			<rich:tabPanel switchType="client" activeItem="#{tagSearchBean.selectedTab}" id="tabPanel" style="clear: both">
+				<rich:tab id="category">
+					<f:facet name="header">
+						<a4j:commandLink value="Category" style="text-decoration: none; color: black">
+							<a4j:param value="category" assignTo="#{tagSearchBean.selectedTab}" />
+						</a4j:commandLink>
+					</f:facet>
+					<cc:tagSearchByCategory onTagClick="tagSearch.AddSelectedTag('#{tag.name}', 'category');" bean="#{tagSearchBean}" />
+				</rich:tab>
+				<rich:tab id="cloud">
+					<f:facet name="header">
+						<a4j:commandLink value="Cloud" style="text-decoration: none; color: black">
+							<a4j:param value="cloud" assignTo="#{tagSearchBean.selectedTab}" />
+						</a4j:commandLink>
+					</f:facet>				
+					<cc:tagSearchByCloud onTagClick="tagSearch.AddSelectedTag('#{tag.name}','cloud');" bean="#{tagSearchBean}" />
+				</rich:tab>
+			</rich:tabPanel><h:panelGroup layout="block">
+			
+	      	<h:inputHidden id="queryTags"  value="#{tagSearchBean.hiddenQueryTags}" converter="converters.SelectedTagsConverter"/>  
+	      	<h:inputHidden id="selectedTab"  value="category"/>
+	      	</h:panelGroup>      		       		   
+		</rich:panel>
+		  
+		<rich:panel header="Query" style="float: left; clear: both; width: 100%">
+			<rich:dataGrid id="queryTagDataGrid" value="#{tagSearchBean.queryTagItems}" var="tag"
+			          columns="5" elements="5" width="600px" border="0" style="margin-left:auto; margin-right:auto">
+				<rich:panel onclick="tagSearch.RemoveSelectedTag('#{cc.clientId}','#{tag.name}');">
+				    <f:facet name="header">
+				        <h:outputText value="#{tag.name}" style="float:left;"/>
+				        <h:outputText value="#{tag.used}" style="float:right; color:red"/>
+				        <h:panelGroup layout="block" style="clear: both;"/>                      
+				    </f:facet>
+				    <h:panelGrid columns="2">
+				        <h:graphicImage id="tagImage" url="#{tag.shortTagImageURL}" style="height: 150px; display: block; 
+				        margin-left: auto; margin-right: auto"/>
+				    </h:panelGrid>
+				</rich:panel>
+			    <f:facet name="footer">
+			        <rich:dataScroller />
+			    </f:facet>
+			</rich:dataGrid>
+			<h:commandButton value="Search" type="submit" action="#{tagSearchBean.queryTableSearch}" style="margin: 10px;" 
+			onclick="pager.SetToZero();"/>
+			<h:commandButton value="Clear" type="button" onclick="tagSearch.ClearSearchTags('#{cc.clientId}')"/>	
+		</rich:panel>   
+	   	<rich:panel id="queryTablePanel" header="Search Results">
+		   	<cc:taggableQueryTable mediaList="#{tagSearchBean.mediaList}"/>
+	   	</rich:panel>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components/"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="mediaList" type="java.util.List"
+		required="false" />
+</composite:interface>
+<composite:implementation>
+	<h:panelGrid id="panelGrid" columns="2">
+		<h:outputText value="Select Tag(s):" />
+		<cc:multiTagPicker2 id="multiTagPicker" taggableBean="#{queryTableBean}" />
+	</h:panelGrid>
+	<a4j:commandButton action="#{queryTableBean.modifyTag('add')}" value="Add Tag" execute="@form" 
+		render="@form" style="margin: 10px;"/>
+
+	<a4j:commandButton action="#{queryTableBean.modifyTag('remove')}" value="Remove Tag" execute="@form" 
+		render="@form" />
+	<cc:queryTable id="queryTable" mediaList="#{cc.attrs.mediaList}" />
+</composite:implementation>
+</body>
+</html>

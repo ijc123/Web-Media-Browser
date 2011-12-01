@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<typeAliases>
+		<typeAlias type="database.TagItem" alias="TagItem" />
+		<typeAlias type="database.TagImageItem" alias="TagImageItem" />
+		<typeAlias type="database.MediaItem" alias="MediaItem" />
+		<typeAlias type="database.SettingsItem" alias="SettingsItem" />
+		<typeAlias type="database.MediaLocationItem" alias="MediaLocationItem" />
+		<typeAlias type="database.TypeItem" alias="TypeItem" />
+		<typeAlias type="database.CategoryItem" alias="CategoryItem" />
+		<typeAlias type="database.UserItem" alias="UserItem" />
+	</typeAliases>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="MANAGED"/>
+			<dataSource type="JNDI">
+				<property name="data_source" value="java:/mydb"/>				
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="database/UserMapper.xml"/>
+		<mapper resource="database/TagMapper.xml"/>
+		<mapper resource="database/MediaMapper.xml"/>
+		<mapper resource="database/SettingsMapper.xml"/>
+		<mapper resource="database/MediaLocationMapper.xml"/>
+		<mapper resource="database/TypeMapper.xml"/>
+		<mapper resource="database/CategoryMapper.xml"/>
+	</mappers>
+</configuration>

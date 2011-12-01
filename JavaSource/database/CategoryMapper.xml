@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.CategoryMapper">
+		
+	<select id="getCategoriesByType" parameterType="String" resultType="CategoryItem">
+		SELECT 
+			name, 
+			type as typeName 
+		FROM category 
+		WHERE type = #{type}
+	</select>
+	
+	<select id="getCategoryByName" parameterType="String" resultType="CategoryItem">
+		SELECT 
+			name, 
+			type as typeName 
+		FROM category 
+		WHERE name = #{name}
+	</select>
+	
+	<select id="getCategoryByPrefix" parameterType="CategoryItem" resultType="CategoryItem">
+		SELECT 
+			name, 
+			type as typeName, 
+			CONCAT('/',type, name) as fullCategory 
+		FROM category 
+		HAVING fullCategory REGEXP #{fullName} '*';
+	</select>
+
+	<select id="getAllCategories" resultType="CategoryItem">
+		SELECT 
+			name, 
+			type as typeName 
+		FROM category 
+	</select>
+
+	<insert id="setCategory" parameterType="CategoryItem">
+		INSERT INTO category (name, type) VALUES (#{name}, #{typeName})
+	</insert>
+	
+	<update id="renameCategory" parameterType="hashmap">
+		UPDATE category 
+		SET name = #{newName}
+		WHERE type = #{typeName} AND name = #{name}
+	</update>
+	
+	<delete id="deleteCategory" parameterType="CategoryItem">
+		DELETE FROM category WHERE name = #{name} AND type = #{typeName}
+	</delete>
+		
+</mapper>

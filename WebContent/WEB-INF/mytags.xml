@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facelet-taglib version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibary_2_0.xsd">
+ <namespace>/WEB-INF/mytags</namespace>
+ <tag>
+  <tag-name>queryTable</tag-name>
+  <component>
+   <description>
+   	Render a table displaying the results of a query into the media table 
+   		available tags: 
+   		query = a string to search for in the database
+   </description>
+   <component-type>custom.component.QueryTable</component-type>
+   <renderer-type>custom.component.QueryTable</renderer-type>
+   <handler-class/>
+  </component>
+ </tag>
+ <tag>
+  <tag-name>fileSelectOne</tag-name>
+  <component>
+   <description>
+   	Select a file or directory 
+   		available tags: 
+   		root = starting directory, should not end with a /
+   		hideDirectories = do not show directories
+   		hideFiles = do not show files
+   </description>
+   <component-type>custom.component.FileSelectOne</component-type>
+   <renderer-type>custom.component.FileSelectOne</renderer-type>
+   <handler-class/>
+  </component>
+ </tag>
+ <tag>
+  <tag-name>mediaPlayer</tag-name>
+  <component>
+   <description>
+   	Plays a video using the windows media player plugin
+   		available tags: 
+   		filePath = path to the file to be displayed
+   </description>
+   <component-type>custom.component.UIMediaPlayer</component-type>
+   <handler-class/>
+  </component>
+ </tag>
+ <tag>
+  <tag-name>tagInfo</tag-name>
+  <component>
+   <description>
+	   	Creates a graphic representation of a suplied list of tags
+   </description>
+   <component-type>custom.component.UITagInfo</component-type>
+   <handler-class/>
+  </component>
+ </tag>
+ <tag>
+  <tag-name>preview</tag-name>
+  <component>
+   <description>
+	   	Creates and displays a preview of a media file
+   </description>
+   <component-type>custom.component.UIPreview</component-type>
+   <handler-class/>
+  </component>
+ </tag>
+ <tag>
+  <tag-name>pager</tag-name>
+  <component>
+   <description>
+   	Allows paging trough a large datatable
+   </description>
+   <component-type>custom.component.UIPager</component-type>
+   <handler-class/>
+  </component>
+ </tag>
+  <tag>
+  <tag-name>dataTable</tag-name>
+  <component>
+   <description>
+   		Modified data table
+   </description>
+   <component-type>custom.component.UIMyData</component-type>
+   <handler-class/>
+  </component>
+ </tag>
+</facelet-taglib>

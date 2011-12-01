@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+</composite:interface>
+<composite:implementation>
+	<h:outputStylesheet library="css" name="querytable.css"/>
+	<rich:dataTable id="mediaLocationsTable" value="#{settingsBean.dataModel}" 
+	var="mediaLocation" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
+	<h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="location"/>
+        </f:facet>
+		<cc:locationPickerButton location="#{mediaLocation.location}" style="width:100%"/>        	
+    </h:column> 
+    <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="type"/>
+        </f:facet>      
+        <h:selectOneMenu value="#{mediaLocation.typeName}" id="typeSelect">     
+            <f:selectItems value="#{typeBean.allTypeNames}" />
+        </h:selectOneMenu>
+    </h:column>
+    <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="video"/>
+        </f:facet>      
+        <h:selectBooleanCheckbox value="#{mediaLocation.video}" id="videoSelect"/>                
+    </h:column>
+    <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="audio"/>
+        </f:facet>      
+        <h:selectBooleanCheckbox value="#{mediaLocation.audio}" id="audioSelect"/>   
+    </h:column>
+    <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="images"/>
+        </f:facet>      
+        <h:selectBooleanCheckbox value="#{mediaLocation.images}" id="imagesSelect"/>   
+    </h:column>   
+    <h:column>  
+    	<f:facet name="header">
+        	<a4j:commandButton execute="@this" render="mediaLocationsTable"
+        	action="#{settingsBean.addMediaLocation}" value="add"/>        		
+        </f:facet>   
+    	<a4j:commandButton execute="@this" render="mediaLocationsTable" 
+    	action="#{settingsBean.deleteMediaLocation}" value="delete"/>         
+    </h:column>  
+	</rich:dataTable>
+	
+</composite:implementation>
+</body>
+</html>

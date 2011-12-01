@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<h:head>
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Settings</title>
+</h:head>
+<h:body>	
+	<cc:navigationToolbar/>
+	<h:form>
+		<rich:panel id="settingsPanel" header="Settings">
+			<h:panelGrid columns="2">
+								
+				<h:outputText value="Preview Root Directory:"/>
+				<cc:locationPickerButton location="#{settingsBean.settings.previewRootDirectory}"/>
+				
+				<h:outputText value="Media Root Directories:"/>
+				<cc:mediaLocationsTable/>				 										
+			</h:panelGrid>				
+		</rich:panel>
+		<rich:panel id="synchronizePanel" header="Synchronize">
+			<h:panelGrid columns="2">
+				<h:outputText value="Last Sync:" />
+				<h:outputText value="#{settingsBean.settings.synchronized}" converter="converters.TimestampConverter"/>
+						
+				<h:outputText value="Total Items:" />
+				<h:outputText value="#{settingsBean.settings.nrMediaItems}"/>
+				
+				<h:outputText value="Items Added:" />
+				<h:outputText value="#{settingsBean.settings.nrMediaItemsAdded}"/>
+				
+				<h:outputText value="Items Removed:" />
+				<h:outputText value="#{settingsBean.settings.nrMediaItemsRemoved}"/>								
+			</h:panelGrid>
+			<h:commandButton value="Synchronize" action="#{settingsBean.synchronize}"  type="button" 
+				onfocus="this.type = 'submit';" onblur="this.type = 'button';" style="margin: 10px;"/>
+		</rich:panel>	
+	</h:form>
+</h:body>
+</html>

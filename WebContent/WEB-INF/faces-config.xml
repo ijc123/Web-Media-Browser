@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+ <navigation-rule>
+  <from-view-id>/pages/login.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>login success</from-outcome>
+   <to-view-id>/pages/addtags.xhtml</to-view-id>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>login failure</from-outcome>
+   <to-view-id>/pages/login.xhtml</to-view-id>
+  </navigation-case>
+ </navigation-rule>
+ <application>
+  <resource-bundle>
+   <base-name>resources</base-name>
+   <var>msgs</var>
+  </resource-bundle>
+ </application>
+ <factory>
+  <exception-handler-factory>exceptions.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+ </factory>
+ <lifecycle>
+  <phase-listener>phaseListeners.PhaseDebugger</phase-listener>
+  <phase-listener>phaseListeners.MultipartPhaseListener</phase-listener>
+  <phase-listener>phaseListeners.DynamicResourcePhaseListener</phase-listener>
+ </lifecycle>
+</faces-config>

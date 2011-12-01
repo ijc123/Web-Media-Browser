@@ -1,0 +1,140 @@
+package database;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import org.apache.ibatis.session.SqlSession;
+
+@Stateless
+public class CategoryTable {
+	
+	@EJB
+	TypeTable typeTable;
+	
+	@SuppressWarnings("unchecked")
+	public List<CategoryItem> getCategoriesByType(String typeName) {
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		List<CategoryItem> category  = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoriesByType", typeName);
+			
+		session.close();
+		
+		return(category);
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<CategoryItem> getAllCategories() {
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		List<CategoryItem> category = (List<CategoryItem>) session.selectList("database.CategoryMapper.getAllCategories");		
+		
+		session.close();
+		
+		return(category);
+		
+	}
+	
+	public void setCategory(CategoryItem category) {
+	
+		if(category == null) return;
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		session.insert("database.CategoryMapper.setCategory", category);
+		
+		session.close();
+	}
+	
+	public void renameCategory(CategoryItem category, String newName) {
+		
+		if(category == null) return;
+		if(newName == null || newName.isEmpty()) return;
+		
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("typeName", category.getTypeName());
+		map.put("name", category.getName());
+		map.put("newName", newName);
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+				
+		session.update("database.CategoryMapper.renameCategory", map);
+	
+		session.close();
+	}
+	
+	public void deleteCategory(CategoryItem category) {
+		
+		if(category == null) return;
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		session.delete("database.CategoryMapper.deleteCategory", category);
+	
+		session.close();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<CategoryItem> getChildCategories(CategoryItem parent) {
+		
+		List<CategoryItem> category = null;
+		
+		if(parent.getFullName().equals("/")) {
+			
+			List<TypeItem> type = typeTable.getAllTypes();
+			
+			category = new ArrayList<CategoryItem>();
+			
+			for(int i = 0; i < type.size(); i++) {
+			
+				category.add(new CategoryItem("/" + type.get(i).getName()));
+			}
+			
+		} else {
+			
+			SqlSession session = MyBatis.getSession().openSession(); 
+				
+			category  = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoryByPrefix", parent);
+				
+			session.close();
+		}
+		
+		Map<String, CategoryItem> uniqueChildMap = new HashMap<String, CategoryItem>();
+		
+		for(int i = 0; i < category.size(); i++) {
+			
+			String fullName = category.get(i).getFullName();
+			
+			int parentLength = parent.getFullName().length();
+			int nextSlash = fullName.indexOf("/", parentLength + 1);
+			if(nextSlash == -1) nextSlash = fullName.length();
+			
+			String child = fullName.substring(parentLength, nextSlash);
+		
+			if(!uniqueChildMap.containsKey(child) && child.isEmpty() == false) {
+				uniqueChildMap.put(child, category.get(i));
+			}
+			
+		}
+		
+		category.clear();
+		
+		for(Map.Entry<String, CategoryItem> entry : uniqueChildMap.entrySet())
+		{
+			category.add(entry.getValue());
+		}
+
+		java.util.Collections.sort(category);
+		
+		return(category);
+	
+	}
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="onTagClick"/> 
+	<composite:attribute name="bean"  type="beans.tagSearch.TagSearchBean" required="true"/>
+</composite:interface>
+<composite:implementation>	
+	<rich:dataGrid id="tagDataGrid" value="#{cc.attrs.bean.relevantTagsByCategoryList}" var="tag"
+	    columns="5" elements="15" width="600px" border="0" style="margin-left:auto; margin-right:auto">
+	 <rich:panel onclick="#{cc.attrs.onTagClick}">
+	     <f:facet name="header">
+	         <h:outputText value="#{tag.name}" style="float:left;"/>
+	         <h:outputText value="#{tag.used}" style="float:right; color:red"/>
+	         <h:panelGroup layout="block" style="clear: both;"/>                      
+	     </f:facet>
+	     <h:panelGrid columns="2">
+	         <h:graphicImage id="tagImage" url="#{tag.shortTagImageURL}" style="height: 150px; display: block; 
+	         margin-left: auto; margin-right: auto"/>
+	        </h:panelGrid>
+	    </rich:panel>
+	    <f:facet name="footer">
+	        <rich:dataScroller />
+	    </f:facet>
+	</rich:dataGrid>	
+</composite:implementation>
+</body>
+</html>

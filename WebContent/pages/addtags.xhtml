@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j">
+<h:head>
+	<title>Add Tag(s)</title>
+	<h:outputScript library="javascript" name="addTag.js" target="head"/>
+	<meta http-equiv="pragma" content="no-cache" />
+</h:head>
+<h:body>	
+	<cc:navigationToolbar/>
+	<h:form id="addTagForm">
+		<rich:panel id="addTag" header="Add Tag">
+	   		<h:panelGrid columns="2">
+	   			<h:outputText value="Search:" />
+				<h:inputText id="query" label="query" value='#{addTagBean.fileNameQuery}' 
+				onkeypress="addTagJS.DoQuery(event,'#{cc.clientId}');"/>
+
+				<h:outputText value="Added Since:" />
+				<rich:calendar value="#{addTagBean.selectedDate}" id="calendar"
+                    locale="#{addTagBean.locale}" popup="true"
+                    datePattern="#{addTagBean.pattern}"
+                    showApplyButton="true" cellWidth="24px"
+                    cellHeight="22px" style="width:200px"/>							
+									
+			</h:panelGrid>
+			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>
+		</rich:panel>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j">
+<h:head>
+	<title>Create Tag</title>
+	<meta http-equiv="pragma" content="no-cache" />
+	<script type="text/javascript" src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0"/>
+	<script type="text/javascript">
+
+		google.load("search", "1");
+				
+	</script>	
+	<h:outputScript library="javascript" name="createTag.js" />
+</h:head>
+<h:body>	
+	<cc:navigationToolbar/>
+	<h:form id="createTagForm">
+	   	<rich:panel id="createTagPanel" header="Create Tag">
+	   		<h:panelGrid columns="2">
+	   		
+	   			<h:outputText value="Select Tag"/>
+	   			<h:panelGroup id="somePanel" name="somePanel">
+	   			<rich:select id="selectTag" enableManualInput="true" defaultLabel="start typing for select"
+	   				value="#{createTagBean.selectedTag}">
+                	<f:selectItems value="#{tagBean.allTags}" />
+                	<f:ajax event="selectitem" render="@form" execute="selectTag"/>
+            	</rich:select>
+				<a4j:commandButton id="newTagButton" value="New" render="@form" execute="@this" type="button">
+					<a4j:param value="true" assignTo="#{createTagBean.newTag}"/>
+				</a4j:commandButton>	
+				</h:panelGroup>
+					   			 	   		
+	   			<h:outputText value="Tag Name:"/>  	   			  	   		
+	   			<h:inputText id="tagName" value="#{createTagBean.tag.name}"/>
+	   					   				   						   				
+	   			<h:outputText value="Tag Image URL:" />
+	   			<h:inputText  id="tagImageURL" size="128" value="#{createTagBean.resourceURL}" 
+	   				onkeypress="ShowTagImage(this, event);"/>
+									   									   										
+	   			<h:outputText value="Tag Image:" />
+	   			<h:graphicImage id="tagImage" url="#{createTagBean.tag.shortTagImageURL}" />
+	   			
+	   			<h:outputText value="Search Tag Image:" />	 
+	   			<h:panelGroup>	
+	   				<h:inputText name="inputQuery" onkeypress="DoQuery(event, this);"/>
+	   				<h:panelGroup layout="block" id="content"/>	   					
+	   			</h:panelGroup>  			
+	   			
+	   			<h:outputText value="Tag Category:"/>
+	   			<cc:tagCategoryTable/>
+	   			
+	   			<h:outputText value="Link Tags:"/>	   
+	   			<cc:multiTagPicker id="multiTagPicker" selected="#{createTagBean.tag.linkedTagNames}"/>		
+	   			
+		</h:panelGrid>							
+		<!--	To prevent enter from submitting the form in input fields 
+		change button type from submit to button and change it back to submit using
+		javascript on the onfocus event, the subsequent form submit will restore the button type   -->
+		<h:commandButton value="#{createTagBean.newTag ? 'Create' : 'Modify'}" action="#{createTagBean.modify}"  
+			type="button"  onfocus="this.type = 'submit';" onblur="this.type = 'button';" id="modifyButton" style="margin: 10px;"/>
+			
+		<h:commandButton value="Delete" action="#{createTagBean.deleteTag}"  type="button" 
+			onfocus="this.type = 'submit';" onblur="this.type = 'button';" id="deleteButton"
+			rendered="#{!createTagBean.newTag}"/>							
+	    </rich:panel>		    		    	
+    </h:form>
+</h:body>
+</html>

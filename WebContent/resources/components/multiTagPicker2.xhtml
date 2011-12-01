@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="taggableBean" required="false"/>
+	<composite:attribute name="id" required="false"/>
+</composite:interface>
+<composite:implementation>
+   	<h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
+   	<h:outputScript library="javascript" name="jquery.json-2.2.js" target="head"/>
+   	<h:outputScript library="components" name="multiTagPicker.js" target="head"/>
+   	<a4j:jsFunction name="addSelection" render="selectedTagsPanel">
+         <a4j:param name="name" assignTo="#{cc.attrs.taggableBean.addTag}"/>
+    </a4j:jsFunction>
+    <a4j:jsFunction name="removeSelection" render="selectedTagsPanel">
+         <a4j:param name="name" assignTo="#{cc.attrs.taggableBean.removeTag}"/>
+    </a4j:jsFunction>
+   	<h:panelGrid id="#{cc.attrs.id}" border="0" columns="2">
+   	
+   		<rich:panel id="quickSelectPanel" style="height:40px; width: 500px; overflow:auto;">
+   			<rich:autocomplete id="tagAutoComplete"  value="#{cc.attrs.taggableBean.addTag}"
+	   				autocompleteMethod="#{tagBean.suggestAutoComplete}" minChars="0" 
+	   				mode="ajax"  autofill="true" selectFirst="true" />   
+	   		<a4j:commandButton id="addButton" render="selectedTagsPanel quickSelectPanel" 
+   				execute="tagAutoComplete" value="add" style="float: right"/>	 				 					   								
+		</rich:panel>	   	
+		
+		<rich:panel id="quickSelectButtonPanel" style="height:40px; width: 200px; overflow:auto;">
+  			<a4j:commandButton id="clearButton" render="selectedTagsPanel"  value="clear" style="float: right">	 
+   				 <a4j:param name="dummy" value="true" assignTo="#{cc.attrs.taggableBean.clearSelectedTags}" />
+             </a4j:commandButton>
+		</rich:panel>	 		
+   	
+   		<rich:panel id="tagTreePanel" style="height:100px; width: 500px; overflow:auto;">
+			<cc:tagPicker id="tagTree"  ontagclick="addSelection('#{item}')"/>			
+		</rich:panel>
+		
+		<rich:panel id="selectedTagsPanel" style="height:100px; width: 200px; overflow:auto;">	
+			<rich:list id="selectedList" value="#{cc.attrs.taggableBean.selectedTags}" var="tag">        		
+   				<h:outputLink value="#" onclick="removeSelection('#{tag}');return false;">
+     				<h:outputText value="#{tag}"/>
+     			</h:outputLink>
+			</rich:list>
+		</rich:panel>
+	</h:panelGrid>		
+</composite:implementation>
+</body>
+</html>

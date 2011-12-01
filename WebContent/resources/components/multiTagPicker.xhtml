@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:rich="http://richfaces.org/rich">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="selected" type="java.util.List" required="false"/>
+	<composite:attribute name="id" required="false"/>
+</composite:interface>
+<composite:implementation>
+   	<h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
+   	<h:outputScript library="javascript" name="jquery.json-2.2.js" target="head"/>
+   	<h:outputScript library="components" name="multiTagPicker.js" target="head"/>
+   	<h:panelGrid id="#{cc.attrs.id}" border="0" columns="2">
+   	
+   		<rich:panel id="tagTreePanel" style="height:100px; width: 500px; overflow:auto;">
+			<cc:tagPicker id="tagTree" ontagclick="multiTagPicker.AddSelectedTag('#{cc.clientId}', '#{item}')"/>
+		</rich:panel>
+		
+		<rich:panel id="selectedTagsPanel" style="height:100px; width: 200px; overflow:auto;">	
+			<h:inputHidden id="hiddenSelectedTags" value="#{cc.attrs.selected}" 
+				converter="converters.SelectedTagsConverter"/>
+			<rich:list id="selectedList" value="#{cc.attrs.selected}" var="tag">        		
+   				<h:outputLink value="#" onclick="multiTagPicker.RemoveSelectedTag(this, '#{cc.clientId}','#{tag}');return false;">
+     				<h:outputText value="#{tag}"/>
+     			</h:outputLink>
+			</rich:list>
+		</rich:panel>
+	</h:panelGrid>		
+</composite:implementation>
+</body>
+</html>

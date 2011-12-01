@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+
+<composite:interface>
+	<composite:attribute name="root" required="true"></composite:attribute>
+</composite:interface>
+
+<composite:implementation>
+<h:outputScript library="components" name="addFile.js" target="head"/>
+<h:form method="post" enctype="multipart/form-data" action="">
+	<fieldset>
+	<legend>Add File</legend>
+		<div>
+			Browse: <input type="file" name="uploadFile"  id="uploadFile" onchange="setDefaultRenameText()"></input>
+		</div>
+		<div>
+			Rename: <input type="text" name="renameFile" id="renameFile"></input>
+		</div>
+		<div>
+			<my:fileSelectOne size="5" root="#{cc.attrs.root}"/>
+		</div>
+		<div>
+			<input type="submit" value="Submit"></input>	
+		</div>
+	</fieldset>	
+</h:form>
+</composite:implementation>
+
+</body>
+</html>

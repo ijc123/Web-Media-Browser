@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.MediaLocationMapper">
+	
+	<select id="getMediaLocations" resultType="MediaLocationItem">
+		SELECT 
+			location as location,
+			type as typeName,
+			video as video,
+			audio as audio,
+			images as images
+		FROM medialocation
+	</select>
+	
+	<insert id="setMediaLocations" parameterType="MediaLocationItem">
+		INSERT INTO medialocation (location, type, video, audio, images)
+		VALUES (#{location}, #{typeName}, #{video}, #{audio}, #{images})
+	</insert>
+	
+	<delete id="deleteMediaLocations">
+		DELETE FROM medialocation
+	</delete>
+	
+</mapper>
+

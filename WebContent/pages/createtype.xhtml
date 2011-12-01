@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<h:head>
+	<title>Create Type</title>
+</h:head>
+<h:body>	
+	<cc:navigationToolbar/>
+	<h:form>
+		<rich:panel id="createTypePanel" header="Create Type">
+			<cc:typeTable/>
+			<h:commandButton value="Update" action="#{createTypeBean.update}"  type="button" 
+				onfocus="this.type = 'submit';" onblur="this.type = 'button';" style="margin: 10px;"/>			
+		</rich:panel>
+	</h:form>
+</h:body>
+</html>

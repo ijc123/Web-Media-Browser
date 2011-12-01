@@ -1,0 +1,49 @@
+package beans.tagTree;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import database.TagItem;
+import database.TagTable;
+
+public class TagPickerNode extends Node<TagPickerNode> {
+
+	List<String> tags;
+
+
+	public TagPickerNode(String path) {
+		
+		super(path, TagPickerNode.class);
+        
+	}
+		
+	public List<String> getTags() {
+		
+		if(tags != null) return(tags);
+						
+		TagTable tagTable = null;
+		
+		try {
+			tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		List<TagItem> result = tagTable.getTagsByCategory(category);
+		
+		tags = new ArrayList<String>();
+		
+		for(int i = 0; i < result.size(); i++) {
+			
+			tags.add(result.get(i).getName());
+			
+		}
+		
+		return(tags);
+	}
+	
+}

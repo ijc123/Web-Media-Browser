@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:cc="http://java.sun.com/jsf/composite/components/"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:my="/WEB-INF/mytags">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+<composite:interface>
+	<composite:attribute name="location" type="java.lang.String" required="true"/>
+	<composite:attribute name="style" required="false"/>
+</composite:interface>
+<composite:implementation>
+	<h:outputScript library="components" name="locationPickerButton.js" target="head"/>
+	<h:commandButton id="mediaLocation" value="#{cc.attrs.location}" style="#{cc.attrs.style}">
+       	<rich:componentControl target="popup" operation="show" />
+   	</h:commandButton>
+   	<rich:popupPanel id="popup" modal="true" autosized="true" resizeable="false"
+        onmaskclick="#{rich:component('popup')}.hide(); locationPickerButton.Redraw('#{cc.clientId}');">
+        <f:facet name="header">
+            <h:outputText value="Select Location" />
+        </f:facet>
+        <my:fileSelectOne value="#{cc.attrs.location}" hideFiles="true" size="20"/>
+        <h:commandButton value="ok" onclick="#{rich:component('popup')}.hide(); locationPickerButton.Redraw('#{cc.clientId}'); return false;"/>
+   	</rich:popupPanel>          	
+</composite:implementation>
+</body>
+</html>

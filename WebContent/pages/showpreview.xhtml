@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:my="/WEB-INF/mytags"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j">
+<h:head>	
+	<f:metadata>
+		<f:viewParam name="uri" value="#{largePreviewImageBean.uri}"/> 
+	</f:metadata>
+	<title>#{largePreviewImageBean.fileName}</title>
+</h:head>
+<h:body>	
+	<h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
+	<h:outputScript library="javascript" name="showPreview.js" target="head"/>
+	<cc:navigationToolbar/>	
+	<rich:panel id="modifyTag"  style="height: 650px; overflow:auto;">	
+		<h:graphicImage id="previewImage" url="#{largePreviewImageBean.previewURL}" 
+		style="display:block; margin-left:auto; margin-right:auto" 
+		onclick="#{rich:component('popup')}.show(); 
+			showPreview.StartVideo('mediaPlayer', event, this, #{largePreviewImageBean.imageInfo}); 
+			return false;"/>
+	</rich:panel>
+    <rich:popupPanel id="popup" modal="false" autosized="true" resizeable="false">
+        <f:facet name="header">
+            <h:outputText value="#{largePreviewImageBean.fileName}" />
+        </f:facet>
+        <f:facet name="controls">
+            <h:outputLink value="#" 
+            onclick="#{rich:component('popup')}.hide(); return false;">
+                    X
+            </h:outputLink>
+        </f:facet>
+       <my:mediaPlayer id="mediaPlayer" uri="#{largePreviewImageBean.uri}" autostart="false"/>
+    </rich:popupPanel>
+	<h:form>
+		<rich:panel id="modifyTag" header="Modify Tags">		
+			<cc:multiTagPicker2 taggableBean="#{largePreviewImageBean}"/>
+			<h:commandButton type="button" value="Modify">
+				<f:ajax listener="#{largePreviewImageBean.replaceTagsEvent}" render="@form"/>
+			</h:commandButton>
+		</rich:panel>		
+	</h:form>
+</h:body>
+</html>
