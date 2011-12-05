@@ -24,7 +24,7 @@
                 </f:facet>
                 <rich:menuItem submitMode="client"
                     onclick="document.location.href='createtype.jsf'">
-                        <h:outputText value="Create Type" />
+                        <h:outputText value="Type" />
                 </rich:menuItem>             
                 <rich:menuItem submitMode="client"
                     onclick="document.location.href='settings.jsf'">
@@ -54,6 +54,19 @@
                         <h:outputText value="Search" />
                 </rich:menuItem> 
             </rich:dropDownMenu>
+            <rich:toolbarGroup location="right">
+	            <rich:dropDownMenu mode="ajax">
+	                <f:facet name="label">
+	                    <h:panelGrid cellpadding="0" cellspacing="0" columns="2" style="vertical-align:middle">
+	                        <h:outputText value="#{loginBean.currentUser.name}" style="color:blue"/>
+	                    </h:panelGrid>
+	                </f:facet>
+	                <rich:menuItem submitMode="client"
+	                    onclick="document.location.href='logout.jsf'">
+	                        <h:outputText value="Logout" />
+	                </rich:menuItem> 
+	            </rich:dropDownMenu>
+            </rich:toolbarGroup>     
         </rich:toolbar>
    </h:form>
 </composite:implementation>

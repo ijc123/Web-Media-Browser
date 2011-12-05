@@ -32,36 +32,29 @@
 			<f:facet name="header">
 			   <h:outputText value="Select Tags"/>          
 			</f:facet>
-			
-			
-				<rich:panel style="float: left"> 	
-				<h:selectOneMenu id="type" value="#{tagSearchBean.typeName}">
-					<f:selectItems value="#{typeBean.allTypeNames}" /> 
-					<f:ajax render="tagCategory tabPanel" event="change" execute="type"/>
-		 		</h:selectOneMenu>
-			
-				<h:selectOneMenu id="tagCategory" value="#{tagSearchBean.category}">
-					<f:selectItems value="#{tagSearchBean.categoryList}" /> 
-					<f:ajax render="tabPanel" event="change" execute="tagCategory"/>
-		 		</h:selectOneMenu>
-		 		</rich:panel>
-		 			
-		 		<rich:panel style="float: right"> 	 	
-		 		<h:selectOneRadio id="sortOrder" value="#{tagSearchBean.sortMode}">
-	  				<f:selectItem itemLabel="Alphabethical" itemValue="0" />
-	  				<f:selectItem itemLabel="Results" itemValue="1" />
-	  				<f:ajax render="sortOrder tabPanel" event="change" execute="sortOrder" />
-				</h:selectOneRadio>	
-				</rich:panel> 	
-				
-				<rich:panel style="float: right"> 
-				<h:selectOneRadio id="searchMode" value="#{tagSearchBean.searchMode}">
-	  				<f:selectItem itemLabel="Media" itemValue="0" />
-	  				<f:selectItem itemLabel="Tags" itemValue="1" />
-	  				<f:ajax render="searchMode tabPanel" event="change" execute="searchMode" />
-				</h:selectOneRadio>		 		
-	   			</rich:panel> 
-			   
+						
+			<h:selectOneMenu id="type" value="#{tagSearchBean.typeName}" style="float: left">
+				<f:selectItems value="#{typeBean.allTypeNames}" /> 
+				<f:ajax render="tagCategory tabPanel" event="change" execute="type"/>
+	 		</h:selectOneMenu>
+		
+			<h:selectOneMenu id="tagCategory" value="#{tagSearchBean.category}" style="float: left">
+				<f:selectItems value="#{tagSearchBean.categoryList}" /> 
+				<f:ajax render="tabPanel" event="change" execute="tagCategory"/>
+	 		</h:selectOneMenu>
+	 	
+	 		<h:selectOneRadio id="sortOrder" value="#{tagSearchBean.sortMode}" style="float: right">
+  				<f:selectItem itemLabel="Alphabethical" itemValue="0" />
+  				<f:selectItem itemLabel="Results" itemValue="1" />
+  				<f:ajax render="sortOrder tabPanel" event="change" execute="sortOrder" />
+			</h:selectOneRadio>	
+
+			<h:selectOneRadio id="searchMode" value="#{tagSearchBean.searchMode}" style="float: right">
+  				<f:selectItem itemLabel="Media" itemValue="0" />
+  				<f:selectItem itemLabel="Tags" itemValue="1" />
+  				<f:ajax render="searchMode tabPanel" event="change" execute="searchMode" />
+			</h:selectOneRadio>		 		
+ 
 			<rich:tabPanel switchType="client" activeItem="#{tagSearchBean.selectedTab}" id="tabPanel" style="clear: both">
 				<rich:tab id="category">
 					<f:facet name="header">
