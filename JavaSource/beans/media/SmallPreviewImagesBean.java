@@ -5,15 +5,15 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.context.RequestScoped;
 import javax.faces.application.ViewHandler;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Named;
 
 import database.MediaItem;
 
-@ManagedBean
 @RequestScoped
+@Named
 public class SmallPreviewImagesBean {
 	
 	public List<String> imagesURLList(MediaItem media) {

@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.CategoryItem;
 import database.CategoryTable;
@@ -18,19 +18,19 @@ import database.TagTable;
 import database.TypeItem;
 import database.TypeTable;
 
-@ManagedBean
 @ViewScoped
+@Named
 public class CreateTagBean implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@EJB
+	@Inject
 	private CategoryTable categoryTable;
-	@EJB
+	@Inject
 	private TypeTable typeTable;
-	@EJB
+	@Inject
 	private TagTable tagTable;
 	
 	private boolean isNewTag;

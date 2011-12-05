@@ -3,6 +3,7 @@ package beans.media;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -10,17 +11,21 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.faces.application.ViewHandler;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.imageio.ImageIO;
+import javax.inject.Named;
 
 import com.google.gson.Gson;
 
-@ManagedBean
 @ViewScoped
-public class LargePreviewImageBean extends Taggable {
+@Named
+public class LargePreviewImageBean extends Taggable implements Serializable {
 		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String largeImagePath;
 	private List<String> smallImagesPath;
 	private String previewURL;

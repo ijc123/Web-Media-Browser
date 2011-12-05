@@ -1,5 +1,6 @@
 package beans.tagSearch;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,10 +14,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.CategoryItem;
 import database.CategoryTable;
@@ -27,10 +28,15 @@ import database.TagTable;
 import database.TypeItem;
 import database.TypeTable;
 
-@ManagedBean
 @ViewScoped
-public class TagSearchBean {
+@Named
+public class TagSearchBean implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	static final Comparator<TagItem> ALPHABETHICAL_ORDER = new Comparator<TagItem>() {
 
 		public int compare(TagItem a, TagItem b) {
@@ -50,13 +56,13 @@ public class TagSearchBean {
 		}
 	};
 
-	@EJB
+	@Inject
 	CategoryTable categoryTable;
-	@EJB
+	@Inject
 	TypeTable typeTable;
-	@EJB
+	@Inject
 	private TagTable tagTable;
-	@EJB
+	@Inject
 	private MediaTable mediaTable;
 	
 	private TypeItem type;

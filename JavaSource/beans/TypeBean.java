@@ -3,18 +3,18 @@ package beans;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.TypeItem;
 import database.TypeTable;
 
-@ManagedBean
 @RequestScoped
+@Named
 public class TypeBean {
 	
-	@EJB
+	@Inject
 	private TypeTable typeTable;
 
 	public List<String> getAllTypeNames() {

@@ -4,7 +4,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
 @RequestScoped
-@Named("credentialsBean")
+@Named
 public class CredentialsBean {
 
     private String username;

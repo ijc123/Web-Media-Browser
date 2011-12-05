@@ -1,23 +1,30 @@
 package beans;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.TypeItem;
 import database.TypeTable;
 
-@ManagedBean
+
 @ViewScoped
-public class CreateTypeBean {
+@Named
+public class CreateTypeBean implements Serializable {
 	
-	@EJB
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Inject
 	private TypeTable typeTable;
 
 	private DataModel<TypeItem> dataModel;

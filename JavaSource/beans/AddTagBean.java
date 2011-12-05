@@ -6,18 +6,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.MediaItem;
 import database.MediaTable;
 
-@ManagedBean
 @ViewScoped
+@Named
 public class AddTagBean implements Serializable {
 
-	@EJB
+	@Inject
 	private MediaTable mediaTable;
 
 	private static final long serialVersionUID = 1L;

@@ -1,25 +1,31 @@
 package beans.queryTable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import multiTagPicker.MultiTagPickerSupport;
 import database.MediaItem;
 import database.MediaTable;
 
-@ManagedBean
 @ViewScoped
-public class QueryTableBean extends MultiTagPickerSupport {
+@Named
+public class QueryTableBean extends MultiTagPickerSupport implements Serializable {
 	
-	@EJB
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Inject
 	private MediaTable mediaTable;
 	
 	protected Comparator<MediaItem> sortOrder;

@@ -1,26 +1,33 @@
 package beans;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.MediaLocationItem;
 import database.MediaTable;
 import database.SettingsTable;
 
-@ManagedBean
-@ViewScoped
-public class SettingsBean {
 
-	@EJB
+@ViewScoped
+@Named
+public class SettingsBean implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Inject
 	private SettingsTable settingsTable;
 	
-	@EJB
+	@Inject
 	private MediaTable mediaTable;
 		
 	private DataModel<MediaLocationItem> dataModel;

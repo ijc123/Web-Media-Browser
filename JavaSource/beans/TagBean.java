@@ -5,18 +5,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import database.TagItem;
 import database.TagTable;
 
-@ManagedBean
 @RequestScoped
+@Named
 public class TagBean {
 
-	@EJB
+	@Inject
 	private TagTable tagTable;
 	
 	static final Comparator<TagItem> USAGE_ORDER = 
