@@ -9,7 +9,8 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import fileUtils.MimeType;
+import utils.MimeType;
+
 
 public class MediaItem {
 	

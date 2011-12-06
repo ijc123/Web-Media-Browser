@@ -4,36 +4,47 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="database.CategoryMapper">
 		
-	<select id="getCategoriesByType" parameterType="String" resultType="CategoryItem">
+	<sql id="accessTypesFilter">
+		type IN
+		<foreach item="item" index="i" collection="accessTypes" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</sql>
+		
+	<select id="getCategoriesByType" parameterType="Map" resultType="CategoryItem">
 		SELECT 
 			name, 
 			type as typeName 
 		FROM category 
-		WHERE type = #{type}
+		WHERE type = #{typeName}
+		AND <include refid="accessTypesFilter"/>
 	</select>
 	
-	<select id="getCategoryByName" parameterType="String" resultType="CategoryItem">
+	<select id="getCategoryByName" parameterType="Map" resultType="CategoryItem">
 		SELECT 
 			name, 
 			type as typeName 
 		FROM category 
 		WHERE name = #{name}
+		AND <include refid="accessTypesFilter"/>
 	</select>
 	
-	<select id="getCategoryByPrefix" parameterType="CategoryItem" resultType="CategoryItem">
+	<select id="getCategoryByPrefix" parameterType="Map" resultType="CategoryItem">
 		SELECT 
 			name, 
 			type as typeName, 
 			CONCAT('/',type, name) as fullCategory 
 		FROM category 
-		HAVING fullCategory REGEXP #{fullName} '*';
+		WHERE <include refid="accessTypesFilter"/>
+		HAVING fullCategory REGEXP #{category.fullName} '*';
 	</select>
 
-	<select id="getAllCategories" resultType="CategoryItem">
+	<select id="getAllCategories" parameterType="Map" resultType="CategoryItem">
 		SELECT 
 			name, 
 			type as typeName 
 		FROM category 
+		WHERE <include refid="accessTypesFilter"/>
 	</select>
 
 	<insert id="setCategory" parameterType="CategoryItem">

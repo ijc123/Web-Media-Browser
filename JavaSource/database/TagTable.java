@@ -7,17 +7,21 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.jboss.ejb3.annotation.IgnoreDependency;
+
+import utils.MapArgument;
+
+import beans.user.LoginBean;
 
 @Stateless
 public class TagTable {
@@ -26,6 +30,9 @@ public class TagTable {
 	@IgnoreDependency
 	private MediaTable mediaTable;
 	
+	@Inject
+	private LoginBean loginBean;
+		
 	public TagItem getTagByName(String name) {
 		
 		if(name == null) return(null);
@@ -48,14 +55,21 @@ public class TagTable {
 
 	@SuppressWarnings("unchecked")
 	public List<TagItem> getTagByName(List<String> name) {
-						
+					
 		List<TagItem> results = new ArrayList<TagItem>();
 				
 		if(name.isEmpty()) return(results);
-						
+							
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		results = (List<TagItem>) session.selectList("database.TagMapper.getTagsByName", name);
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(
+				"name", name,
+				"accessTypes", accessTypes
+				);
+		
+		results = (List<TagItem>) session.selectList("database.TagMapper.getTagsByName", map);
 			
 		session.close();
 		
@@ -101,7 +115,14 @@ public class TagTable {
 			
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getTagsByCategory", category);
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(
+				"category", category,
+				"accessTypes", accessTypes
+				);
+		
+		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getTagsByCategory", map);
 		
 		session.close();
 		
@@ -114,7 +135,13 @@ public class TagTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getAllTags");
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(
+				"accessTypes", accessTypes
+				);
+		
+		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getAllTags", map);
 		
 		session.close();
 		
@@ -155,7 +182,14 @@ public class TagTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getTagsByNameQuery", name + "%");
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(
+				"name", name + "%",
+				"accessTypes", accessTypes
+				);
+		
+		List<TagItem> tag = (List<TagItem>) session.selectList("database.TagMapper.getTagsByNameQuery", map);
 			
 		session.close();
 		
@@ -225,11 +259,11 @@ public class TagTable {
 									
 		for(int i = 0; i < linkedTags.size(); i++) {
 			
-			Map<String, String> map = new HashMap<String, String>();
-			
-			map.put("tag", tagItem.getName());
-			map.put("linked", linkedTags.get(i));
-		
+			Map<String, Object> map = MapArgument.create(
+					"tag", tagItem.getName(),
+					"linked", linkedTags.get(i)
+					);
+					
 			session.insert("database.TagMapper.setTagLinked", map);
 			
 		}
@@ -245,10 +279,10 @@ public class TagTable {
 					
 		for(int i = 0; i < linkedTags.size(); i++) {
 			
-			Map<String, String> map = new HashMap<String, String>();
-			
-			map.put("tag", tag);
-			map.put("linked", linkedTags.get(i));
+			Map<String, Object> map = MapArgument.create(			
+				"tag", tag,
+				"linked", linkedTags.get(i)
+				);
 		
 			session.delete("database.TagMapper.deleteTagLinked", map);
 			
@@ -266,11 +300,11 @@ public class TagTable {
 							
 		for(int i = 0; i < category.size(); i++) {
 			
-			Map<String, String> map = new HashMap<String, String>();
-			
-			map.put("tag", tagItem.getName());
-			map.put("category", category.get(i).getName());
-			map.put("type", category.get(i).getTypeName());
+			Map<String, Object> map = MapArgument.create(
+				"tag", tagItem.getName(),
+				"category", category.get(i).getName(),
+				"type", category.get(i).getTypeName()
+				);
 		
 			session.insert("database.TagMapper.setTagCategory", map);
 			
@@ -287,11 +321,11 @@ public class TagTable {
 					
 		for(int i = 0; i < category.size(); i++) {
 			
-			Map<String, String> map = new HashMap<String, String>();
-			
-			map.put("tag", name);
-			map.put("category", category.get(i).getName());
-			map.put("type", category.get(i).getTypeName());
+			Map<String, Object> map = MapArgument.create(
+					"tag", name,
+					"category", category.get(i).getName(),
+					"type", category.get(i).getTypeName()
+					);
 		
 			session.delete("database.TagMapper.deleteTagCategory", map);
 			
@@ -316,11 +350,14 @@ public class TagTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		Map<String, Object> map = new HashMap<String, Object>();
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
 		
-		map.put("children", children);
-		map.put("size", children.size());
-					
+		Map<String, Object> map = MapArgument.create(
+				"children", children, 
+				"size", children.size(),
+				"accessTypes", accessTypes
+				);
+							
 		List<TagItem> parentTags =
 				(List<TagItem>) session.selectList("database.TagMapper.getParentTags", map);
 		
@@ -436,11 +473,11 @@ public class TagTable {
 				suffix = filename.substring(lastDot).toLowerCase();
 			}
 
-			String mimeType = fileUtils.MimeType.getMimeTypeFromExt(suffix);
+			String mimeType = utils.MimeType.getMimeTypeFromExt(suffix);
 
 			if(!mimeType.startsWith("image")) {	
 				// dont't know what kind of image this is, just guess it's a jpg
-				mimeType = fileUtils.MimeType.getMimeTypeFromExt(".jpg");
+				mimeType = utils.MimeType.getMimeTypeFromExt(".jpg");
 			}
 
 			input = new BufferedInputStream(u.openStream());			

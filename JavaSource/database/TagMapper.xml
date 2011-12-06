@@ -21,6 +21,13 @@
 			ON tags.name = tagscategory.tag
 	</sql>
 	
+	<sql id="accessTypesFilter">
+		tagscategory.type IN
+		<foreach item="item" index="i" collection="accessTypes" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</sql>
+	
 	<resultMap id="tagItemResults" type="TagItem"> 		
   		<id property="name" column="tag_name"/>
   		<result property="id" column="tag_id"/>  		
@@ -42,29 +49,34 @@
 		WHERE tags.id IN
 		<foreach item="item" index="i" collection="list" open="(" separator="," close=")">
 			#{item}
-		</foreach>
+		</foreach>		
 	</select>
 
-	<select id="getTagsByName" parameterType="String" resultMap="tagItemResults">
+	<select id="getTagsByName" parameterType="Map" resultMap="tagItemResults">
 		<include refid="selectTags"/>
 		WHERE tags.name IN
-		<foreach item="item" index="i" collection="list" open="(" separator="," close=")">
+		<foreach item="item" index="i" collection="name" open="(" separator="," close=")">
 			#{item}
 		</foreach>
+		AND <include refid="accessTypesFilter"/>
 	</select>
 	
-	<select id="getTagsByCategory" parameterType="CategoryItem" resultMap="tagItemResults">		
+	<select id="getTagsByCategory" parameterType="Map" resultMap="tagItemResults">		
 		<include refid="selectTags"/>
-		WHERE tagscategory.type = #{typeName} AND tagscategory.category = #{name}
+		WHERE tagscategory.type = #{category.typeName} 
+		AND tagscategory.category = #{category.name}
+		AND <include refid="accessTypesFilter"/>
 	</select>
 	
 	<select id="getTagsByNameQuery" parameterType="String" resultMap="tagItemResults">
 		<include refid="selectTags"/>
 		WHERE tags.name LIKE #{name}
+		AND <include refid="accessTypesFilter"/>
 	</select>
 	
-	<select id="getAllTags" resultMap="tagItemResults">
+	<select id="getAllTags" parameterType="Map" resultMap="tagItemResults">
 		<include refid="selectTags"/>
+		WHERE <include refid="accessTypesFilter"/>
 	</select>
 				
 	<insert id="insertTag" parameterType="TagItem">
@@ -107,7 +119,7 @@
 			tagscategory.category AS category 
 		FROM 
 			(SELECT tags.*
-					from tags
+					FROM tags
 				LEFT OUTER JOIN tagslinked
 					ON tags.name = tagslinked.tag
 				WHERE
@@ -123,6 +135,7 @@
 			ON temp.name = tagslinked.tag				
 		INNER JOIN tagscategory
 			ON temp.name = tagscategory.tag
+		WHERE <include refid="accessTypesFilter"/>
 	</select>
 			
 	<insert id="setTagImage" parameterType="TagImageItem">

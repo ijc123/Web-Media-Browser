@@ -11,11 +11,16 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import fileUtils.FileUtils;
+import beans.user.LoginBean;
+
+import utils.FileUtils;
+import utils.MapArgument;
+
 
 @Stateless
 public class MediaTable {
@@ -26,15 +31,22 @@ public class MediaTable {
 	@EJB
 	TagTable tagTable;
 	
+	@Inject
+	LoginBean loginBean;
+	
+	
 	@SuppressWarnings("unchecked")
 	public List<MediaItem> getMediaByTagQuery(final List<String> tag) {
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map.put("tags", tag);
-		map.put("size", tag.size());
-				
+						
 		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"tags", tag,
+				"size", tag.size(),
+				"accessTypes", accessTypes
+				);
 		
 		List<MediaItem> media  = (List<MediaItem>) session.selectList("database.MediaMapper.getMediaByTagQuery", map);
 		
@@ -46,7 +58,9 @@ public class MediaTable {
 	@SuppressWarnings("unchecked")
 	public List<MediaItem> getMediaByFilenameQuery(String query, java.sql.Timestamp timeStamp) {
 		
-		Map<String, String> map = new HashMap<String, String>();
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		if(query != null && query != "") {
 			
@@ -60,8 +74,10 @@ public class MediaTable {
 			map.put("timeStamp", timeStampString);
 		}
 	
-		SqlSession session = MyBatis.getSession().openSession(); 
-			
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		map.put("accessTypes", accessTypes);
+						
 		List<MediaItem> result = (List<MediaItem>)session.selectList("database.MediaMapper.getMediaByFilenameQuery", map);		
 		
 		session.close();
@@ -74,7 +90,14 @@ public class MediaTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		MediaItem media  = (MediaItem) session.selectOne("database.MediaMapper.getMediaByUri", uri);
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"uri", uri,
+				"accessTypes", accessTypes
+				);
+		
+		MediaItem media  = (MediaItem) session.selectOne("database.MediaMapper.getMediaByUri", map);
 		
 		session.close();
 		
@@ -87,7 +110,13 @@ public class MediaTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<MediaItem> media  = (List<MediaItem>) session.selectList("database.MediaMapper.getAllMedia");
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"accessTypes", accessTypes
+				);
+		
+		List<MediaItem> media  = (List<MediaItem>) session.selectList("database.MediaMapper.getAllMedia", map);
 		
 		session.close();
 		

@@ -20,6 +20,13 @@
 			ON media.uri = mediatag.uri
 	</sql>
 	
+	<sql id="accessTypesFilter">
+		mediatype.type IN
+		<foreach item="item" index="i" collection="accessTypes" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</sql>
+	
 	<resultMap id="mediaItemResults" type="MediaItem"> 		
   		<id property="uri" column="media_uri"/>
   		<result property="fileName" column="media_filename"/>   
@@ -50,7 +57,7 @@
 			GROUP BY uri
 			HAVING count(*) = #{size}
 		)	-->	
-	<select id="getMediaByTagQuery" parameterType="hashmap" resultMap="mediaItemResults">
+	<select id="getMediaByTagQuery" parameterType="Map" resultMap="mediaItemResults">
 		SELECT 
 			temp.uri AS media_uri,
 			temp.filename AS media_filename,
@@ -76,9 +83,10 @@
 			ON mediatag.uri = temp.uri
 		INNER JOIN mediatype
 			ON mediatype.uri = temp.uri	
+		WHERE <include refid="accessTypesFilter"/> 
 	</select>
 
-	<select id="getMediaByFilenameQuery" parameterType="map" resultMap="mediaItemResults">
+	<select id="getMediaByFilenameQuery" parameterType="Map" resultMap="mediaItemResults">
 		<include refid="selectMedia"/> 
 		WHERE 
 		<choose>
@@ -92,15 +100,18 @@
 				media.creation > #{timeStamp}
 			</otherwise>
 		</choose>
+		AND <include refid="accessTypesFilter"/> 
 	</select>
 	
-	<select id="getMediaByUri" parameterType="string" resultMap="mediaItemResults">
+	<select id="getMediaByUri" parameterType="Map" resultMap="mediaItemResults">
 		<include refid="selectMedia"/>
-		WHERE media.uri = #{uri}	
+		WHERE media.uri = #{uri}
+		AND <include refid="accessTypesFilter"/> 	
 	</select>
 
-	<select id="getAllMedia" parameterType="string" resultMap="mediaItemResults">
+	<select id="getAllMedia" parameterType="Map" resultMap="mediaItemResults">
 		<include refid="selectMedia"/>	
+		WHERE <include refid="accessTypesFilter"/> 
 	</select>
 
 	<insert id="setMedia" parameterType="mediaItem">

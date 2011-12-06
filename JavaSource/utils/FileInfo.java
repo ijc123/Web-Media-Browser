@@ -1,4 +1,4 @@
-package fileUtils;
+package utils;
 
 public class FileInfo {
 

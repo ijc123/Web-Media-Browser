@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 import database.TagImageItem;
 import database.TagTable;
 
+import utils.MimeType;
 import video.HTTPLiveStreaming;
 
-import fileUtils.MimeType;
 
 public class DynamicResourcePhaseListener implements PhaseListener {
 

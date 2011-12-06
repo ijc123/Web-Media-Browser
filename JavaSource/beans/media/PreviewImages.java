@@ -12,10 +12,11 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 
+import utils.FileUtils;
+
 import database.MediaTable;
 import database.SettingsTable;
 
-import fileUtils.FileUtils;
 
 public class PreviewImages {
 	

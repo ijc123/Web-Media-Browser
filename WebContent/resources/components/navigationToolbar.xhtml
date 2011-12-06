@@ -61,8 +61,7 @@
 	                        <h:outputText value="#{loginBean.currentUser.name}" style="color:blue"/>
 	                    </h:panelGrid>
 	                </f:facet>
-	                <rich:menuItem submitMode="client"
-	                    onclick="document.location.href='logout.jsf'">
+	                <rich:menuItem submitMode="client" action="#{loginBean.logout}">
 	                        <h:outputText value="Logout" />
 	                </rich:menuItem> 
 	            </rich:dropDownMenu>

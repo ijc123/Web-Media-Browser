@@ -5,11 +5,19 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.apache.ibatis.session.SqlSession;
 
+import utils.MapArgument;
+
+import beans.user.LoginBean;
+
 @Stateless
 public class TypeTable {
+	
+	@Inject
+	LoginBean loginBean;
 	
 	public boolean updateAllTypes(List<TypeItem> type) {
 		
@@ -108,7 +116,13 @@ public class TypeTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<TypeItem> type  = (List<TypeItem>) session.selectList("database.TypeMapper.getAllTypes");
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"accessTypes", accessTypes
+				);
+		
+		List<TypeItem> type  = (List<TypeItem>) session.selectList("database.TypeMapper.getAllTypes", map);
 		
 		session.close();
 		

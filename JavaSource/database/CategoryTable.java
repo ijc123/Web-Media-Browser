@@ -7,8 +7,13 @@ import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.apache.ibatis.session.SqlSession;
+
+import utils.MapArgument;
+
+import beans.user.LoginBean;
 
 @Stateless
 public class CategoryTable {
@@ -16,12 +21,22 @@ public class CategoryTable {
 	@EJB
 	TypeTable typeTable;
 	
+	@Inject
+	LoginBean loginBean;
+	
 	@SuppressWarnings("unchecked")
 	public List<CategoryItem> getCategoriesByType(String typeName) {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<CategoryItem> category  = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoriesByType", typeName);
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"typeName", typeName,
+				"accessTypes", accessTypes
+				);
+		
+		List<CategoryItem> category  = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoriesByType", map);
 			
 		session.close();
 		
@@ -34,7 +49,13 @@ public class CategoryTable {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<CategoryItem> category = (List<CategoryItem>) session.selectList("database.CategoryMapper.getAllCategories");		
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"accessTypes", accessTypes
+				);
+		
+		List<CategoryItem> category = (List<CategoryItem>) session.selectList("database.CategoryMapper.getAllCategories", map);		
 		
 		session.close();
 		
@@ -101,8 +122,15 @@ public class CategoryTable {
 		} else {
 			
 			SqlSession session = MyBatis.getSession().openSession(); 
+			
+			List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+			
+			Map<String, Object> map = MapArgument.create(	
+					"category", parent,
+					"accessTypes", accessTypes
+					);
 				
-			category  = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoryByPrefix", parent);
+			category = (List<CategoryItem>) session.selectList("database.CategoryMapper.getCategoryByPrefix", map);
 				
 			session.close();
 		}

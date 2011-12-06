@@ -1,5 +1,6 @@
 package beans.user;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 //import javax.ejb.EJB;
@@ -45,6 +46,13 @@ public class LoginBean implements Serializable {
     public void logout() {
        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Goodbye, " + currentUser.getName()));
        currentUser = null;
+       
+       try {
+    	   FacesContext.getCurrentInstance().getExternalContext().redirect("/mijngod/pages/login.jsf");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public boolean isLoggedIn() {

@@ -107,7 +107,7 @@ public class TagSearchBean implements Serializable {
 		
 		if(!allTypes.isEmpty()) {
 					
-			type = allTypes.get(3);
+			type = allTypes.get(0);
 			
 			List<CategoryItem> allCategories = categoryTable.getCategoriesByType(type.getName());
 			
