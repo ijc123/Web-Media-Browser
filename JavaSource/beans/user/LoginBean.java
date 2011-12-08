@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.UserItem;
-import database.UserTable;
+import database.UserEJB;
 
 @SessionScoped
 @Named
@@ -24,13 +24,13 @@ public class LoginBean implements Serializable {
     private CredentialsBean credentials;
 
     @Inject
-    private UserTable userTable;
+    private UserEJB userEJB;
 
     private UserItem currentUser;
 
     public String login() throws Exception {
        
-       UserItem user = userTable.getUser(credentials.getUsername(), credentials.getPassword());
+       UserItem user = userEJB.getUser(credentials.getUsername(), credentials.getPassword());
        if (user != null) {
     	   
           this.currentUser = user;

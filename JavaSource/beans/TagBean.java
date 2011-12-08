@@ -10,14 +10,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.TagItem;
-import database.TagTable;
+import database.TagEJB;
 
 @RequestScoped
 @Named
 public class TagBean {
 
 	@Inject
-	private TagTable tagTable;
+	private TagEJB tagEJB;
 	
 	static final Comparator<TagItem> USAGE_ORDER = 
 			
@@ -45,7 +45,7 @@ public class TagBean {
 
 		ArrayList<String> names= new ArrayList<String>();
 
-		List<TagItem> tags = tagTable.getTagByNameQuery(input);
+		List<TagItem> tags = tagEJB.getTagByNameQuery(input);
 
 		Collections.sort(tags, USAGE_ORDER);
 
@@ -62,7 +62,7 @@ public class TagBean {
 
 		ArrayList<String> names = new ArrayList<String>();
 
-		List<TagItem> tags = tagTable.getAllTags();
+		List<TagItem> tags = tagEJB.getAllTags();
 
 		Collections.sort(tags, ALPHABETICAL_ORDER);
 		

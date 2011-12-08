@@ -14,7 +14,7 @@ import javax.inject.Named;
 
 import multiTagPicker.MultiTagPickerSupport;
 import database.MediaItem;
-import database.MediaTable;
+import database.MediaEJB;
 
 @ViewScoped
 @Named
@@ -26,7 +26,7 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private MediaTable mediaTable;
+	private MediaEJB mediaEJB;
 	
 	protected Comparator<MediaItem> sortOrder;
 	
@@ -183,7 +183,7 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 			}
 		}
 
-		mediaTable.updateMedia(selectedMedia);
+		mediaEJB.updateMedia(selectedMedia);
 
 	}
 	

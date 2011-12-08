@@ -18,7 +18,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletResponse;
 
 import database.TagImageItem;
-import database.TagTable;
+import database.TagEJB;
 
 import utils.MimeType;
 import video.HTTPLiveStreaming;
@@ -48,16 +48,16 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 			
 			if(debugOutput) System.out.println("Loading Tag Image: " + tagName);
 			
-			TagTable tagTable = null;
+			TagEJB tagEJB = null;
 			
 			try {
-				tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
+				tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
 			} catch (NamingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			TagImageItem tagImage = tagTable.getTagImage(tagName);
+			TagImageItem tagImage = tagEJB.getTagImage(tagName);
 				
 			if(tagImage != null) {
 			

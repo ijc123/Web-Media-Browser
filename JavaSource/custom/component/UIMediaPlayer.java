@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import video.HTTPLiveStreaming;
 import database.MediaItem;
-import database.MediaTable;
+import database.MediaEJB;
 
 
 @FacesComponent("custom.component.UIMediaPlayer")
@@ -145,16 +145,16 @@ public class UIMediaPlayer extends UIOutput {
 		
 		String uri = (String) getAttributes().get("uri");
 		
-		MediaTable mediaTable = null;
+		MediaEJB mediaEJB = null;
 		
 		try {
-			mediaTable = (MediaTable) new InitialContext().lookup("java:module/MediaTable");
+			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		MediaItem media = mediaTable.getMediaByUri(uri);
+		MediaItem media = mediaEJB.getMediaByUri(uri);
 		
 		String id = (String) getAttributes().get("id");
 		if(id == null) id = "mediaPlayer";

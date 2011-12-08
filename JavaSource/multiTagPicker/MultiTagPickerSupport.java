@@ -6,7 +6,7 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import database.TagTable;
+import database.TagEJB;
 
 public class MultiTagPickerSupport {
 
@@ -48,16 +48,16 @@ public class MultiTagPickerSupport {
 		
 		if(name == null) return;
 		
-		TagTable tagTable = null;
+		TagEJB tagEJB = null;
 		
 		try {
-			tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
+			tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		if(tagTable.getTagByName(name) == null) return;
+		if(tagEJB.getTagByName(name) == null) return;
 		
 		if(tags == null) return;
 		

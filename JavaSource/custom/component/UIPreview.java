@@ -20,7 +20,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 
 import utils.FileUtils;
 
-import database.SettingsTable;
+import database.SettingsEJB;
 
 @FacesComponent("custom.component.UIPreview")
 public class UIPreview extends UIOutput {
@@ -50,16 +50,16 @@ public class UIPreview extends UIOutput {
 			e1.printStackTrace();
 		}
 		
-		SettingsTable settingsTable = null;
+		SettingsEJB settingsEJB = null;
 		
 		try {
-			settingsTable = (SettingsTable) new InitialContext().lookup("java:module/SettingsTable");
+			settingsEJB = (SettingsEJB) new InitialContext().lookup("java:module/SettingsEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		String previewPath = settingsTable.getSettings().getPreviewRootDirectory();
+		String previewPath = settingsEJB.getSettings().getPreviewRootDirectory();
 		
 		FileUtils f = new FileUtils(previewPath);
 		

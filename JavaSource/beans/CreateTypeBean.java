@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.TypeItem;
-import database.TypeTable;
+import database.TypeEJB;
 
 
 @ViewScoped
@@ -25,7 +25,7 @@ public class CreateTypeBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private TypeTable typeTable;
+	private TypeEJB typeEJB;
 
 	private DataModel<TypeItem> dataModel;
 	private List<TypeItem> type;
@@ -34,7 +34,7 @@ public class CreateTypeBean implements Serializable {
 	@PostConstruct
 	private void Init() {
 		
-		type = typeTable.getAllTypes();
+		type = typeEJB.getAllTypes();
 	}
 	
 	public DataModel<TypeItem> getDataModel() {
@@ -103,7 +103,7 @@ public class CreateTypeBean implements Serializable {
 	
 	public void update() {
 		
-		typeTable.updateAllTypes(type);
+		typeEJB.updateAllTypes(type);
 	}
 	
 	

@@ -8,6 +8,7 @@ public class UserItem {
 	private String name;
 	private String password;
 	private List<String> accessTypes;
+	private int level;
 	
 	public String getName() {
 		return name;
@@ -33,6 +34,12 @@ public class UserItem {
 	}
 	public void setAccessTypes(List<String> accessTypes) {
 		this.accessTypes = accessTypes;
+	}
+	public int getLevel() {
+		return level;
+	}
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	
 	

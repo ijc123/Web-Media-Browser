@@ -8,18 +8,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.TypeItem;
-import database.TypeTable;
+import database.TypeEJB;
 
 @RequestScoped
 @Named
 public class TypeBean {
 	
 	@Inject
-	private TypeTable typeTable;
+	private TypeEJB typeEJB;
 
 	public List<String> getAllTypeNames() {
 
-		List<TypeItem> types = typeTable.getAllTypes();
+		List<TypeItem> types = typeEJB.getAllTypes();
 
 		List<String> typeName = new ArrayList<String>();
 

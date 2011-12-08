@@ -7,7 +7,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import database.TagItem;
-import database.TagTable;
+import database.TagEJB;
 
 public class TagPickerNode extends Node<TagPickerNode> {
 
@@ -24,16 +24,16 @@ public class TagPickerNode extends Node<TagPickerNode> {
 		
 		if(tags != null) return(tags);
 						
-		TagTable tagTable = null;
+		TagEJB tagEJB = null;
 		
 		try {
-			tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
+			tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		List<TagItem> result = tagTable.getTagsByCategory(category);
+		List<TagItem> result = tagEJB.getTagsByCategory(category);
 		
 		tags = new ArrayList<String>();
 		

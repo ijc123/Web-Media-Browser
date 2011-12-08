@@ -11,8 +11,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.MediaLocationItem;
-import database.MediaTable;
-import database.SettingsTable;
+import database.MediaEJB;
+import database.SettingsEJB;
 
 
 @ViewScoped
@@ -25,10 +25,10 @@ public class SettingsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private SettingsTable settingsTable;
+	private SettingsEJB settingsEJB;
 	
 	@Inject
-	private MediaTable mediaTable;
+	private MediaEJB mediaEJB;
 		
 	private DataModel<MediaLocationItem> dataModel;
 	private database.SettingsItem settings;
@@ -37,7 +37,7 @@ public class SettingsBean implements Serializable {
 	@PostConstruct
 	private void Init() {
 
-		settings = settingsTable.getSettings();		
+		settings = settingsEJB.getSettings();		
 
 	}
 
@@ -49,7 +49,7 @@ public class SettingsBean implements Serializable {
 
 	public void synchronize() {
 			
-		mediaTable.synchronize(settings);
+		mediaEJB.synchronize(settings);
 		
 	}
 	

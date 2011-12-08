@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 
 import multiTagPicker.MultiTagPickerSupport;
 import database.MediaItem;
-import database.MediaTable;
+import database.MediaEJB;
 
 public abstract class Taggable extends MultiTagPickerSupport {
 
@@ -24,13 +24,13 @@ public abstract class Taggable extends MultiTagPickerSupport {
 		
 		if(media != null) return;
 		
-		MediaTable mediaTable = null;
+		MediaEJB mediaEJB = null;
 		
 		try {
 			
-			mediaTable = (MediaTable) new InitialContext().lookup("java:module/MediaTable");
+			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
 				
-			media = mediaTable.getMediaByUri(uri);	
+			media = mediaEJB.getMediaByUri(uri);	
 			
 		} catch (NamingException e) {
 			
@@ -65,15 +65,15 @@ public abstract class Taggable extends MultiTagPickerSupport {
 	
 	public void replaceTagsEvent(AjaxBehaviorEvent event)  {
 	
-		MediaTable mediaTable = null;
+		MediaEJB mediaEJB = null;
 		
 		try {
 			
-			mediaTable = (MediaTable) new InitialContext().lookup("java:module/MediaTable");
+			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
 				
 			media.setTagNames(new ArrayList<String>(tags));
 			
-			mediaTable.updateMedia(media);
+			mediaEJB.updateMedia(media);
 
 			tags = media.getTagNames();
 			

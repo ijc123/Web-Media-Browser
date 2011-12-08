@@ -9,6 +9,7 @@
 			user.id AS user_id,
 			user.name AS user_name,
 			user.password AS user_password,
+			user.level AS user_level,
 			usertype.type AS user_type
 		FROM user
 		INNER JOIN usertype
@@ -18,7 +19,8 @@
 	<resultMap id="userItemResults" type="UserItem">
 		<id property="name" column="user_name"/> 
 		<result property="id" column="user_id"/> 		  		
-  		<result property="password" column="user_password"/>     		 
+  		<result property="password" column="user_password"/>   
+  		<result property="level" column="user_level"/>    		 
   		<collection property="accessTypes" ofType="String"> 
     		<id column="user_type"/> 
   		</collection>  		  	

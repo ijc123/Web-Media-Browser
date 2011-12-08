@@ -17,7 +17,7 @@
 </composite:interface>
 <composite:implementation>
 	<h:outputStylesheet library="css" name="querytable.css"/>
-	<rich:dataTable id="typeTable" value="#{createTypeBean.dataModel}" 
+	<rich:dataTable id="typeEJB" value="#{createTypeBean.dataModel}" 
 	var="type" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
 	<h:column>
  		<f:facet name="header">
@@ -42,10 +42,10 @@
     </h:column>  
     <h:column>  
     	<f:facet name="header">
-        	<a4j:commandButton execute="@this" render="typeTable"
+        	<a4j:commandButton execute="@this" render="typeEJB"
         	action="#{createTypeBean.addType}" value="add"/>        		
         </f:facet>   
-    	<a4j:commandButton execute="@this" render="typeTable" 
+    	<a4j:commandButton execute="@this" render="typeEJB" 
     	action="#{createTypeBean.deleteType}" value="delete"/>         
     </h:column>  
 	</rich:dataTable>

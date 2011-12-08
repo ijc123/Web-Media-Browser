@@ -20,13 +20,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.CategoryItem;
-import database.CategoryTable;
+import database.CategoryEJB;
 import database.MediaItem;
-import database.MediaTable;
+import database.MediaEJB;
 import database.TagItem;
-import database.TagTable;
+import database.TagEJB;
 import database.TypeItem;
-import database.TypeTable;
+import database.TypeEJB;
 
 @ViewScoped
 @Named
@@ -57,13 +57,13 @@ public class TagSearchBean implements Serializable {
 	};
 
 	@Inject
-	CategoryTable categoryTable;
+	CategoryEJB categoryEJB;
 	@Inject
-	TypeTable typeTable;
+	TypeEJB typeEJB;
 	@Inject
-	private TagTable tagTable;
+	private TagEJB tagEJB;
 	@Inject
-	private MediaTable mediaTable;
+	private MediaEJB mediaEJB;
 	
 	private TypeItem type;
 	private CategoryItem category;
@@ -103,13 +103,13 @@ public class TagSearchBean implements Serializable {
 	private void init() {
 		
 		// initialize default type and category
-		List<TypeItem> allTypes = typeTable.getAllTypes();
+		List<TypeItem> allTypes = typeEJB.getAllTypes();
 		
 		if(!allTypes.isEmpty()) {
 					
 			type = allTypes.get(0);
 			
-			List<CategoryItem> allCategories = categoryTable.getCategoriesByType(type.getName());
+			List<CategoryItem> allCategories = categoryEJB.getCategoriesByType(type.getName());
 			
 			if(!allCategories.isEmpty()) {
 				
@@ -129,11 +129,11 @@ public class TagSearchBean implements Serializable {
 		
 		if(queryTagNames.isEmpty()) {
 			
-			children = tagTable.getAllTags();
+			children = tagEJB.getAllTags();
 						
 		} else {
 			
-			List<TagItem> parents = tagTable.getParentTags(queryTagNames);
+			List<TagItem> parents = tagEJB.getParentTags(queryTagNames);
 			
 			for(int j = 0; j < parents.size(); j++) {
 		    	
@@ -154,7 +154,7 @@ public class TagSearchBean implements Serializable {
 			
 			List<String> uniqueChildrenList = new ArrayList<String>(Arrays.asList(temp2));
 			
-			children = tagTable.getTagByName(uniqueChildrenList);					
+			children = tagEJB.getTagByName(uniqueChildrenList);					
 			
 		}
 		
@@ -166,7 +166,7 @@ public class TagSearchBean implements Serializable {
 			
 			selectedChildren.add(child.getName());
 			
-			List<TagItem> parents = tagTable.getParentTags(selectedChildren);
+			List<TagItem> parents = tagEJB.getParentTags(selectedChildren);
 						
 			child.setUsed(parents.size());
 			
@@ -194,7 +194,7 @@ public class TagSearchBean implements Serializable {
 			
 			for(int i = 0; i < category.size(); i++) {
 				
-				List<TagItem> tags = tagTable.getTagsByCategory(category.get(i));
+				List<TagItem> tags = tagEJB.getTagsByCategory(category.get(i));
 				
 				tagMap.get(category.get(i)).addAll(tags);
 				
@@ -204,7 +204,7 @@ public class TagSearchBean implements Serializable {
 		}
 		
 		
-		List<MediaItem> mediaList = mediaTable.getMediaByTagQuery(queryTagNames);
+		List<MediaItem> mediaList = mediaEJB.getMediaByTagQuery(queryTagNames);
 		
 		Map<String, Integer> uniqueTagsMap = new HashMap<String, Integer>();
 		
@@ -241,7 +241,7 @@ public class TagSearchBean implements Serializable {
 	    	   	 
 	    }
 
-	    List<TagItem> result = tagTable.getTagByName(uniqueTagsList);
+	    List<TagItem> result = tagEJB.getTagByName(uniqueTagsList);
 	    
 	    for(int i = 0; i < result.size(); i++) {
 	    	
@@ -270,7 +270,7 @@ public class TagSearchBean implements Serializable {
 		// add categories to tagMap
 		tagMap = new TreeMap<CategoryItem, List<TagItem>>();
 		
-		List<CategoryItem> category = categoryTable.getCategoriesByType(type.getName());
+		List<CategoryItem> category = categoryEJB.getCategoriesByType(type.getName());
 			
 		for(int i = 0; i < category.size(); i++) {
 			
@@ -294,7 +294,7 @@ public class TagSearchBean implements Serializable {
 	
 	public List<String> getCategoryList() {
 		
-		List<CategoryItem> category = categoryTable.getCategoriesByType(type.getName());
+		List<CategoryItem> category = categoryEJB.getCategoriesByType(type.getName());
 		
 		List<String> categoryName = new ArrayList<String>();
 		
@@ -345,7 +345,7 @@ public class TagSearchBean implements Serializable {
 	    	selectedTab = reqParams.get("selectedTab");
 	    }
 				
-		queryTagItems =  tagTable.getTagByName(queryTagNames);
+		queryTagItems =  tagEJB.getTagByName(queryTagNames);
 		
 	}
 
@@ -372,7 +372,7 @@ public class TagSearchBean implements Serializable {
 		
 		if(queryTableSearchTags.isEmpty()) return(mediaList);
 		
-		mediaList = mediaTable.getMediaByTagQuery(queryTableSearchTags);
+		mediaList = mediaEJB.getMediaByTagQuery(queryTableSearchTags);
 		
 		return mediaList;
 	}
@@ -399,7 +399,7 @@ public class TagSearchBean implements Serializable {
 			
 			type.setName(typeName);
 			
-			List<CategoryItem> allCategories = categoryTable.getCategoriesByType(type.getName());
+			List<CategoryItem> allCategories = categoryEJB.getCategoriesByType(type.getName());
 			
 			if(!allCategories.isEmpty()) {
 				

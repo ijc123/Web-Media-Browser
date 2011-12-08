@@ -9,7 +9,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import database.CategoryItem;
-import database.CategoryTable;
+import database.CategoryEJB;
 
 // uses reflection to instantiate nodes of different types, see link below for more info
 // http://java.sun.com/developer/technicalArticles/ALT/Reflection/
@@ -77,16 +77,16 @@ public class Node<Type>  {
 		
 		nodes = new ArrayList<Type>();
 		
-		CategoryTable categoryTable = null;
+		CategoryEJB categoryEJB = null;
 		
 		try {
-			categoryTable = (CategoryTable) new InitialContext().lookup("java:module/CategoryTable");
+			categoryEJB = (CategoryEJB) new InitialContext().lookup("java:module/CategoryEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		List<CategoryItem> child = categoryTable.getChildCategories(category);
+		List<CategoryItem> child = categoryEJB.getChildCategories(category);
 				
 		for(int i = 0; i < child.size(); i++) {
 			

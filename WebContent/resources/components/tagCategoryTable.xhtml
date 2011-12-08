@@ -17,7 +17,7 @@
 </composite:interface>
 <composite:implementation>
 	<h:outputStylesheet library="css" name="querytable.css"/>
-	<rich:dataTable id="tagCategoryTable" value="#{createTagBean.dataModel}" 
+	<rich:dataTable id="tagCategoryEJB" value="#{createTagBean.dataModel}" 
 	var="category" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
 	<h:column>
  		<f:facet name="header">
@@ -25,7 +25,7 @@
         </f:facet>
 		<h:selectOneMenu value="#{category.typeName}" id="typeSelect" style="width:100%">     
             <f:selectItems value="#{typeBean.allTypeNames}" />
-            <f:ajax event="change" render="tagCategoryTable" execute="tagCategoryTable"/>
+            <f:ajax event="change" render="tagCategoryEJB" execute="tagCategoryEJB"/>
         </h:selectOneMenu>        	
     </h:column> 
     <h:column>
@@ -39,10 +39,10 @@
     </h:column> 
     <h:column>  
     	<f:facet name="header">
-        	<a4j:commandButton execute="@this" render="tagCategoryTable" 
+        	<a4j:commandButton execute="@this" render="tagCategoryEJB" 
         	action="#{createTagBean.addTagCategory}" value="add" type="button"/>
         </f:facet>   
-    	<a4j:commandButton execute="@this" render="tagCategoryTable" 
+    	<a4j:commandButton execute="@this" render="tagCategoryEJB" 
     		action="#{createTagBean.deleteTagCategory}" disabled="#{it.rowCount == 1}" 
     		value="remove" type="button"/>               
     </h:column>  

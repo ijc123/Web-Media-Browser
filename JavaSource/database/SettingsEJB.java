@@ -7,7 +7,7 @@ import javax.ejb.Stateless;
 import org.apache.ibatis.session.SqlSession;
 
 @Stateless
-public class SettingsTable {
+public class SettingsEJB {
 	
 	public SettingsItem getSettings() {
 		

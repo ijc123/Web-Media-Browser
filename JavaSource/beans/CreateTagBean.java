@@ -12,11 +12,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.CategoryItem;
-import database.CategoryTable;
+import database.CategoryEJB;
 import database.TagItem;
-import database.TagTable;
+import database.TagEJB;
 import database.TypeItem;
-import database.TypeTable;
+import database.TypeEJB;
 
 @ViewScoped
 @Named
@@ -27,11 +27,11 @@ public class CreateTagBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Inject
-	private CategoryTable categoryTable;
+	private CategoryEJB categoryEJB;
 	@Inject
-	private TypeTable typeTable;
+	private TypeEJB typeEJB;
 	@Inject
-	private TagTable tagTable;
+	private TagEJB tagEJB;
 	
 	private boolean isNewTag;
 	private String selectedTag;
@@ -69,7 +69,7 @@ public class CreateTagBean implements Serializable {
 		
 		if(!tagCategory.isEmpty()) {
 		
-			categories = categoryTable.getCategoriesByType(tagCategory.get(index).getTypeName());
+			categories = categoryEJB.getCategoriesByType(tagCategory.get(index).getTypeName());
 		}
 		
 		return(categories);
@@ -123,7 +123,7 @@ public class CreateTagBean implements Serializable {
 	
 		if(tag.getName().isEmpty()) return;
 		
-		boolean success = tagTable.modifyTag(tag, resourceURL);
+		boolean success = tagEJB.modifyTag(tag, resourceURL);
 		
 		if(success) {
 
@@ -134,7 +134,7 @@ public class CreateTagBean implements Serializable {
 
 	public void deleteTag() {
 
-		tagTable.deleteTag(tag);
+		tagEJB.deleteTag(tag);
 
 		setNewTag(true);		
 	}
@@ -146,7 +146,7 @@ public class CreateTagBean implements Serializable {
 
 	public void setSelectedTag(String selectedTag) {
 		
-		TagItem temp = tagTable.getTagByName(selectedTag);
+		TagItem temp = tagEJB.getTagByName(selectedTag);
 		
 		if(temp != null && !selectedTag.equals(this.selectedTag)) {
 			
@@ -181,7 +181,7 @@ public class CreateTagBean implements Serializable {
 		
 		CategoryItem dummyCategory = new CategoryItem();
 		
-		List<TypeItem> types = typeTable.getAllTypes();
+		List<TypeItem> types = typeEJB.getAllTypes();
 		
 		if(!types.isEmpty()) {
 					

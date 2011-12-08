@@ -23,13 +23,13 @@ import utils.MapArgument;
 
 
 @Stateless
-public class MediaTable {
+public class MediaEJB {
 	
 	@EJB
-	SettingsTable settingsTable;
+	SettingsEJB settingsEJB;
 		
 	@EJB
-	TagTable tagTable;
+	TagEJB tagEJB;
 	
 	@Inject
 	LoginBean loginBean;
@@ -158,9 +158,9 @@ public class MediaTable {
 				
 		removedTags.removeAll(mediaTagNames);
 				
-		List<TagItem> mediaTagItems = tagTable.getTagByName(mediaTagNames);
+		List<TagItem> mediaTagItems = tagEJB.getTagByName(mediaTagNames);
 		
-		mediaTagItems = tagTable.addLinkedTags(mediaTagItems);			
+		mediaTagItems = tagEJB.addLinkedTags(mediaTagItems);			
 		
 		mediaTagNames.clear();
 		
@@ -414,9 +414,9 @@ public class MediaTable {
 
 		System.out.println("done synchronizing database, counting tag usage");
 		
-		tagTable.setTagUsedCounters();
+		tagEJB.setTagUsedCounters();
 		
-		settingsTable.setSettings(settings);
+		settingsEJB.setSettings(settings);
 	
 	}
 	

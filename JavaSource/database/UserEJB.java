@@ -8,7 +8,7 @@ import javax.ejb.Stateless;
 import org.apache.ibatis.session.SqlSession;
 
 @Stateless
-public class UserTable {
+public class UserEJB {
 
 	public UserItem getUser(String userName, String password) {
 		

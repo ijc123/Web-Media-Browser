@@ -14,7 +14,7 @@ import utils.MapArgument;
 import beans.user.LoginBean;
 
 @Stateless
-public class TypeTable {
+public class TypeEJB {
 	
 	@Inject
 	LoginBean loginBean;

@@ -3,7 +3,7 @@ package beans.tagTree;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import database.CategoryTable;
+import database.CategoryEJB;
 
 
 public class ModifyCategoriesNode extends Node<ModifyCategoriesNode> {
@@ -28,16 +28,16 @@ public class ModifyCategoriesNode extends Node<ModifyCategoriesNode> {
 			String oldCategory = category.getName();
 			String temp = oldCategory.substring(0, oldCategory.lastIndexOf('/')); 
 			
-			CategoryTable categoryTable = null;
+			CategoryEJB categoryEJB = null;
 			
 			try {
-				categoryTable = (CategoryTable) new InitialContext().lookup("java:module/CategoryTable");
+				categoryEJB = (CategoryEJB) new InitialContext().lookup("java:module/CategoryEJB");
 			} catch (NamingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 						
-			categoryTable.renameCategory(category, temp + "/" + shortName);
+			categoryEJB.renameCategory(category, temp + "/" + shortName);
 			
 			category.setShortName(shortName);
 				

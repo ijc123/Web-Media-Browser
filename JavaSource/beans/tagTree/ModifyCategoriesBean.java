@@ -13,9 +13,9 @@ import org.richfaces.component.UITree;
 import org.richfaces.event.TreeSelectionChangeEvent;
 
 import database.CategoryItem;
-import database.CategoryTable;
+import database.CategoryEJB;
 import database.TypeItem;
-import database.TypeTable;
+import database.TypeEJB;
 
 
 @RequestScoped
@@ -23,9 +23,9 @@ import database.TypeTable;
 public class ModifyCategoriesBean {
 	
 	@Inject
-	CategoryTable categoryTable;
+	CategoryEJB categoryEJB;
 	@Inject
-	TypeTable typeTable;
+	TypeEJB typeEJB;
 	
     private List<Node<ModifyCategoriesNode>> rootNodes;
     private String selectedCategory;
@@ -37,7 +37,7 @@ public class ModifyCategoriesBean {
                 	        	
         	rootNodes = new ArrayList<Node<ModifyCategoriesNode>>();
         	
-        	List<TypeItem> rootType = typeTable.getAllTypes();
+        	List<TypeItem> rootType = typeEJB.getAllTypes();
         	
         	for(int i = 0; i < rootType.size(); i++) {
         	
@@ -59,7 +59,7 @@ public class ModifyCategoriesBean {
     	
     	CategoryItem parent = selectedNode.getCategory();
     	
-    	List<CategoryItem> child = categoryTable.getChildCategories(parent);
+    	List<CategoryItem> child = categoryEJB.getChildCategories(parent);
         	
     	String uniqueCategory = "category";
     	
@@ -79,7 +79,7 @@ public class ModifyCategoriesBean {
     	
     	CategoryItem newCategory = new CategoryItem(uniqueCategory);
     	
-    	categoryTable.setCategory(newCategory);
+    	categoryEJB.setCategory(newCategory);
     		
 		// force a update of the tree model during render response 
 		rootNodes = null;
@@ -95,7 +95,7 @@ public class ModifyCategoriesBean {
     	 	
     	if(selectedNode == null || selectedNode.getClass().getName().equals("beans.tagTree.ModifyCategoriesRootNode")) return;
     	    	    	
-    	categoryTable.deleteCategory(selectedNode.getCategory());	
+    	categoryEJB.deleteCategory(selectedNode.getCategory());	
     	
 		// force a update of the tree model during render response 
 		rootNodes = null;

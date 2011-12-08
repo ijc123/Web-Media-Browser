@@ -83,13 +83,13 @@ public class MediaItem {
 		
 		ArrayList<String> names = getTagNames();
 		
-		TagTable tagTable = null;
+		TagEJB tagEJB = null;
 		List<TagItem> tagItems = new ArrayList<TagItem>();
 		
 		try {
 			
-			tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
-			tagItems = tagTable.getTagByName(names);
+			tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
+			tagItems = tagEJB.getTagByName(names);
 			
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block

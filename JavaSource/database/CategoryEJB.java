@@ -16,10 +16,10 @@ import utils.MapArgument;
 import beans.user.LoginBean;
 
 @Stateless
-public class CategoryTable {
+public class CategoryEJB {
 	
 	@EJB
-	TypeTable typeTable;
+	TypeEJB typeEJB;
 	
 	@Inject
 	LoginBean loginBean;
@@ -110,7 +110,7 @@ public class CategoryTable {
 		
 		if(parent.getFullName().equals("/")) {
 			
-			List<TypeItem> type = typeTable.getAllTypes();
+			List<TypeItem> type = typeEJB.getAllTypes();
 			
 			category = new ArrayList<CategoryItem>();
 			

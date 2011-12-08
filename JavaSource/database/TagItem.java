@@ -77,16 +77,16 @@ public class TagItem implements Serializable {
 	}
 	public boolean isTagImageAvailable() {
 		
-		TagTable tagTable = null;
+		TagEJB tagEJB = null;
 		
 		try {
-			tagTable = (TagTable) new InitialContext().lookup("java:module/TagTable");
+			tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return(tagTable.hasTagImage(name));		
+		return(tagEJB.hasTagImage(name));		
 	}
 		
 	public String getFullTagImageURL() {

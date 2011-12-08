@@ -11,14 +11,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.MediaItem;
-import database.MediaTable;
+import database.MediaEJB;
 
 @ViewScoped
 @Named
 public class AddTagBean implements Serializable {
 
 	@Inject
-	private MediaTable mediaTable;
+	private MediaEJB mediaEJB;
 
 	private static final long serialVersionUID = 1L;
 	private List<String> selectedTags;
@@ -56,7 +56,7 @@ public class AddTagBean implements Serializable {
 			
 		}
 		
-		mediaList = mediaTable.getMediaByFilenameQuery(fileNameQuery, sqlTimestamp);
+		mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, sqlTimestamp);
 		
 		return(mediaList);
 	}

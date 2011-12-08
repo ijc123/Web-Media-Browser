@@ -24,11 +24,11 @@ import utils.MapArgument;
 import beans.user.LoginBean;
 
 @Stateless
-public class TagTable {
+public class TagEJB {
 
 	@EJB
 	@IgnoreDependency
-	private MediaTable mediaTable;
+	private MediaEJB mediaEJB;
 	
 	@Inject
 	private LoginBean loginBean;
@@ -401,7 +401,7 @@ public class TagTable {
 			ArrayList<String> searchTags = new ArrayList<String>();
 			searchTags.add(tag.getName());
 			
-			List<MediaItem> temp = mediaTable.getMediaByTagQuery(searchTags);
+			List<MediaItem> temp = mediaEJB.getMediaByTagQuery(searchTags);
 			
 			int count = temp.size();
 			
@@ -433,7 +433,7 @@ public class TagTable {
 			
 			if(linkedTagsModified) {
 
-				mediaTable.updateLinkedTags(tag);
+				mediaEJB.updateLinkedTags(tag);
 			}
 			
 		} else if(getTagByName(tag.getName()) != null) {

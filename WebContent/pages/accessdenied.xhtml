@@ -7,16 +7,13 @@
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:cc="http://java.sun.com/jsf/composite/components">
 <h:head>
-	<title>Create Type</title>
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Access Denied</title>
 </h:head>
 <h:body>	
 	<cc:navigationToolbar/>
 	<h:form>
-		<rich:panel id="createTypePanel" header="Create Type">
-			<cc:typeEJB/>
-			<h:commandButton value="Update" action="#{createTypeBean.update}"  type="button" 
-				onfocus="this.type = 'submit';" onblur="this.type = 'button';" style="margin: 10px;"/>			
-		</rich:panel>
+		<h:outputText value="User #{loginBean.currentUser.name} doesn't have permission to access this page" />
 	</h:form>
 </h:body>
 </html>

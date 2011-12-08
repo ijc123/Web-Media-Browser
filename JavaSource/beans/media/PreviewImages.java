@@ -14,8 +14,8 @@ import org.apache.commons.exec.ExecuteWatchdog;
 
 import utils.FileUtils;
 
-import database.MediaTable;
-import database.SettingsTable;
+import database.MediaEJB;
+import database.SettingsEJB;
 
 
 public class PreviewImages {
@@ -24,11 +24,11 @@ public class PreviewImages {
 		
 	PreviewImages() {
 		
-		SettingsTable settings = null;
+		SettingsEJB settings = null;
 		
 		try {
 			
-			settings = (SettingsTable) new InitialContext().lookup("java:module/SettingsTable");
+			settings = (SettingsEJB) new InitialContext().lookup("java:module/SettingsEJB");
 			
 			previewRoot = settings.getSettings().getPreviewRootDirectory();
 			
@@ -41,13 +41,13 @@ public class PreviewImages {
 
 	public void buildAll() {
 		
-		MediaTable mediaTable = null;
+		MediaEJB mediaEJB = null;
 		
 		try {
 			
-			mediaTable = (MediaTable) new InitialContext().lookup("java:module/MediaTable");
+			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
 			
-			List<database.MediaItem> mediaList = mediaTable.getAllMedia();
+			List<database.MediaItem> mediaList = mediaEJB.getAllMedia();
 			
 			for(int i = 0; i < mediaList.size(); i++) {
 				
