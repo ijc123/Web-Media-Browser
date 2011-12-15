@@ -8,17 +8,27 @@ import java.util.List;
 
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PhaseId;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import multiTagPicker.MultiTagPickerSupport;
-import database.MediaItem;
+
+import org.richfaces.event.ItemChangeEvent;
+import org.richfaces.event.ItemChangeListener;
+
 import database.MediaEJB;
+import database.MediaItem;
+import database.MediaPreviewEJB;
 
 @ViewScoped
 @Named
-public class QueryTableBean extends MultiTagPickerSupport implements Serializable {
+public class QueryTableBean extends MultiTagPickerSupport 
+	implements Serializable, ItemChangeListener 
+{
 	
 	/**
 	 * 
@@ -28,10 +38,16 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 	@Inject
 	private MediaEJB mediaEJB;
 	
+	@Inject
+	private MediaPreviewEJB mediaPreviewEJB;
+	
 	protected Comparator<MediaItem> sortOrder;
 	
-	private List<MediaItem> mediaList;
 	private boolean inRenderResponse;
+	
+	private List<MediaItem> mediaList;
+	private DataModel<MediaItem> queryTable;
+	private String[] rowSelectedTab;
 	
 	 static final Comparator<MediaItem> FILENAME_ORDER =
 		 
@@ -76,45 +92,56 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 		 	}
 	 };
 	 
+	 static final Comparator<MediaItem> VERSION_ORDER =
+			 
+	         new Comparator<MediaItem>() {
+			 
+			 	public int compare(MediaItem a, MediaItem b) {
+			 		
+			 		if(a.getVersion() < b.getVersion()) return(-1);
+			 		if(a.getVersion() == b.getVersion()) return(0);
+			 		else return(1);
+			 	}
+	 };
+	 
 	public QueryTableBean() {
-				
-		sortOrder = FILENAME_ORDER;
 		
 		mediaList = new ArrayList<MediaItem>();
-		
+						
 		inRenderResponse = false;
 		sortByFileName();
 		
-		//inRenderResponse = false;
+		rowSelectedTab = null;
 		
 	}
 				
 	public void sortByFileName() {
 		
-		sortOrder = FILENAME_ORDER;
-
+		sortOrder = FILENAME_ORDER;	
 	}
 	
 	public void sortBySizeBytes() {
 		
-		sortOrder = SIZEBYTES_ORDER;
-		
+		sortOrder = SIZEBYTES_ORDER;			
 	}
 	
 	public void sortByCreation() {
 		
 		sortOrder = CREATION_ORDER;
-		
 	}
 	
 	public void sortByModified() {
 		
 		sortOrder = MODIFIED_ORDER;
-		
 	}
 	
+	public void sortByVersion() {
+		
+		sortOrder = VERSION_ORDER;		
+	}
+		
 	@SuppressWarnings("unchecked")
-	public List<MediaItem> getMediaList() {
+	public DataModel<MediaItem> getQueryTableModel() {
 		
 		// make sure the data lookup is done once on the first occurrence of a render response phase
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -123,15 +150,16 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 		
 		if(phase == PhaseId.RENDER_RESPONSE) {  
 		
-			if(inRenderResponse == false) {
+			if(inRenderResponse == false) {									
 							
-				System.out.println("request database access");
-			
 				mediaList = (List<MediaItem>)context.getApplication().getExpressionFactory()
-				.createValueExpression(context.getELContext(), "#{cc.attrs.mediaList}", List.class).getValue(context.getELContext());
-				
+				.createValueExpression(context.getELContext(), "#{cc.attrs.mediaList}", List.class).getValue(context.getELContext());								
+											
 				Collections.sort(mediaList, sortOrder);
+								
+				queryTable = new ListDataModel<MediaItem>(mediaList);
 				
+				setupRowSelectedTabArray(mediaList.size());
 				
 				inRenderResponse = true;
 			}
@@ -141,7 +169,7 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 			inRenderResponse = false;
 		}
 		
-		return(mediaList);
+		return(queryTable);
 	
 	}
 	
@@ -185,6 +213,49 @@ public class QueryTableBean extends MultiTagPickerSupport implements Serializabl
 
 		mediaEJB.updateMedia(selectedMedia);
 
+	}
+	
+	// detect changing tab panels in mediaInfo 
+	@Override
+	public void processItemChange(ItemChangeEvent event)
+			throws AbortProcessingException {
+		
+		 int rowIndex = queryTable.getRowIndex();
+		   
+		 if(event.getNewItemName().equals("preview")) {
+			 
+			 mediaPreviewEJB.build(mediaList.get(rowIndex));
+		 }
+		 
+		 rowSelectedTab[rowIndex] = event.getNewItemName();
+		
+	}
+	
+	public String getRowSelectedTab() {
+		
+		int rowIndex = queryTable.getRowIndex();
+		
+		return(rowSelectedTab[rowIndex]);
+	}
+	
+	public void setRowSelectedTab(String selected) {
+		
+		//int rowIndex = queryTable.getRowIndex();
+		
+		//rowSelectedTab[rowIndex] = selected;
+	}
+	
+	private void setupRowSelectedTabArray(int nrRows) {
+	
+		if(rowSelectedTab == null || nrRows != rowSelectedTab.length) {
+			
+			rowSelectedTab = new String[nrRows];
+			
+			for(int i = 0; i < nrRows; i++) {
+			
+				rowSelectedTab[i] = "tags";			
+			}		
+		} 			
 	}
 	
 }

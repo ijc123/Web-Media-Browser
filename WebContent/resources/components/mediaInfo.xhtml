@@ -14,19 +14,22 @@
 </head>
 <body>
 <composite:interface>
-	<composite:attribute name="media"  type="database.MediaItem" required="false"/>
+	<composite:attribute name="media" type="database.MediaItem" required="false"/>
 </composite:interface>
 <composite:implementation>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank" style="font-size: 1.5em;">
 		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
 	</h:link>
-	<rich:tabPanel selectedTab="tags" switchType="ajax">
-        <rich:tab name="tags" header="Tags">
-            <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>
+	<rich:tabPanel id="tabPanel" activeItem="#{queryTableBean.rowSelectedTab}" 
+	switchType="ajax" itemChangeListener="#{queryTableBean.processItemChange}">        	        	
+        <rich:tab id="tagInfoTab" name="tags" header="Tags" 
+        oncomplete="jsf.ajax.request(this, null, {execute:'#{component.parent.parent.parent.parent.clientId}:table',render:'#{component.parent.parent.parent.parent.clientId}:table'});">         	
+            <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>   
         </rich:tab>
-        <rich:tab name="preview" header="Preview" style="text-align: center;">
+        <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;"
+        oncomplete="jsf.ajax.request(this, null, {execute:'#{component.parent.parent.parent.parent.clientId}:table',render:'#{component.parent.parent.parent.parent.clientId}:table'});">         	
    			<cc:smallPreviewImages media="#{cc.attrs.media}"/>
-        </rich:tab>
+        </rich:tab>                      
     </rich:tabPanel>	
 </composite:implementation>
 </body>

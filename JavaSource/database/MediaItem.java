@@ -19,6 +19,7 @@ public class MediaItem {
 	private String fileName;
 	private Timestamp creation;
 	private Timestamp modified;
+	private int version;
 	private ArrayList<String> tagNames;
 	private ArrayList<String> typeNames;
 	
@@ -147,6 +148,33 @@ public class MediaItem {
 
 	public void setTypeNames(ArrayList<String> typeNames) {
 		this.typeNames = typeNames;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		
+		if (other == this) return true;
+		if (other == null) return false;
+		if (getClass() != other.getClass()) return false;
+
+		MediaItem media = (MediaItem)other;
+
+		return (uri.equals(media.getUri()) &&
+				sizeBytes == media.getSizeBytes() &&
+				fileName.equals(media.getFileName()) &&
+				creation.equals(media.getCreation()) &&
+				modified.equals(media.getModified()) &&
+				version == media.getVersion() &&
+				tagNames.equals(media.getTagNames()) &&
+				typeNames.equals(media.getTypeNames()));	
 	}
 	
 

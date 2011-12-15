@@ -8,29 +8,34 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.application.ViewHandler;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import database.MediaItem;
+import database.MediaPreviewEJB;
 
 @RequestScoped
 @Named
 public class SmallPreviewImagesBean {
+	
+	@Inject
+	MediaPreviewEJB mediaPreviewEJB;
 	
 	public List<String> imagesURLList(MediaItem media) {
 		
 		if(media == null) return(new ArrayList<String>());
 		//MediaItem media = getMediaItem();
 	
-		PreviewImages previewImages = new PreviewImages();
+//		PreviewImages previewImages = new PreviewImages();
 		
-		List<String> images = previewImages.getSmallPreviewImagesList(media);
-		
+		List<String> images = mediaPreviewEJB.getSmallPreviewImagesList(media);
+/*		
 		if(images.isEmpty()) {
 			
 			previewImages.build(media);
 			images = previewImages.getSmallPreviewImagesList(media);
 		}
-		
+*/		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();
 		String imageURL = handler.getActionURL(context, "/previewimage");

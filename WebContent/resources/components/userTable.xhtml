@@ -17,36 +17,45 @@
 </composite:interface>
 <composite:implementation>
 	<h:outputStylesheet library="css" name="querytable.css"/>
-	<rich:dataTable id="typeTable" value="#{createTypeBean.dataModel}" 
-	var="type" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
+	<rich:dataTable id="userTable" value="#{createUserBean.dataModel}" 
+	var="user" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
 	<h:column>
  		<f:facet name="header">
         	 <h:outputText value="name"/>
         </f:facet>
-        <rich:inplaceInput value="#{createTypeBean.name}" showControls="true" 
+        <rich:inplaceInput value="#{user.name}" showControls="true" 
         editEvent="dblclick">
         	<f:ajax event="change" execute="@form" render="@form" />			
 		</rich:inplaceInput>       	
     </h:column> 
     <h:column>
  		<f:facet name="header">
-        	 <h:outputText value="creation"/>
+        	 <h:outputText value="password"/>
         </f:facet>      
-        <h:outputText value="#{type.creation}" converter="converters.TimestampConverter"/>							
+        <rich:inplaceInput value="#{user.password}" showControls="true" 
+        editEvent="dblclick">
+        	<f:ajax event="change" execute="@form" render="@form" />			
+		</rich:inplaceInput> 							
     </h:column>  
      <h:column>
  		<f:facet name="header">
-        	 <h:outputText value="modified"/>
+        	 <h:outputText value="level"/>
         </f:facet>      
-        <h:outputText value="#{type.modified}" converter="converters.TimestampConverter"/>							
+        <rich:inputNumberSpinner value="#{user.level}" minValue="0" maxValue="10"/>						
+    </h:column> 
+     <h:column>
+ 		<f:facet name="header">
+        	 <h:outputText value="Access Types"/>
+        </f:facet>      
+        <cc:userAccessTypesTable dataModel="#{createUserBean.userAccesTypesDataModel}"/>						
     </h:column>  
     <h:column>  
     	<f:facet name="header">
-        	<a4j:commandButton execute="@this" render="typeTable"
-        	action="#{createTypeBean.addType}" value="add"/>        		
+        	<a4j:commandButton execute="@this" render="userTable"
+        	action="#{createUserBean.addUser}" value="Add User"/>        		
         </f:facet>   
-    	<a4j:commandButton execute="@this" render="typeTable" 
-    	action="#{createTypeBean.deleteType}" value="delete"/>         
+    	<a4j:commandButton execute="@this" render="userTable" 
+    	action="#{createUserBean.deleteUser}" value="Delete User"/>         
     </h:column>  
 	</rich:dataTable>
 	

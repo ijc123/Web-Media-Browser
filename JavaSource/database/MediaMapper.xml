@@ -11,6 +11,7 @@
 			media.sizebytes AS media_sizebytes,
 			media.creation AS media_creation,
 			media.modified AS media_modified,
+			media.version AS media_version,
 			mediatype.type AS type_name,
 			mediatag.tag AS tag_name
 		FROM media 
@@ -33,6 +34,7 @@
   		<result property="sizeBytes" column="media_sizebytes"/> 
   		<result property="creation" column="media_creation"/>  
   		<result property="modified" column="media_modified"/>  
+  		<result property="version" column="media_version"/>  
   		<collection property="typeNames" ofType="String"> 
     		<id column="type_name"/> 
   		</collection>  		
@@ -64,6 +66,7 @@
 			temp.sizebytes AS media_sizebytes,
 			temp.creation AS media_creation,
 			temp.modified AS media_modified,
+			temp.version AS media_version,
 			mediatype.type AS type_name,
 			mediatag.tag AS tag_name 
 		FROM
@@ -88,19 +91,24 @@
 
 	<select id="getMediaByFilenameQuery" parameterType="Map" resultMap="mediaItemResults">
 		<include refid="selectMedia"/> 
-		WHERE 
-		<choose>
-			<when test="query != null and timeStamp != null">
-				media.filename LIKE '%' #{query} '%' AND media.creation > #{timeStamp}		
-			</when>
-			<when test="query != null">
-				media.filename LIKE '%' #{query} '%'					
-			</when>			
-			<otherwise>
-				media.creation > #{timeStamp}
-			</otherwise>
-		</choose>
-		AND <include refid="accessTypesFilter"/> 
+		<where>
+			<if test="query != null">
+				media.filename LIKE '%' #{query} '%'
+			</if>
+			<if test="fromTimestamp != null">
+				AND media.creation > #{fromTimestamp}
+			</if>
+			<if test="toTimestamp != null">
+				AND media.creation &lt; #{toTimestamp}
+			</if>
+			<if test="minVersion != null">
+				AND media.version > #{minVersion}
+			</if>	
+			<if test="maxVersion != null">
+				AND media.version &lt; #{maxVersion}
+			</if>	
+		</where> 			
+		AND <include refid="accessTypesFilter"/>		 
 	</select>
 	
 	<select id="getMediaByUri" parameterType="Map" resultMap="mediaItemResults">
@@ -115,8 +123,8 @@
 	</select>
 
 	<insert id="setMedia" parameterType="mediaItem">
-		INSERT INTO media (uri, sizeBytes, fileName, modified) VALUES (#{uri}, #{sizeBytes}, #{fileName}, null) 
-		ON DUPLICATE KEY UPDATE sizeBytes = #{sizeBytes}, fileName = #{fileName}	
+		INSERT INTO media (uri, sizeBytes, fileName, modified, version) VALUES (#{uri}, #{sizeBytes}, #{fileName}, null, #{version}) 
+		ON DUPLICATE KEY UPDATE sizeBytes = #{sizeBytes}, fileName = #{fileName}, version = #{version}	
 	</insert>
 	
 	<insert id="setMediaTag" parameterType="Map">

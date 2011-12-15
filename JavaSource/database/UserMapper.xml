@@ -26,10 +26,38 @@
   		</collection>  		  	
 	</resultMap> 
 	
+	<select id="getAllUsers" resultMap="userItemResults">
+		<include refid="selectUser"/>
+	</select>
+	
 	<select id="getUser" parameterType="map" resultMap="userItemResults">
 		<include refid="selectUser"/>
 		WHERE user.name = #{name} AND user.password = #{password}
 	</select>
+		
+	<insert id="insertUser" parameterType="UserItem">
+		INSERT IGNORE INTO user (name, password, level) VALUES (#{name}, #{password}, #{level}) 	
+	</insert>
+
+	<update id="modifyUser" parameterType="UserItem">
+		UPDATE user SET name = #{name}, password = #{password}, level = #{level}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteUser" parameterType="UserItem">
+		DELETE FROM user WHERE id = #{id}
+	</delete>
+	
+	<insert id="insertUserTypes" parameterType="Map">
+		INSERT IGNORE INTO usertype (name, type) VALUES 
+		<foreach item="type" index="i" collection="accessTypes" open="(" separator="," close=")">
+			#{name}, #{type}
+		</foreach>
+	</insert>
+	
+	<delete id="deleteUserTypes" parameterType="UserItem">
+		DELETE FROM usertype WHERE name = #{name}
+	</delete>
 	
 </mapper>
 

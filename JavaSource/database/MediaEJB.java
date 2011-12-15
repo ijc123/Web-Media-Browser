@@ -56,7 +56,9 @@ public class MediaEJB {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<MediaItem> getMediaByFilenameQuery(String query, java.sql.Timestamp timeStamp) {
+	public List<MediaItem> getMediaByFilenameQuery(String query, 
+			java.sql.Timestamp fromTimestamp, java.sql.Timestamp toTimestamp,
+			Integer minVersion, Integer maxVersion) {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
@@ -67,13 +69,30 @@ public class MediaEJB {
 			map.put("query", query);
 		}
 		
-		if(timeStamp != null) {
+		if(fromTimestamp != null) {
 					
-			String timeStampString = timeStamp.toString();
+			String timeStampString = fromTimestamp.toString();
 			
-			map.put("timeStamp", timeStampString);
+			map.put("fromTimestamp", timeStampString);
+		}
+		
+		if(toTimestamp != null) {
+			
+			String timeStampString = toTimestamp.toString();
+			
+			map.put("toTimestamp", timeStampString);
 		}
 	
+		if(minVersion != null) {
+			
+			map.put("minVersion", minVersion);
+		}
+		
+		if(maxVersion != null) {
+			
+			map.put("maxVersion", maxVersion);
+		}
+		
 		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
 		
 		map.put("accessTypes", accessTypes);
@@ -135,7 +154,7 @@ public class MediaEJB {
 	}
 	
 	
-	// potentially modifies mediaItem by adding linked tags
+	// potentially modifies mediaItem to it's updated state
 	public void updateMedia(MediaItem mediaItem) {
 		
 		// remove potential duplicate tags from mediaItem
@@ -151,19 +170,24 @@ public class MediaEJB {
 		
 		// Add linked tags to the mediaItem
 		// If tags are removed from the old media item
-		// do not re-introduce them as linked tags 		
-		MediaItem oldMediaItem = getMediaByUri(mediaItem.getUri());
-		
-		ArrayList<String> removedTags = oldMediaItem.getTagNames();		
-				
-		removedTags.removeAll(mediaTagNames);
-				
+		// do not re-introduce them as linked tags 					
 		List<TagItem> mediaTagItems = tagEJB.getTagByName(mediaTagNames);
 		
 		mediaTagItems = tagEJB.addLinkedTags(mediaTagItems);			
 		
-		mediaTagNames.clear();
+		MediaItem oldMediaItem = getMediaByUri(mediaItem.getUri());
 		
+		ArrayList<String> removedTags = new ArrayList<String>();
+		
+		if(oldMediaItem != null) {
+					
+			removedTags = oldMediaItem.getTagNames();		
+				
+			removedTags.removeAll(mediaTagNames);
+		}
+		
+		mediaTagNames.clear();
+	
 		for(int i = 0; i < mediaTagItems.size(); i++) {
 			
 			TagItem tag = mediaTagItems.get(i);
@@ -173,21 +197,21 @@ public class MediaEJB {
 				mediaTagNames.add(tag.getName());
 			}
 		}
-		
+				
 		mediaItem.setTagNames(mediaTagNames);
 			
-		// update the mediaItem
+		// update the mediaItem in the database
 		
-		setMedia(mediaItem);
+		setMedia(mediaItem, oldMediaItem);
 		
 	}
 	
 	
-	private void setMedia(final MediaItem newMediaItem) {
-		
-		MediaItem oldMediaItem = getMediaByUri(newMediaItem.getUri());
+	private void setMedia(MediaItem newMediaItem, MediaItem oldMediaItem) {
 		
 		if(oldMediaItem != null) {
+			
+			if(oldMediaItem.equals(newMediaItem)) return;
 			
 			List<String> oldTags = oldMediaItem.getTagNames();
 			List<String> newTags = newMediaItem.getTagNames();
@@ -203,6 +227,9 @@ public class MediaEJB {
 			
 			deleteMediaType(newMediaItem.getUri(), oldTypes);
 			
+			// update version
+			newMediaItem.setVersion(oldMediaItem.getVersion() + 1);
+			
 		}
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
@@ -214,16 +241,7 @@ public class MediaEJB {
 		setMediaTags(newMediaItem);
 		setMediaType(newMediaItem);
 	}
-	
-	private void setMedia(List<MediaItem> media) {
-		
-		for(int i = 0; i < media.size(); i++) {
-		
-			setMedia(media.get(i));
-		}
-				
-	}
-	
+
 	private void setMediaTags(final MediaItem media) {
 		
 		List<String> tags = media.getTagNames();
@@ -336,7 +354,7 @@ public class MediaEJB {
 			}					
 		}
 		
-		setMedia(result);
+		updateMedia(result);
 		
 	}
 	
@@ -358,13 +376,13 @@ public class MediaEJB {
 			
 		}
 		
-		setMedia(result);
+		updateMedia(result);
 		
 	}
 		
 
 	public void synchronize(SettingsItem settings) {
-								
+						
 		// update last synchronized date to now
 		java.util.Date curDate = Calendar.getInstance().getTime();
 		Timestamp now = new Timestamp(curDate.getTime());
@@ -419,6 +437,63 @@ public class MediaEJB {
 		settingsEJB.setSettings(settings);
 	
 	}
+/*	
+	public void SetMediaVersions() {
+				
+		CategoryItem category = new CategoryItem();
+		
+		category.setTypeName("porn");
+		category.setName("/pornstars");
+		
+		List<TagItem> pornstars = tagEJB.getTagsByCategory(category);
+		
+		Map<String, TagItem> pornstarHash = new HashMap<String, TagItem>();
+		
+		for(int i = 0; i < pornstars.size(); i++) {
+			
+			pornstarHash.put(pornstars.get(i).getName(), pornstars.get(i));
+			
+		}
+		
+		List<MediaItem> media = getAllMedia();
+		
+		for(int i = 0; i < media.size(); i++) {
+		
+			MediaItem mediaItem = media.get(i);
+			
+			@SuppressWarnings("unchecked")
+			List<String> mediaTags = (List<String>)mediaItem.getTagNames().clone();
+			
+			if(mediaTags.isEmpty()) continue;
+			
+			for(int j = 0; j < mediaTags.size(); j++) {
+				
+				String tag = mediaTags.get(j);
+				
+				TagItem pornstar = pornstarHash.get(tag);
+				
+				if(pornstar != null) {
+					
+					mediaTags.remove(pornstar.getName());
+					mediaTags.removeAll(pornstar.getLinkedTagNames());
+				
+				}
+			}
+		
+			if(mediaTags.isEmpty()) {
+				
+				updateMedia(mediaItem);
+				
+			} else {
+				
+				updateMedia(mediaItem);	
+				updateMedia(mediaItem);					
+			}
+			
+		}		
+		
+	}
+*/	
 	
 	public void Test() {
 			
@@ -428,7 +503,7 @@ public class MediaEJB {
 		
 		List<MediaItem> result = getMediaByTagQuery(tags);
 		
-		result = getMediaByFilenameQuery("jessica fiorentino", null);
+		result = getMediaByFilenameQuery("jessica fiorentino", null, null, null, null);
 		
 		MediaItem item = getMediaByUri(result.get(0).getUri());
 		
@@ -436,13 +511,13 @@ public class MediaEJB {
 		
 		item.setSizeBytes(0);
 		
-		setMedia(item);
+		updateMedia(item);
 		
 		item = getMediaByUri(result.get(0).getUri());
 		
 		item.setSizeBytes(oldSize);
 		
-		setMedia(item);
+		updateMedia(item);
 	
 		
 	}

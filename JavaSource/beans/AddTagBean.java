@@ -25,8 +25,12 @@ public class AddTagBean implements Serializable {
 	private List<MediaItem> mediaList;
 	
 	private String fileNameQuery;
-	private Date selectedDate;
+	private Date fromDate;
+	private Date toDate;
 	private Locale locale;
+	
+	private Integer minVersion;
+	private Integer maxVersion;
 	
 	public AddTagBean() {
 		
@@ -35,6 +39,10 @@ public class AddTagBean implements Serializable {
 		setLocale(Locale.US);
 		
 		mediaList = new ArrayList<MediaItem>();
+		
+		minVersion = maxVersion = null;
+		
+		fileNameQuery = "";
 	}
 	
 	public void setMediaList(List<MediaItem> mediaList) {
@@ -43,20 +51,30 @@ public class AddTagBean implements Serializable {
 	
 	public List<MediaItem> getMediaList() {
 			
-		if(fileNameQuery == null && selectedDate == null) {
+		if(fileNameQuery.isEmpty() && fromDate == null && toDate == null 
+				&& minVersion == null && maxVersion == null) {
 						
 			return(new ArrayList<MediaItem>());		
 		}
 		
-		java.sql.Timestamp sqlTimestamp = null;
+		java.sql.Timestamp fromTimestamp = null;
 		
-		if(selectedDate != null) {
+		if(fromDate != null) {
 			
-			sqlTimestamp = new java.sql.Timestamp(selectedDate.getTime());
+			fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
 			
 		}
 		
-		mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, sqlTimestamp);
+		java.sql.Timestamp toTimestamp = null;
+		
+		if(toDate != null) {
+			
+			toTimestamp = new java.sql.Timestamp(toDate.getTime());
+			
+		}
+		
+		mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, fromTimestamp,
+				toTimestamp, minVersion, maxVersion);
 		
 		return(mediaList);
 	}
@@ -72,16 +90,6 @@ public class AddTagBean implements Serializable {
 		return fileNameQuery;
 	}
 	
-	public void setSelectedDate(Date selectedDate) {
-		
-		this.selectedDate = selectedDate;
-		
-	}
-
-	public Date getSelectedDate() {
-		return selectedDate;
-	}
-
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
@@ -111,6 +119,59 @@ public class AddTagBean implements Serializable {
 		}
 		
 		return selectedTags;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+
+	public String getMinVersion() {
+		
+		if(minVersion == null) return("");
+		else return(Integer.toString(minVersion));
+	}
+
+	public void setMinVersion(String minVersion) {
+		
+		if(minVersion.isEmpty()) {
+			
+			this.minVersion = null;
+			
+		} else {
+			
+			this.minVersion = Integer.parseInt(minVersion);
+		}			
+	}
+
+	public String getMaxVersion() {
+		
+		if(maxVersion == null) return("");
+		else return(Integer.toString(maxVersion));
+	}
+
+	public void setMaxVersion(String maxVersion) {
+		
+		if(maxVersion.isEmpty()) {
+			
+			this.maxVersion = null;
+			
+		} else {
+			
+			this.maxVersion = Integer.parseInt(maxVersion);
+		}	
+
 	}
 
 	

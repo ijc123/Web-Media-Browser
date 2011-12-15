@@ -17,15 +17,14 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletResponse;
 
-import database.TagImageItem;
-import database.TagEJB;
-
 import utils.MimeType;
 import video.HTTPLiveStreaming;
+import database.TagEJB;
+import database.TagImageItem;
 
 
 public class DynamicResourcePhaseListener implements PhaseListener {
-
+	
 	private static final long serialVersionUID = 1L;
 	private static final boolean debugOutput = true;
 

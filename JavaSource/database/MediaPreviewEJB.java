@@ -1,11 +1,12 @@
-package beans.media;
+package database;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.annotation.PostConstruct;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -14,55 +15,36 @@ import org.apache.commons.exec.ExecuteWatchdog;
 
 import utils.FileUtils;
 
-import database.MediaEJB;
-import database.SettingsEJB;
+@Stateless
+public class MediaPreviewEJB {
 
-
-public class PreviewImages {
+	@Inject
+	SettingsEJB settings;
+	
+	@Inject
+	MediaEJB mediaEJB;
 	
 	private String previewRoot;
-		
-	PreviewImages() {
-		
-		SettingsEJB settings = null;
-		
-		try {
-			
-			settings = (SettingsEJB) new InitialContext().lookup("java:module/SettingsEJB");
-			
-			previewRoot = settings.getSettings().getPreviewRootDirectory();
-			
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-				
-	}
-
+	
+   @SuppressWarnings("unused")
+   @PostConstruct
+   private void init(){
+	   
+	   previewRoot = settings.getSettings().getPreviewRootDirectory();
+   }
+	
 	public void buildAll() {
+					
+		List<database.MediaItem> mediaList = mediaEJB.getAllMedia();
 		
-		MediaEJB mediaEJB = null;
-		
-		try {
+		for(int i = 0; i < mediaList.size(); i++) {
 			
-			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
-			
-			List<database.MediaItem> mediaList = mediaEJB.getAllMedia();
-			
-			for(int i = 0; i < mediaList.size(); i++) {
-				
-				build(mediaList.get(i));			
-			}
-			
-			
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			build(mediaList.get(i));			
 		}
-		
+					
 	}
 		
-	protected String getPath(final database.MediaItem inputVideo) {
+	private String getMediaPreviewPath(final MediaItem inputVideo) {
 		
 		String hashSource = 
 			inputVideo.getFileName() + Long.toString(inputVideo.getSizeBytes());
@@ -74,12 +56,18 @@ public class PreviewImages {
 		return(path);
 	}
 	
-	public void build(final database.MediaItem inputMedia) {
+	public void build(final MediaItem inputMedia) {
 
+		if(!getSmallPreviewImagesList(inputMedia).isEmpty()) {
+			
+			// preview images already exist
+			return;
+		}
+				
 		if(!inputMedia.getMimeType().startsWith("video")) return;
 		
 		String inputPath = inputMedia.getPath();
-		String outputPath = getPath(inputMedia);
+		String outputPath = getMediaPreviewPath(inputMedia);
 		
 		try {
 		
@@ -114,7 +102,7 @@ public class PreviewImages {
 
 	}
 	
-	public List<String> getSmallPreviewImagesList(final database.MediaItem inputMedia) {
+	public List<String> getSmallPreviewImagesList(final MediaItem inputMedia) {
 	
 		List<String> result = new ArrayList<String>();
 		
@@ -122,7 +110,7 @@ public class PreviewImages {
 		
 		FileUtils f = new FileUtils(previewRoot);
 		
-		String outputPath = getPath(inputMedia);
+		String outputPath = getMediaPreviewPath(inputMedia);
 		
 		f.moveDown(outputPath);
 		
@@ -144,13 +132,13 @@ public class PreviewImages {
 
 	}
 	
-	public String getLargePreviewImage(final database.MediaItem inputMedia) {
+	public String getLargePreviewImage(final MediaItem inputMedia) {
 	
 		if(!inputMedia.getMimeType().startsWith("video")) return(null);
 		
 		FileUtils f = new FileUtils(previewRoot);
 		
-		String outputPath = getPath(inputMedia);
+		String outputPath = getMediaPreviewPath(inputMedia);
 		
 		f.moveDown(outputPath);
 		
@@ -165,5 +153,8 @@ public class PreviewImages {
 			
 			return(f.getPath() + largePreviewImage);
 		}
+		
+		
 	}
+	
 }

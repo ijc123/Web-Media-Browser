@@ -14,17 +14,20 @@ import javax.faces.application.ViewHandler;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.gson.Gson;
 
+import database.MediaPreviewEJB;
+
 @ViewScoped
 @Named
 public class LargePreviewImageBean extends Taggable implements Serializable {
-		
-	/**
-	 * 
-	 */
+	
+	@Inject
+	MediaPreviewEJB mediaPreviewEJB;
+	
 	private static final long serialVersionUID = 1L;
 	private String largeImagePath;
 	private List<String> smallImagesPath;
@@ -43,10 +46,10 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 				
 		super.setUri(uri);
 		
-		PreviewImages previewImages = new PreviewImages();
+		//PreviewImages previewImages = new PreviewImages();
 		
-		largeImagePath = previewImages.getLargePreviewImage(media);
-		smallImagesPath = previewImages.getSmallPreviewImagesList(media);
+		largeImagePath = mediaPreviewEJB.getLargePreviewImage(media);
+		smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesList(media);
 		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();

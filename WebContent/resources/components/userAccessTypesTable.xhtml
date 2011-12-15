@@ -14,42 +14,30 @@
 </head>
 <body>
 <composite:interface>
+	<composite:attribute name="dataModel" required="false"/>
 </composite:interface>
 <composite:implementation>
 	<h:outputStylesheet library="css" name="querytable.css"/>
-	<rich:dataTable id="typeTable" value="#{createTypeBean.dataModel}" 
+	<rich:dataTable id="userAccessTypeTable" value="#{cc.attrs.dataModel}" 
 	var="type" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
 	<h:column>
  		<f:facet name="header">
-        	 <h:outputText value="name"/>
+        	 <h:outputText value="Type"/>
         </f:facet>
-        <rich:inplaceInput value="#{createTypeBean.name}" showControls="true" 
-        editEvent="dblclick">
-        	<f:ajax event="change" execute="@form" render="@form" />			
-		</rich:inplaceInput>       	
+        <h:selectOneListbox id="selectType" value="#{createUserBean.userAccessType}" size="1">
+        	<f:selectItems value="#{typeBean.allTypeNames}" />    
+        	<f:ajax event="change" render="selectType" execute="selectType"/>      
+        </h:selectOneListbox>	
     </h:column> 
-    <h:column>
- 		<f:facet name="header">
-        	 <h:outputText value="creation"/>
-        </f:facet>      
-        <h:outputText value="#{type.creation}" converter="converters.TimestampConverter"/>							
-    </h:column>  
-     <h:column>
- 		<f:facet name="header">
-        	 <h:outputText value="modified"/>
-        </f:facet>      
-        <h:outputText value="#{type.modified}" converter="converters.TimestampConverter"/>							
-    </h:column>  
     <h:column>  
     	<f:facet name="header">
-        	<a4j:commandButton execute="@this" render="typeTable"
-        	action="#{createTypeBean.addType}" value="add"/>        		
+        	<a4j:commandButton execute="@this" render="userAccessTypeTable"
+        	action="#{createUserBean.addUserAccessType}" value="Add Type"/>        		
         </f:facet>   
-    	<a4j:commandButton execute="@this" render="typeTable" 
-    	action="#{createTypeBean.deleteType}" value="delete"/>         
+    	<a4j:commandButton execute="@this" render="userAccessTypeTable" 
+    	action="#{createUserBean.removeUserAccessType}" value="Delete Type"/>         
     </h:column>  
-	</rich:dataTable>
-	
+	</rich:dataTable>	
 </composite:implementation>
 </body>
 </html>

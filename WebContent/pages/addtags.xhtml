@@ -17,18 +17,30 @@
 	<h:form id="addTagForm">
 		<rich:panel id="addTag" header="Add Tag">
 	   		<h:panelGrid columns="2">
-	   			<h:outputText value="Search:" />
-				<h:inputText id="query" label="query" value='#{addTagBean.fileNameQuery}' 
-				onkeypress="addTagJS.DoQuery(event,'#{cc.clientId}');"/>
+	   			<h:outputText value="Filename:" />
+				<h:inputText id="query" value='#{addTagBean.fileNameQuery}'/>
 
-				<h:outputText value="Added Since:" />
-				<rich:calendar value="#{addTagBean.selectedDate}" id="calendar"
+				<h:outputText value="Added After:" />				
+				<rich:calendar value="#{addTagBean.fromDate}" id="fromCalendar"
                     locale="#{addTagBean.locale}" popup="true"
                     datePattern="#{addTagBean.pattern}"
                     showApplyButton="true" cellWidth="24px"
-                    cellHeight="22px" style="width:200px"/>							
-									
+                    cellHeight="22px" style="width:200px"/>	
+	            
+	            <h:outputText value="Added Before:" />  	                    
+                <rich:calendar value="#{addTagBean.toDate}" id="toCalendar"
+                    locale="#{addTagBean.locale}" popup="true"
+                    datePattern="#{addTagBean.pattern}"
+                    showApplyButton="true" cellWidth="24px"
+                    cellHeight="22px" style="width:200px"/>	
+                
+                <h:outputText value="Min Edits:"/>   
+                <h:inputText id="minVersion" value="#{addTagBean.minVersion}" />
+                
+                <h:outputText value="Max Edits:"/> 
+                <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}" />																				
 			</h:panelGrid>
+			<h:commandButton value="search" onclick="pager.SetToZero();"/>	
 			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>
 		</rich:panel>
 	</h:form>

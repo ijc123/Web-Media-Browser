@@ -1,5 +1,6 @@
 package database;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserItem {
@@ -9,6 +10,15 @@ public class UserItem {
 	private String password;
 	private List<String> accessTypes;
 	private int level;
+	
+	public UserItem() {
+		
+		id = 0;
+		name = "";
+		password = "";
+		accessTypes = new ArrayList<String>();
+		level = 0;		
+	}
 	
 	public String getName() {
 		return name;

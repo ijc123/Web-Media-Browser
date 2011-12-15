@@ -21,8 +21,8 @@
  <h:outputScript library="javascript" name="jquery-1.5.1.js" target="head"/>
  <h:outputScript library="components" name="queryTable.js" target="head"/>
  <h:outputStylesheet library="css" name="querytable.css"/>
- <my:dataTable value="#{queryTableBean.mediaList}" var="media" id="table" 
- columnClasses="tdCheckboxStyle, tdStyle1, tdStyle2, tdStyle2, tdStyle2" 
+ <my:dataTable value="#{queryTableBean.queryTableModel}" var="media" id="table" 
+ columnClasses="tdCheckboxStyle, tdStyle1, tdStyle2, tdStyle2, tdStyle2, tdStyle2" 
  styleClass="tableStyle" rows="10">
  	<h:column>
  		<f:facet name="header">
@@ -54,6 +54,12 @@
         </f:facet>
         <h:outputText value="#{media.modified}" />
     </h:column>   
+    <h:column>
+        <f:facet name="header">
+             <a4j:commandLink value="Edits" render="table" action="#{queryTableBean.sortByVersion}" />
+        </f:facet>
+        <h:outputText value="#{media.version}" />
+    </h:column>      
 </my:dataTable>
  <my:pager id="pager" dataTableId="table" showpages="19"/>
 </composite:implementation>
