@@ -40,7 +40,7 @@
                 <h:outputText value="Max Edits:"/> 
                 <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}" />																				
 			</h:panelGrid>
-			<h:commandButton value="search" onclick="pager.SetToZero();"/>	
+			<h:commandButton value="search" onclick="pager.SetToZero();" action="#{addTagBean.doQuery}"/>	
 			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>
 		</rich:panel>
 	</h:form>

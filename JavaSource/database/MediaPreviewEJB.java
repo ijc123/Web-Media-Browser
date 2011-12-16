@@ -15,6 +15,8 @@ import org.apache.commons.exec.ExecuteWatchdog;
 
 import utils.FileUtils;
 
+// Note: Shouldn't really use disk i/o in EJB's
+// going to break in a distributed/high concurrency environment
 @Stateless
 public class MediaPreviewEJB {
 

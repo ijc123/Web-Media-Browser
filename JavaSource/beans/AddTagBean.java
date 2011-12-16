@@ -10,6 +10,8 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import beans.queryTable.QueryTableBean;
+
 import database.MediaItem;
 import database.MediaEJB;
 
@@ -19,10 +21,12 @@ public class AddTagBean implements Serializable {
 
 	@Inject
 	private MediaEJB mediaEJB;
+	
+	@Inject
+	private QueryTableBean queryTable;
 
 	private static final long serialVersionUID = 1L;
 	private List<String> selectedTags;
-	private List<MediaItem> mediaList;
 	
 	private String fileNameQuery;
 	private Date fromDate;
@@ -37,46 +41,43 @@ public class AddTagBean implements Serializable {
 		super();
 		
 		setLocale(Locale.US);
-		
-		mediaList = new ArrayList<MediaItem>();
-		
+				
 		minVersion = maxVersion = null;
 		
 		fileNameQuery = "";
 	}
-	
-	public void setMediaList(List<MediaItem> mediaList) {
 		
-	}
-	
-	public List<MediaItem> getMediaList() {
+	public void doQuery() {
 			
-		if(fileNameQuery.isEmpty() && fromDate == null && toDate == null 
-				&& minVersion == null && maxVersion == null) {
-						
-			return(new ArrayList<MediaItem>());		
+		List<MediaItem> mediaList = new ArrayList<MediaItem>();
+
+		if(!(fileNameQuery.isEmpty() && fromDate == null && toDate == null 
+				&& minVersion == null && maxVersion == null)) 
+		{
+
+			java.sql.Timestamp fromTimestamp = null;
+
+			if(fromDate != null) {
+
+				fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
+
+			}
+
+			java.sql.Timestamp toTimestamp = null;
+
+			if(toDate != null) {
+
+				toTimestamp = new java.sql.Timestamp(toDate.getTime());
+
+			}
+
+			mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, fromTimestamp,
+					toTimestamp, minVersion, maxVersion);
+
 		}
+
+		queryTable.setMediaList(mediaList);
 		
-		java.sql.Timestamp fromTimestamp = null;
-		
-		if(fromDate != null) {
-			
-			fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
-			
-		}
-		
-		java.sql.Timestamp toTimestamp = null;
-		
-		if(toDate != null) {
-			
-			toTimestamp = new java.sql.Timestamp(toDate.getTime());
-			
-		}
-		
-		mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, fromTimestamp,
-				toTimestamp, minVersion, maxVersion);
-		
-		return(mediaList);
 	}
 	
 	public void setFileNameQuery(String fileNameQuery) {

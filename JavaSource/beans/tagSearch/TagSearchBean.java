@@ -19,6 +19,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import beans.queryTable.QueryTableBean;
+
 import database.CategoryItem;
 import database.CategoryEJB;
 import database.MediaItem;
@@ -64,7 +66,9 @@ public class TagSearchBean implements Serializable {
 	private TagEJB tagEJB;
 	@Inject
 	private MediaEJB mediaEJB;
-	
+	@Inject
+	private QueryTableBean queryTable;
+		
 	private TypeItem type;
 	private CategoryItem category;
 	private List<TagItem> tagList;
@@ -85,11 +89,13 @@ public class TagSearchBean implements Serializable {
 	private String selectedTab;
 	
 	public TagSearchBean() {
-				
+						
 		updateTagMap = true;
 		queryTagNames = new ArrayList<String>();	
 		queryTableSearchTags = new ArrayList<String>();	
 		selectedTab = "category";
+		
+		mediaList = new ArrayList<MediaItem>();
 		
 		type = new TypeItem();
 		category = new CategoryItem();
@@ -204,7 +210,7 @@ public class TagSearchBean implements Serializable {
 		}
 		
 		
-		List<MediaItem> mediaList = mediaEJB.getMediaByTagQuery(queryTagNames);
+		mediaList = mediaEJB.getMediaByTagQuery(queryTagNames);
 		
 		Map<String, Integer> uniqueTagsMap = new HashMap<String, Integer>();
 		
@@ -355,26 +361,9 @@ public class TagSearchBean implements Serializable {
 	}
 
 	public void queryTableSearch() {
-		
-		queryTableSearchTags.clear();
-		
-		for(int i = 0; i < queryTagNames.size(); i++) {
-	
-			queryTableSearchTags.add(queryTagNames.get(i));
-		}
-	
-		
-	}
-	
-	public List<MediaItem> getMediaList() {
-		
-		mediaList = new ArrayList<MediaItem>();
-		
-		if(queryTableSearchTags.isEmpty()) return(mediaList);
-		
-		mediaList = mediaEJB.getMediaByTagQuery(queryTableSearchTags);
-		
-		return mediaList;
+
+		//queryTable.setMediaList(mediaEJB.getMediaByTagQuery(queryTagNames));
+		queryTable.setMediaList(mediaList);
 	}
 
 	public void setQueryTagItems(List<TagItem> queryTagItems) {

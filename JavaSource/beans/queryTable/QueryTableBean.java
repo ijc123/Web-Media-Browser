@@ -40,14 +40,11 @@ public class QueryTableBean extends MultiTagPickerSupport
 	
 	@Inject
 	private MediaPreviewEJB mediaPreviewEJB;
-	
-	protected Comparator<MediaItem> sortOrder;
-	
+		
 	private boolean inRenderResponse;
 	
-	private List<MediaItem> mediaList;
-	private DataModel<MediaItem> queryTable;
-	private String[] rowSelectedTab;
+	private List<MediaTableItem> mediaList;
+	private DataModel<MediaTableItem> queryTable;
 	
 	 static final Comparator<MediaItem> FILENAME_ORDER =
 		 
@@ -106,42 +103,53 @@ public class QueryTableBean extends MultiTagPickerSupport
 	 
 	public QueryTableBean() {
 		
-		mediaList = new ArrayList<MediaItem>();
+		mediaList = new ArrayList<MediaTableItem>();
 						
 		inRenderResponse = false;
 		sortByFileName();
 		
-		rowSelectedTab = null;
 		
 	}
 				
 	public void sortByFileName() {
 		
-		sortOrder = FILENAME_ORDER;	
+		Collections.sort(mediaList, FILENAME_ORDER);
 	}
 	
 	public void sortBySizeBytes() {
 		
-		sortOrder = SIZEBYTES_ORDER;			
+		Collections.sort(mediaList, SIZEBYTES_ORDER);			
 	}
 	
 	public void sortByCreation() {
 		
-		sortOrder = CREATION_ORDER;
+		Collections.sort(mediaList, CREATION_ORDER);
 	}
 	
 	public void sortByModified() {
 		
-		sortOrder = MODIFIED_ORDER;
+		Collections.sort(mediaList, MODIFIED_ORDER);
 	}
 	
 	public void sortByVersion() {
 		
-		sortOrder = VERSION_ORDER;		
+		Collections.sort(mediaList, VERSION_ORDER);		
 	}
 		
-	@SuppressWarnings("unchecked")
-	public DataModel<MediaItem> getQueryTableModel() {
+	public void setMediaList(List<MediaItem> media) {
+		
+		mediaList = new ArrayList<MediaTableItem>();
+		
+		for(int i = 0; i < media.size(); i++) {
+			
+			mediaList.add(new MediaTableItem(media.get(i)));
+			
+		}
+		
+		sortByFileName();
+	}
+	
+	public DataModel<MediaTableItem> getQueryTableModel() {
 		
 		// make sure the data lookup is done once on the first occurrence of a render response phase
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -152,14 +160,10 @@ public class QueryTableBean extends MultiTagPickerSupport
 		
 			if(inRenderResponse == false) {									
 							
-				mediaList = (List<MediaItem>)context.getApplication().getExpressionFactory()
-				.createValueExpression(context.getELContext(), "#{cc.attrs.mediaList}", List.class).getValue(context.getELContext());								
-											
-				Collections.sort(mediaList, sortOrder);
-								
-				queryTable = new ListDataModel<MediaItem>(mediaList);
-				
-				setupRowSelectedTabArray(mediaList.size());
+//				mediaList = (List<MediaItem>)context.getApplication().getExpressionFactory()
+//				.createValueExpression(context.getELContext(), "#{cc.attrs.mediaList}", List.class).getValue(context.getELContext());								
+																					
+				queryTable = new ListDataModel<MediaTableItem>(mediaList);				
 				
 				inRenderResponse = true;
 			}
@@ -221,41 +225,25 @@ public class QueryTableBean extends MultiTagPickerSupport
 			throws AbortProcessingException {
 		
 		 int rowIndex = queryTable.getRowIndex();
-		   
+		 
+		 MediaTableItem mediaTableItem = mediaList.get(rowIndex);
+		 
+		 // in case we switch to the preview tab make sure there
+		 // is a preview image
 		 if(event.getNewItemName().equals("preview")) {
-			 
-			 mediaPreviewEJB.build(mediaList.get(rowIndex));
+			 			 
+			 mediaPreviewEJB.build(mediaTableItem);
 		 }
 		 
-		 rowSelectedTab[rowIndex] = event.getNewItemName();
+		 // update the mediaitem with the latest version from the database				
+		 mediaTableItem.setMediaItemData(mediaEJB.getMediaByUri(mediaTableItem.getUri()));
+		 
+		 mediaTableItem.setSelectedTab(event.getNewItemName());
+		 
+		 mediaList.set(rowIndex, mediaTableItem);
 		
 	}
 	
-	public String getRowSelectedTab() {
-		
-		int rowIndex = queryTable.getRowIndex();
-		
-		return(rowSelectedTab[rowIndex]);
-	}
-	
-	public void setRowSelectedTab(String selected) {
-		
-		//int rowIndex = queryTable.getRowIndex();
-		
-		//rowSelectedTab[rowIndex] = selected;
-	}
-	
-	private void setupRowSelectedTabArray(int nrRows) {
-	
-		if(rowSelectedTab == null || nrRows != rowSelectedTab.length) {
-			
-			rowSelectedTab = new String[nrRows];
-			
-			for(int i = 0; i < nrRows; i++) {
-			
-				rowSelectedTab[i] = "tags";			
-			}		
-		} 			
-	}
+
 	
 }

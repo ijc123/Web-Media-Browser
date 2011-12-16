@@ -12,7 +12,7 @@ import javax.naming.NamingException;
 import utils.MimeType;
 
 
-public class MediaItem {
+public class MediaItem implements Cloneable {
 	
 	private String uri;
 	private long sizeBytes;
@@ -22,13 +22,9 @@ public class MediaItem {
 	private int version;
 	private ArrayList<String> tagNames;
 	private ArrayList<String> typeNames;
-	
-	private boolean selected;
-	
+			
 	public MediaItem() {
-		
-		selected = false;	
-		
+						
 		uri = "";
 		fileName = "";
 		sizeBytes = 0;
@@ -40,15 +36,6 @@ public class MediaItem {
 		typeNames = new ArrayList<String>();
 	}
 	
-	public void setSelected(boolean selected) {
-		
-		this.selected = selected;
-	}
-
-	public boolean isSelected() {
-		return selected;
-	}
-
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
@@ -177,5 +164,17 @@ public class MediaItem {
 				typeNames.equals(media.getTypeNames()));	
 	}
 	
+	@Override
+	public Object clone() {
+		
+		try {
+	
+			return super.clone();
+				
+		} catch(CloneNotSupportedException e) {
+	
+			return null;
+		}
+	} 
 
 }

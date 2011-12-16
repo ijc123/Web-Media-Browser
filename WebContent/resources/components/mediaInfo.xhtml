@@ -14,20 +14,18 @@
 </head>
 <body>
 <composite:interface>
-	<composite:attribute name="media" type="database.MediaItem" required="false"/>
+	<composite:attribute name="media" type="beans.queryTable.MediaTableItem" required="false"/>
 </composite:interface>
 <composite:implementation>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank" style="font-size: 1.5em;">
 		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
 	</h:link>
-	<rich:tabPanel id="tabPanel" activeItem="#{queryTableBean.rowSelectedTab}" 
+	<rich:tabPanel id="tabPanel" activeItem="#{cc.attrs.media.selectedTab}" 
 	switchType="ajax" itemChangeListener="#{queryTableBean.processItemChange}">        	        	
-        <rich:tab id="tagInfoTab" name="tags" header="Tags" 
-        oncomplete="jsf.ajax.request(this, null, {execute:'#{component.parent.parent.parent.parent.clientId}:table',render:'#{component.parent.parent.parent.parent.clientId}:table'});">         	
+        <rich:tab id="tagInfoTab" name="tags" header="Tags">         	
             <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>   
         </rich:tab>
-        <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;"
-        oncomplete="jsf.ajax.request(this, null, {execute:'#{component.parent.parent.parent.parent.clientId}:table',render:'#{component.parent.parent.parent.parent.clientId}:table'});">         	
+        <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;">         	
    			<cc:smallPreviewImages media="#{cc.attrs.media}"/>
         </rich:tab>                      
     </rich:tabPanel>	
