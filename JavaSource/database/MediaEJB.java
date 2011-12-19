@@ -155,6 +155,7 @@ public class MediaEJB {
 	
 	
 	// potentially modifies mediaItem to it's updated state
+	@SuppressWarnings("unchecked")
 	public void updateMedia(MediaItem mediaItem) {
 		
 		// remove potential duplicate tags from mediaItem
@@ -181,7 +182,7 @@ public class MediaEJB {
 		
 		if(oldMediaItem != null) {
 					
-			removedTags = oldMediaItem.getTagNames();		
+			removedTags = (ArrayList<String>)oldMediaItem.getTagNames().clone();		
 				
 			removedTags.removeAll(mediaTagNames);
 		}
@@ -382,7 +383,10 @@ public class MediaEJB {
 		
 
 	public void synchronize(SettingsItem settings) {
-						
+			
+	//setMediaVersions();
+
+		
 		// update last synchronized date to now
 		java.util.Date curDate = Calendar.getInstance().getTime();
 		Timestamp now = new Timestamp(curDate.getTime());
@@ -435,10 +439,10 @@ public class MediaEJB {
 		tagEJB.setTagUsedCounters();
 		
 		settingsEJB.setSettings(settings);
-	
+
 	}
-/*	
-	public void SetMediaVersions() {
+
+	public void setMediaVersions() {
 				
 		CategoryItem category = new CategoryItem();
 		
@@ -493,7 +497,7 @@ public class MediaEJB {
 		}		
 		
 	}
-*/	
+
 	
 	public void Test() {
 			

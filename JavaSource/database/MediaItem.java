@@ -1,5 +1,6 @@
 package database;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -12,8 +13,9 @@ import javax.naming.NamingException;
 import utils.MimeType;
 
 
-public class MediaItem implements Cloneable {
+public class MediaItem implements Serializable, Cloneable {
 	
+	private static final long serialVersionUID = 1L;
 	private String uri;
 	private long sizeBytes;
 	private String fileName;
@@ -177,4 +179,21 @@ public class MediaItem implements Cloneable {
 		}
 	} 
 
+	public boolean isVideo() {
+		
+		if(getMimeType().startsWith("video")) return(true);
+		else return(false);
+	}
+	
+	public boolean isAudio() {
+		
+		if(getMimeType().startsWith("audio")) return(true);
+		else return(false);
+	}
+	
+	public boolean isImage() {
+		
+		if(getMimeType().startsWith("image")) return(true);
+		else return(false);
+	}
 }

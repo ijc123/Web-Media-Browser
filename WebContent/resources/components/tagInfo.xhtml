@@ -18,12 +18,12 @@
 <composite:implementation>
 	<h:panelGrid columns="1">
 		<h:panelGroup>
-			<a4j:repeat value="#{cc.attrs.tags}" var="tag">
+			<ui:repeat value="#{cc.attrs.tags}" var="tag">
 				<h:outputText value="#{tag.name}, "  rendered="#{!tag.tagImageAvailable}"/>		
-			</a4j:repeat>	
+			</ui:repeat>	
 		</h:panelGroup>
 		<h:panelGroup>
-			<a4j:repeat value="#{cc.attrs.tags}" var="tag">
+			<ui:repeat value="#{cc.attrs.tags}" var="tag">
 				<h:graphicImage id="tagImage" url="#{tag.shortTagImageURL}" style="height: 150px" 
 				rendered="#{tag.tagImageAvailable}"> 
 				<rich:tooltip followMouse="true" showDelay="1000"
@@ -34,7 +34,7 @@
 	              </a4j:repeat>
 	            </rich:tooltip>
             </h:graphicImage>
-			</a4j:repeat>	
+			</ui:repeat>	
 		</h:panelGroup>
 	</h:panelGrid>
 </composite:implementation>

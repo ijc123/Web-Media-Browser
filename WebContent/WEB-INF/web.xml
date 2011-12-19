@@ -31,6 +31,9 @@
   <extension>ts</extension>
   <mime-type>video/MP2T</mime-type>
  </mime-mapping>
+ <session-config>
+	<session-timeout>120</session-timeout>
+ </session-config>
  <welcome-file-list>
   <welcome-file>index.html</welcome-file>
   <welcome-file>index.htm</welcome-file>

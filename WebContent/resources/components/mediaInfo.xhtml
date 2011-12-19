@@ -23,12 +23,12 @@
 	<rich:tabPanel id="tabPanel" activeItem="#{cc.attrs.media.selectedTab}" 
 	switchType="ajax" itemChangeListener="#{queryTableBean.processItemChange}">        	        	
         <rich:tab id="tagInfoTab" name="tags" header="Tags">         	
-            <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>   
+            <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>              
         </rich:tab>
         <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;">         	
    			<cc:smallPreviewImages media="#{cc.attrs.media}"/>
         </rich:tab>                      
-    </rich:tabPanel>	
+    </rich:tabPanel>		  
 </composite:implementation>
 </body>
 </html>

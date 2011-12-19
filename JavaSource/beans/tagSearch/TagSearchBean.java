@@ -39,16 +39,18 @@ public class TagSearchBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static final Comparator<TagItem> ALPHABETHICAL_ORDER = new Comparator<TagItem>() {
+	private Comparator<TagItem> ALPHABETHICAL_ORDER = new Comparator<TagItem>() {
 
+		@Override
 		public int compare(TagItem a, TagItem b) {
 
 			return a.getName().compareTo(b.getName());
 		}
 	};
 
-	static final Comparator<TagItem> USED_ORDER = new Comparator<TagItem>() {
+	private Comparator<TagItem> USED_ORDER = new Comparator<TagItem>() {
 
+		@Override
 		public int compare(TagItem a, TagItem b) {
 
 			if(a.getUsed() > b.getUsed()) return(-1);
@@ -76,7 +78,6 @@ public class TagSearchBean implements Serializable {
 	private List<String> queryTagNames;
 	private List<TagItem> queryTagItems;
 	
-	private List<String> queryTableSearchTags;
 	private List<MediaItem> mediaList;
 	private Map<CategoryItem, List<TagItem>> tagMap;
 	private boolean updateTagMap;
@@ -92,7 +93,7 @@ public class TagSearchBean implements Serializable {
 						
 		updateTagMap = true;
 		queryTagNames = new ArrayList<String>();	
-		queryTableSearchTags = new ArrayList<String>();	
+		new ArrayList<String>();	
 		selectedTab = "category";
 		
 		mediaList = new ArrayList<MediaItem>();
@@ -362,8 +363,9 @@ public class TagSearchBean implements Serializable {
 
 	public void queryTableSearch() {
 
-		//queryTable.setMediaList(mediaEJB.getMediaByTagQuery(queryTagNames));
-		queryTable.setMediaList(mediaList);
+		List<MediaItem> queryResults = mediaEJB.getMediaByTagQuery(queryTagNames);
+
+		queryTable.setMediaList(queryResults);
 	}
 
 	public void setQueryTagItems(List<TagItem> queryTagItems) {

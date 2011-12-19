@@ -45,21 +45,25 @@ public class QueryTableBean extends MultiTagPickerSupport
 	
 	private List<MediaTableItem> mediaList;
 	private DataModel<MediaTableItem> queryTable;
+	private Comparator<MediaItem> currentSortMode;
 	
-	 static final Comparator<MediaItem> FILENAME_ORDER =
+	
+	private Comparator<MediaItem> FILENAME_ORDER =
 		 
          new Comparator<MediaItem>() {
 		 
+		 	@Override
 		 	public int compare(MediaItem a, MediaItem b) {
 		 		
 		 		return a.getFileName().compareTo(b.getFileName());
 		 	}
 	 };
 
-	 static final Comparator<MediaItem> SIZEBYTES_ORDER =
+	 private Comparator<MediaItem> SIZEBYTES_ORDER =
 		 
          new Comparator<MediaItem>() {
 		 
+		 	@Override
 		 	public int compare(MediaItem a, MediaItem b) {
 		 		
 		 		if(a.getSizeBytes() < b.getSizeBytes()) return(-1);
@@ -69,30 +73,33 @@ public class QueryTableBean extends MultiTagPickerSupport
 		 	}
 	 };
 	 
-	 static final Comparator<MediaItem> CREATION_ORDER =
+	 private Comparator<MediaItem> CREATION_ORDER =
 		 
          new Comparator<MediaItem>() {
 		 
+		 	@Override
 		 	public int compare(MediaItem a, MediaItem b) {
 		 		
 		 		return a.getCreation().compareTo(b.getCreation());
 		 	}
 	 };
 	
-	 static final Comparator<MediaItem> MODIFIED_ORDER =
+	 private Comparator<MediaItem> MODIFIED_ORDER =
 		 
          new Comparator<MediaItem>() {
 		 
+		 	@Override
 		 	public int compare(MediaItem a, MediaItem b) {
 		 		
 		 		return a.getModified().compareTo(b.getModified());
 		 	}
 	 };
 	 
-	 static final Comparator<MediaItem> VERSION_ORDER =
-			 
+	 private Comparator<MediaItem> VERSION_ORDER =
+						 
 	         new Comparator<MediaItem>() {
 			 
+		 		@Override
 			 	public int compare(MediaItem a, MediaItem b) {
 			 		
 			 		if(a.getVersion() < b.getVersion()) return(-1);
@@ -106,34 +113,78 @@ public class QueryTableBean extends MultiTagPickerSupport
 		mediaList = new ArrayList<MediaTableItem>();
 						
 		inRenderResponse = false;
-		sortByFileName();
-		
+		currentSortMode = Collections.reverseOrder(FILENAME_ORDER);
 		
 	}
 				
 	public void sortByFileName() {
+				
+		if(currentSortMode.equals(FILENAME_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(FILENAME_ORDER);
 		
-		Collections.sort(mediaList, FILENAME_ORDER);
+		} else {
+		
+			currentSortMode = FILENAME_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);
 	}
 	
 	public void sortBySizeBytes() {
 		
-		Collections.sort(mediaList, SIZEBYTES_ORDER);			
+		if(currentSortMode.equals(SIZEBYTES_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(SIZEBYTES_ORDER);
+		
+		} else {
+		
+			currentSortMode = SIZEBYTES_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);		
 	}
 	
 	public void sortByCreation() {
+			
+		if(currentSortMode.equals(CREATION_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(CREATION_ORDER);
 		
-		Collections.sort(mediaList, CREATION_ORDER);
+		} else {
+		
+			currentSortMode = CREATION_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);	
 	}
 	
 	public void sortByModified() {
+			
+		if(currentSortMode.equals(MODIFIED_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(MODIFIED_ORDER);
 		
-		Collections.sort(mediaList, MODIFIED_ORDER);
+		} else {
+		
+			currentSortMode = MODIFIED_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);	
 	}
 	
 	public void sortByVersion() {
+				
+		if(currentSortMode.equals(VERSION_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(VERSION_ORDER);
 		
-		Collections.sort(mediaList, VERSION_ORDER);		
+		} else {
+		
+			currentSortMode = VERSION_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);	
 	}
 		
 	public void setMediaList(List<MediaItem> media) {
@@ -158,10 +209,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 		
 		if(phase == PhaseId.RENDER_RESPONSE) {  
 		
-			if(inRenderResponse == false) {									
-							
-//				mediaList = (List<MediaItem>)context.getApplication().getExpressionFactory()
-//				.createValueExpression(context.getELContext(), "#{cc.attrs.mediaList}", List.class).getValue(context.getELContext());								
+			if(inRenderResponse == false) {																
 																					
 				queryTable = new ListDataModel<MediaTableItem>(mediaList);				
 				
@@ -241,7 +289,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 		 mediaTableItem.setSelectedTab(event.getNewItemName());
 		 
 		 mediaList.set(rowIndex, mediaTableItem);
-		
+				
 	}
 	
 

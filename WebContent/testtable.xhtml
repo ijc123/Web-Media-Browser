@@ -5,14 +5,15 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets" 
 	xmlns:my="/WEB-INF/mytags"
 	xmlns:rich="http://richfaces.org/rich"
-	xmlns:cc="http://java.sun.com/jsf/composite/javascript">
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j">
 <h:head>
 	<meta http-equiv="pragma" content="no-cache" />
 </h:head>
 <h:body>	
-<h:form id="testForm">
-	
-	<cc:queryTableMobile id="taggableQueryTable" mediaList="#{tagAddBean.testData}"/>
+<h:form id="testForm">	
+	<h:outputText value="#{testBean.dummy}"></h:outputText>
+	<cc:queryTable/>
 </h:form>
 </h:body>
 </html>

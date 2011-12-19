@@ -4,6 +4,10 @@ import database.MediaItem;
 
 public class MediaTableItem extends MediaItem {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean selected;
 	private String selectedTab;
 	
@@ -52,8 +56,8 @@ public class MediaTableItem extends MediaItem {
 	}
 
 	public void setSelectedTab(String selectedTab) {
-		this.selectedTab = selectedTab;
+		this.selectedTab = selectedTab;		
 	}
-		
 	
+
 }
