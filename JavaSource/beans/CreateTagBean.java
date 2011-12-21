@@ -36,7 +36,7 @@ public class CreateTagBean implements Serializable {
 	private boolean isNewTag;
 	private String selectedTag;
 	private DataModel<CategoryItem> dataModel;
-	private TagItem tag, dummyTag;
+	private TagItem tag;
 	private String resourceURL;
 	
 	@SuppressWarnings("unused")
@@ -44,7 +44,7 @@ public class CreateTagBean implements Serializable {
 	private void Init() {
 		
 		setNewTag(true);
-		dummyTag = new TagItem();
+
 	}
 		
 	public TagItem getTag() {
@@ -94,7 +94,7 @@ public class CreateTagBean implements Serializable {
 		items.add(newCategory);
 		
 		tag.setCategory(items);
-		dummyTag.setCategory(items);
+
 	}
 	
 	public void deleteTagCategory() {

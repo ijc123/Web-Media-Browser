@@ -196,8 +196,17 @@ public class TagEJB {
 		return(tag);		
 	}
 		
-	private boolean updateTag(final TagItem newTagItem, final TagItem oldTagItem) {
-							
+	private boolean updateTag(TagItem newTagItem, final TagItem oldTagItem) {
+						
+		if(newTagItem.equals(oldTagItem)) {
+			
+			return(false);
+			
+		} else {
+			
+			newTagItem.setVersion(oldTagItem.getVersion() + 1);
+		}
+		
 		List<String> oldLinkedTags = oldTagItem.getLinkedTagNames();
 		List<String> newLinkedTags = newTagItem.getLinkedTagNames();
 						
@@ -339,7 +348,7 @@ public class TagEJB {
 		List<String> childList = new ArrayList<String>();
 		childList.add(child);
 			
-		List<TagItem> parentTags = getParentTags(child);;
+		List<TagItem> parentTags = getParentTags(childList);
 		
 		return(parentTags);
 	}
@@ -372,18 +381,7 @@ public class TagEJB {
 		SqlSession session = MyBatis.getSession().openSession(); 
 							
 		String tagName = tag.getName();
-					
-		List<TagItem> parentTags = getParentTags(tagName);
-						
-		for(int i = 0; i < parentTags.size(); i++) {
-			
-			TagItem parentTag = parentTags.get(i);
-			
-			parentTag.getLinkedTagNames().remove(tagName);
-						
-			modifyTag(parentTag, "");
-		}
-				
+	
 		session.delete("database.TagMapper.deleteTag", tagName);
 							
 		session.close();
@@ -420,7 +418,7 @@ public class TagEJB {
 		
 		returns true if successful
 	*/
-	public boolean modifyTag(final TagItem tag, final String tagImageURL) 
+	public boolean modifyTag(TagItem tag, final String tagImageURL) 
 	{		
 		if(tag.getName().isEmpty()) return(false);
 		
@@ -453,7 +451,7 @@ public class TagEJB {
 	
 	private void storeTagImage(TagItem tag, String imageURL) {
 		
-		if(imageURL.equals("")) return;
+		if(imageURL == null || imageURL.equals("")) return;
 
 		URL u;
 		InputStream input = null;
@@ -544,8 +542,21 @@ public class TagEJB {
 	}
 
 
-	public static void Test() {
+	public void Test() {
 
+		List<TagItem> tags = getAllTags();
+		
+		for(int i = 0; i < tags.size(); i++) {
+		
+			TagItem tag = tags.get(i);
+			
+			if(!tag.getLinkedTagNames().isEmpty()) {
+				
+				modifyTag(tag, null);
+			}
+				
+		}
+		
 	}
 	
 

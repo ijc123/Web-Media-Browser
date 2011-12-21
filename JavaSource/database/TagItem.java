@@ -21,13 +21,12 @@ public class TagItem implements Serializable {
 	private String name;
 	private int id;
 	private int used;
+	private int version;
 	private Timestamp modified;
 	private Timestamp creation;
 	private List<String> linkedTagNames;	
 	private ArrayList<CategoryItem> category;
-	
-	private String tagImageURL;
-	
+		
 	public TagItem() {
 		
 		this.name = "";
@@ -37,7 +36,6 @@ public class TagItem implements Serializable {
 		modified = java.sql.Timestamp.valueOf("0000-00-00 00:00:00");
 		creation =  java.sql.Timestamp.valueOf("0000-00-00 00:00:00");
 		
-		this.tagImageURL = "";
 		linkedTagNames = new ArrayList<String>();
 		setCategory(new ArrayList<CategoryItem>());
 		
@@ -80,9 +78,11 @@ public class TagItem implements Serializable {
 		TagEJB tagEJB = null;
 		
 		try {
+			
 			tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
+			
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
 		
@@ -93,18 +93,16 @@ public class TagItem implements Serializable {
 	
 		if(isTagImageAvailable() == false) {
 		
-			 tagImageURL = "/mijngod/javax.faces.resource/NoPhotoAvailable.jpg.jsf?ln=images";
+			 return("/mijngod/javax.faces.resource/NoPhotoAvailable.jpg.jsf?ln=images");
 			
 		}
 		
-		if(!tagImageURL.isEmpty()) return(tagImageURL);
+		String tagImageURL = "";
 		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();
 		String actionURL = handler.getActionURL(context, "/tagimage");
-				
-		tagImageURL = "";
-		
+						
 		try {
 			
 			tagImageURL = URLEncoder.encode(name, "UTF-8");
@@ -121,17 +119,13 @@ public class TagItem implements Serializable {
 	}
 	
 	public String getShortTagImageURL() {
-		
-		String url;
-		
+				
 		if(isTagImageAvailable() == false) {
 			
-			 url = "/mijngod/javax.faces.resource/NoPhotoAvailable.jpg.jsf?ln=images";
-			
-			 return(url);
+			 return("/mijngod/javax.faces.resource/NoPhotoAvailable.jpg.jsf?ln=images");
 		}
-		
-		url = getFullTagImageURL();
+				
+		String url = getFullTagImageURL();
 		
 		url = url.substring(1);
 		url = url.substring(url.indexOf('/'));
@@ -154,6 +148,33 @@ public class TagItem implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		
+		if (other == this) return true;
+		if (other == null) return false;
+		if (getClass() != other.getClass()) return false;
+
+		TagItem tag = (TagItem)other;
+
+		return (name.equals(tag.getName()) &&
+				id == tag.getId() &&
+				used == tag.getUsed() &&
+				version == tag.getVersion() &&
+				creation.equals(tag.getCreation()) &&
+				modified.equals(tag.getModified()) &&				
+				linkedTagNames.equals(tag.getLinkedTagNames()) &&
+				category.equals(tag.getCategory()));	
 	}
 			
 }

@@ -108,6 +108,17 @@ public class QueryTableBean extends MultiTagPickerSupport
 			 	}
 	 };
 	 
+	 private Comparator<MediaItem> MEDIA_ORDER =
+			 
+	         new Comparator<MediaItem>() {
+			 
+		 	@Override
+		 	public int compare(MediaItem a, MediaItem b) {
+		 		
+		 		return a.getMimeType().compareTo(b.getMimeType());
+		 	}
+	 };
+	 
 	public QueryTableBean() {
 		
 		mediaList = new ArrayList<MediaTableItem>();
@@ -182,6 +193,20 @@ public class QueryTableBean extends MultiTagPickerSupport
 		} else {
 		
 			currentSortMode = VERSION_ORDER;
+		}
+		
+		Collections.sort(mediaList, currentSortMode);	
+	}
+	
+	public void sortByMedia() {
+		
+		if(currentSortMode.equals(MEDIA_ORDER)) {
+			
+			currentSortMode = Collections.reverseOrder(MEDIA_ORDER);
+		
+		} else {
+		
+			currentSortMode = MEDIA_ORDER;
 		}
 		
 		Collections.sort(mediaList, currentSortMode);	

@@ -384,9 +384,7 @@ public class MediaEJB {
 
 	public void synchronize(SettingsItem settings) {
 			
-	//setMediaVersions();
-
-		
+			
 		// update last synchronized date to now
 		java.util.Date curDate = Calendar.getInstance().getTime();
 		Timestamp now = new Timestamp(curDate.getTime());

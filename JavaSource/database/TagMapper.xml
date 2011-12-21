@@ -11,6 +11,7 @@
 			tags.used AS tag_used,			
 			tags.creation AS tag_creation,
 			tags.modified AS tag_modified,
+			tags.version AS tag_version,
 			tagslinked.linked AS linked_name,
 			tagscategory.type AS category_type,
 			tagscategory.category AS category 
@@ -34,7 +35,8 @@
   		<result property="used" column="tag_used"/>   
   		<result property="category" column="tag_category"/>
   		<result property="creation" column="tag_creation"/>  
-  		<result property="modified" column="tag_modified"/>   		
+  		<result property="modified" column="tag_modified"/>
+  		<result property="version" column="tag_version"/>     		
   		<collection property="linkedTagNames" ofType="String"> 
   			<id column="linked_name"/>     	
   		</collection> 
@@ -84,7 +86,8 @@
 	</insert>
 	
 	<update id="updateTag" parameterType="TagItem">
-		UPDATE tags SET name = #{name}, used = #{used} WHERE id = #{id}
+		UPDATE tags SET name = #{name}, used = #{used}, version = #{version} 
+		WHERE id = #{id}
 	</update>
 	
 	<delete id="deleteTag" parameterType="String">

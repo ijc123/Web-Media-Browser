@@ -22,7 +22,7 @@
  <h:outputScript library="components" name="queryTable.js" target="head"/>
  <h:outputStylesheet library="css" name="querytable.css"/>
  <my:dataTable value="#{queryTableBean.queryTableModel}" var="media" id="table" 
- columnClasses="tdCheckboxStyle, tdStyle1, tdStyle2, tdStyle2, tdStyle2, tdStyle2" 
+ columnClasses="tdCheckboxStyle, tdStyle1, tdStyle2, tdStyle2, tdStyle2, tdStyle2, tdStyle2" 
  styleClass="tableStyle" rows="10">
  	<h:column>
  		<f:facet name="header">
@@ -53,13 +53,19 @@
              <a4j:commandLink value="Modified" render="table" action="#{queryTableBean.sortByModified}" />
         </f:facet>
         <h:outputText value="#{media.modified}" />
+    </h:column>  
+    <h:column>
+        <f:facet name="header">
+             <a4j:commandLink value="Media" render="table" action="#{queryTableBean.sortByMedia}" />
+        </f:facet>
+        <h:outputText value="#{media.mimeType}" />
     </h:column>   
     <h:column>
         <f:facet name="header">
              <a4j:commandLink value="Edits" render="table" action="#{queryTableBean.sortByVersion}" />
         </f:facet>
         <h:outputText value="#{media.version}" />
-    </h:column>      
+    </h:column>         
 </my:dataTable>
  <my:pager id="pager" dataTableId="table" showpages="19"/>
 </composite:implementation>
