@@ -6,11 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import beans.queryTable.QueryTableBean;
+import beans.user.LoginBean;
 
 import database.MediaItem;
 import database.MediaEJB;
@@ -24,7 +26,7 @@ public class AddTagBean implements Serializable {
 	
 	@Inject
 	private QueryTableBean queryTable;
-
+	
 	private static final long serialVersionUID = 1L;
 	private List<String> selectedTags;
 	
@@ -36,6 +38,8 @@ public class AddTagBean implements Serializable {
 	private Integer minVersion;
 	private Integer maxVersion;
 	
+	private List<String> excludeTypes;
+	
 	public AddTagBean() {
 		
 		super();
@@ -45,8 +49,10 @@ public class AddTagBean implements Serializable {
 		minVersion = maxVersion = null;
 		
 		fileNameQuery = "";
-	}
 		
+		excludeTypes = new ArrayList<String>();
+	}
+			
 	public void doQuery() {
 			
 		List<MediaItem> mediaList = new ArrayList<MediaItem>();
@@ -72,7 +78,7 @@ public class AddTagBean implements Serializable {
 			}
 
 			mediaList = mediaEJB.getMediaByFilenameQuery(fileNameQuery, fromTimestamp,
-					toTimestamp, minVersion, maxVersion);
+					toTimestamp, minVersion, maxVersion, excludeTypes);
 
 		}
 
@@ -173,6 +179,14 @@ public class AddTagBean implements Serializable {
 			this.maxVersion = Integer.parseInt(maxVersion);
 		}	
 
+	}
+
+	public List<String> getExcludeTypes() {		
+		return excludeTypes;
+	}
+
+	public void setExcludeTypes(List<String> excludeTypes) {
+		this.excludeTypes = excludeTypes;
 	}
 
 	

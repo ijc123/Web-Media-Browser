@@ -38,7 +38,12 @@
                 <h:inputText id="minVersion" value="#{addTagBean.minVersion}" />
                 
                 <h:outputText value="Max Edits:"/> 
-                <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}" />																				
+                <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}" />
+                
+                <h:outputText value="Exclude Type(s):"/> 
+                <h:selectManyListbox id="subscriptions" size="5" value="#{addTagBean.excludeTypes}">
+				  <f:selectItems value="#{loginBean.currentUser.accessTypes}" />				  
+				</h:selectManyListbox>																				
 			</h:panelGrid>
 			<h:commandButton value="search" onclick="pager.SetToZero();" action="#{addTagBean.doQuery}"/>	
 			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>

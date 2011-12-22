@@ -245,7 +245,7 @@ public class TagEJB {
 		return(linkedTagsModified);
 	}
 	
-	private void insertTag(final TagItem newTagItem) {
+	private void insertTag(TagItem newTagItem) {
 							
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
@@ -255,6 +255,9 @@ public class TagEJB {
 		
 		setTagLinked(newTagItem);
 		setTagCategory(newTagItem);
+		
+		// update tag id to latest version
+		newTagItem.setId(getTagByName(newTagItem.getName()).getId());
 	
 	}
 	

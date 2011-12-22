@@ -58,7 +58,9 @@ public class MediaEJB {
 	@SuppressWarnings("unchecked")
 	public List<MediaItem> getMediaByFilenameQuery(String query, 
 			java.sql.Timestamp fromTimestamp, java.sql.Timestamp toTimestamp,
-			Integer minVersion, Integer maxVersion) {
+			Integer minVersion, Integer maxVersion,
+			List<String> excludeTypes) 
+	{
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
@@ -93,7 +95,14 @@ public class MediaEJB {
 			map.put("maxVersion", maxVersion);
 		}
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		// make sure to clone the accesstypes before editing them 
+		List<String> accessTypes = 
+				new ArrayList<String>(loginBean.getCurrentUser().getAccessTypes());
+		
+		if(excludeTypes != null) {
+			
+			accessTypes.removeAll(excludeTypes);		
+		}
 		
 		map.put("accessTypes", accessTypes);
 						
@@ -505,7 +514,7 @@ public class MediaEJB {
 		
 		List<MediaItem> result = getMediaByTagQuery(tags);
 		
-		result = getMediaByFilenameQuery("jessica fiorentino", null, null, null, null);
+		result = getMediaByFilenameQuery("jessica fiorentino", null, null, null, null, null);
 		
 		MediaItem item = getMediaByUri(result.get(0).getUri());
 		
