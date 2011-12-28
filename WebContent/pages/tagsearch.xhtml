@@ -43,6 +43,12 @@
 				<f:ajax render="tabPanel" event="change" execute="tagCategory"/>
 	 		</h:selectOneMenu>
 	 	
+	 		<h:selectBooleanCheckbox id="showAllCategories" value="#{tagSearchBean.showAllCategoriesSelected}" 
+	 			style="float: left">
+				<f:ajax render="tabPanel" event="change" execute="showAllCategories"/>
+	 		</h:selectBooleanCheckbox>
+	 		<h:outputText value="All" style="float: left"/>
+	 	
 	 		<h:selectOneRadio id="sortOrder" value="#{tagSearchBean.sortMode}" style="float: right">
   				<f:selectItem itemLabel="Alphabethical" itemValue="0" />
   				<f:selectItem itemLabel="Results" itemValue="1" />
@@ -97,8 +103,9 @@
 			        <rich:dataScroller />
 			    </f:facet>
 			</rich:dataGrid>
-			<h:commandButton value="Search" type="submit" action="#{tagSearchBean.queryTableSearch}" style="margin: 10px;" 
-			onclick="pager.SetToZero();"/>
+			<h:commandButton value="Search" action="#{tagSearchBean.queryTableSearch}" 
+				style="margin: 10px;" onclick="pager.SetToZero();"
+				type="button"  onfocus="this.type = 'submit';" onblur="this.type = 'button';"/>
 			<h:commandButton value="Clear" type="button" onclick="tagSearch.ClearSearchTags('#{cc.clientId}')"/>	
 		</rich:panel>   
 	   	<rich:panel id="queryTablePanel" header="Search Results">

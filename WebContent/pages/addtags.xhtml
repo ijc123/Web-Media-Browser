@@ -45,9 +45,12 @@
 				  <f:selectItems value="#{loginBean.currentUser.accessTypes}" />				  
 				</h:selectManyListbox>																				
 			</h:panelGrid>
-			<h:commandButton value="search" onclick="pager.SetToZero();" action="#{addTagBean.doQuery}"/>	
+			<h:commandButton value="search" onclick="pager.SetToZero();" 
+				action="#{addTagBean.doQuery}" type="button"  
+				onfocus="this.type = 'submit';" onblur="this.type = 'button';"/>	
 			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>
 		</rich:panel>
+		 <ui:debug />
 	</h:form>
 </h:body>
 </html>

@@ -12,7 +12,7 @@ public class UIMyData extends UIData {
 	public UIMyData() {
 		
 		super();
-
+		
 		myFirst = 0;
 	}
 
@@ -37,6 +37,19 @@ public class UIMyData extends UIData {
 	public void restoreState(FacesContext arg0, Object arg1) {
 		
 		super.restoreState(arg0, arg1);
+/*	
+		for(int i = 0; i < getRows(); i++) {
+			
+			setRowIndex(i);
+			MediaTableItem rowData = (MediaTableItem) getRowData();
+						
+			if(rowData.isSelected()) {
+				
+				int j = 0;
+			}
+			
+		}		
+*/
 		
 		//int first = getFirst();
 	}

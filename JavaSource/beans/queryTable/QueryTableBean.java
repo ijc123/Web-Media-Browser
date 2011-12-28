@@ -4,12 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
-import javax.faces.event.PhaseId;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
@@ -40,9 +41,10 @@ public class QueryTableBean extends MultiTagPickerSupport
 	
 	@Inject
 	private MediaPreviewEJB mediaPreviewEJB;
-		
-	private boolean inRenderResponse;
 	
+	@Inject
+	private FacesContext context;
+			
 	private List<MediaTableItem> mediaList;
 	private DataModel<MediaTableItem> queryTable;
 	private Comparator<MediaItem> currentSortMode;
@@ -123,8 +125,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 		
 		mediaList = new ArrayList<MediaTableItem>();
 						
-		inRenderResponse = false;
-		currentSortMode = Collections.reverseOrder(FILENAME_ORDER);
+		currentSortMode = FILENAME_ORDER;
 		
 	}
 				
@@ -222,29 +223,12 @@ public class QueryTableBean extends MultiTagPickerSupport
 			
 		}
 		
-		sortByFileName();
+		Collections.sort(mediaList, currentSortMode);
 	}
 	
 	public DataModel<MediaTableItem> getQueryTableModel() {
 		
-		// make sure the data lookup is done once on the first occurrence of a render response phase
-		FacesContext context = FacesContext.getCurrentInstance();
-		
-		PhaseId phase = context.getCurrentPhaseId();
-		
-		if(phase == PhaseId.RENDER_RESPONSE) {  
-		
-			if(inRenderResponse == false) {																
-																					
-				queryTable = new ListDataModel<MediaTableItem>(mediaList);				
-				
-				inRenderResponse = true;
-			}
-								
-		} else {
-			
-			inRenderResponse = false;
-		}
+		queryTable = new ListDataModel<MediaTableItem>(mediaList);
 		
 		return(queryTable);
 	
@@ -265,7 +249,23 @@ public class QueryTableBean extends MultiTagPickerSupport
 				mediaList.get(i).setSelected(false);
 			}
 		}
-
+/*
+		UIData table = (UIData)findComponent(context.getViewRoot(), "table");
+		
+		for(int i = 0; i < table.getRows(); i++) {
+			
+			table.setRowIndex(i);
+			MediaTableItem rowData = (MediaTableItem) table.getRowData();
+			
+			rowData.setSelected(false);
+			
+			//if(rowData.isSelected()) {
+				
+			//int j = 0;
+			//}
+			
+		}				
+*/		
 		List<String> selectedTags = getSelectedTags();
 
 		for(int i = 0; i < selectedMedia.size(); i++) {
@@ -317,6 +317,19 @@ public class QueryTableBean extends MultiTagPickerSupport
 				
 	}
 	
-
+	
+	  private UIComponent findComponent(UIComponent c, String id) {
+		    if (id.equals(c.getId())) {
+		      return c;
+		    }
+		    Iterator<UIComponent> kids = c.getFacetsAndChildren();
+		    while (kids.hasNext()) {
+		      UIComponent found = findComponent(kids.next(), id);
+		      if (found != null) {
+		        return found;
+		      }
+		    }
+		    return null;
+		  }
 	
 }

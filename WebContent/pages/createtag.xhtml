@@ -26,14 +26,16 @@
 	   		
 	   			<h:outputText value="Select Tag"/>
 	   			<h:panelGroup id="somePanel" name="somePanel">
-	   			<rich:select id="selectTag" enableManualInput="true" defaultLabel="start typing for select"
-	   				value="#{createTagBean.selectedTag}">
-                	<f:selectItems value="#{tagBean.allTags}" />
-                	<f:ajax event="selectitem" render="@form" execute="selectTag"/>
-            	</rich:select>
-				<a4j:commandButton id="newTagButton" value="New" render="@form" execute="@this" type="button">
-					<a4j:param value="true" assignTo="#{createTagBean.newTag}"/>
-				</a4j:commandButton>	
+		   			<rich:select id="selectTag" enableManualInput="true" defaultLabel="start typing for select"
+		   				value="#{createTagBean.selectedTag}" style="float: left">
+	                	<f:selectItems value="#{tagBean.allTags}" />
+	                	<f:ajax event="selectitem" render="@form" execute="selectTag"/>
+	            	</rich:select>
+					<a4j:commandButton id="newTagButton" value="New" render="@form" 
+						execute="@this" type="button" style="margin-left: 10px;"
+						disabled='#{createTagBean.selectedTag == "" ? true : false}'>
+						<a4j:param value="true" assignTo="#{createTagBean.newTag}"/>
+					</a4j:commandButton>	
 				</h:panelGroup>
 					   			 	   		
 	   			<h:outputText value="Tag Name:"/>  	   			  	   		

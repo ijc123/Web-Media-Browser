@@ -29,9 +29,9 @@
 				<rich:tooltip followMouse="true" showDelay="1000"
 	                styleClass="tooltip-custom-body" layout="block">
 	              #{tag.name} <br/><br/>
-	              <a4j:repeat value="#{tag.linkedTagNames}" var="linked">
+	              <ui:repeat value="#{tag.linkedTagNames}" var="linked">
 	              	#{linked} <br/>
-	              </a4j:repeat>
+	              </ui:repeat>
 	            </rich:tooltip>
             </h:graphicImage>
 			</ui:repeat>	

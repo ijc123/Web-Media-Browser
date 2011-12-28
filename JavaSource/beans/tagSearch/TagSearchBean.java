@@ -33,10 +33,7 @@ import database.TypeEJB;
 @ViewScoped
 @Named
 public class TagSearchBean implements Serializable {
-	
-	/**
-	 * 
-	 */
+		
 	private static final long serialVersionUID = 1L;
 
 	private Comparator<TagItem> ALPHABETHICAL_ORDER = new Comparator<TagItem>() {
@@ -83,6 +80,7 @@ public class TagSearchBean implements Serializable {
 	private boolean updateTagMap;
 	
 	private int searchMode;
+	private boolean isShowAllCategoriesSelected;
 	
 	private int sortId;
 	private Comparator<TagItem> sortMode;
@@ -103,6 +101,8 @@ public class TagSearchBean implements Serializable {
 		
 		setSortMode(0);
 		setSearchMode(0);
+		
+		isShowAllCategoriesSelected = false;
 	}
 	
 	@SuppressWarnings("unused")
@@ -221,14 +221,20 @@ public class TagSearchBean implements Serializable {
 			
 			for(int j = 0; j < mediaTags.size(); j++) {
 				
-				if(uniqueTagsMap.get(mediaTags.get(j)) == null) {
+				String mediaTag = mediaTags.get(j);
+				
+				if(queryTagNames.contains(mediaTag)) {
+				
+					continue;
 					
-					uniqueTagsMap.put(mediaTags.get(j), 1);
+				} if(uniqueTagsMap.get(mediaTag) == null) {
+					
+					uniqueTagsMap.put(mediaTag, 1);
 				
 				} else {
 					
-					int count = uniqueTagsMap.get(mediaTags.get(j));
-					uniqueTagsMap.put(mediaTags.get(j), ++count);
+					int count = uniqueTagsMap.get(mediaTag);
+					uniqueTagsMap.put(mediaTag, ++count);
 					
 				}
 				
@@ -333,8 +339,23 @@ public class TagSearchBean implements Serializable {
 			updateTagMap = false;
 		}
 		
-		tagList = tagMap.get(category);
-				
+		if(!isShowAllCategoriesSelected) {
+			
+			// only get the tags for the selected category
+			tagList = tagMap.get(category);
+			
+		} else {
+
+			tagList.clear();
+			
+			// concat all tags for all categories
+			for(List<TagItem> tags : tagMap.values()) {
+			    
+				tagList.addAll(tags);
+			}
+			
+		}
+					
 		Collections.sort(tagList, sortMode);
 			
 		return tagList;
@@ -434,6 +455,20 @@ public class TagSearchBean implements Serializable {
 	public void setSearchMode(int searchMode) {
 		this.searchMode = searchMode;
 		updateTagMap = true;
+	}
+
+	public boolean isShowAllCategoriesSelected() {
+		return isShowAllCategoriesSelected;
+	}
+
+	public void setShowAllCategoriesSelected(boolean isShowAllCategoriesSelected) {
+		
+		if(isShowAllCategoriesSelected != this.isShowAllCategoriesSelected) {
+					
+			updateTagMap = true;		
+		}
+		
+		this.isShowAllCategoriesSelected = isShowAllCategoriesSelected;
 	}
 
 
