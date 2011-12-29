@@ -17,7 +17,12 @@
 	<composite:attribute name="media" type="beans.queryTable.MediaTableItem" required="false"/>
 </composite:interface>
 <composite:implementation>
-	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank" style="font-size: 1.5em;">
+	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank"
+	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.video}">
+		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
+	</h:link>
+	<h:link value="#{cc.attrs.media.fileName}" outcome="showpreview" target="_blank"
+	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.image}">
 		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
 	</h:link>
 	<rich:tabPanel id="tabPanel" activeItem="#{cc.attrs.media.selectedTab}" 
@@ -25,8 +30,9 @@
         <rich:tab id="tagInfoTab" name="tags" header="Tags">         	
             <cc:tagInfo tags="#{cc.attrs.media.tagItems}"/>              
         </rich:tab>
-        <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;">         	
-   			<cc:smallPreviewImages media="#{cc.attrs.media}"/>
+        <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;">        	      	
+   			<cc:videoPreview media="#{cc.attrs.media}" rendered="#{cc.attrs.media.video}"/>
+   			<cc:imagePreview media="#{cc.attrs.media}" rendered="#{cc.attrs.media.image}"/>
         </rich:tab>                      
     </rich:tabPanel>		  
 </composite:implementation>

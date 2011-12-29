@@ -1,16 +1,16 @@
 package database;
 
-public class TagImageItem {
+public class ImageItem {
 
-	private String tag;
+	private String owner;
 	private String mimeType;
 	private int sizeBytes;
 	
 	private byte[] imageData;
 	
-	public TagImageItem() {
+	public ImageItem() {
 		
-		tag = "";
+		owner = "";
 		mimeType = "";
 		sizeBytes = 0;
 		imageData = null;
@@ -40,11 +40,11 @@ public class TagImageItem {
 		this.imageData = data;
 	}
 
-	public String getTag() {
-		return tag;
+	public String getOwner() {
+		return owner;
 	}
 
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setOwner(String tag) {
+		this.owner = tag;
 	}
 }

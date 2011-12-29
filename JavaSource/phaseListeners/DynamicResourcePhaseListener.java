@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import utils.MimeType;
 import video.HTTPLiveStreaming;
+import database.MediaEJB;
 import database.TagEJB;
-import database.TagImageItem;
+import database.ImageItem;
 
 
 public class DynamicResourcePhaseListener implements PhaseListener {
@@ -56,7 +57,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 				e.printStackTrace();
 			}
 			
-			TagImageItem tagImage = tagEJB.getTagImage(tagName);
+			ImageItem tagImage = tagEJB.getTagImage(tagName);
 				
 			if(tagImage != null) {
 			
@@ -103,7 +104,29 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 				
 			}
 			
-		}
+		} else if (viewId.startsWith("/thumbnail")) {
+
+			String uri = external.getRequestParameterMap().get("id");
+
+			if(debugOutput) System.out.println("Loading Thumbnail Image: " + uri);
+
+			MediaEJB mediaEJB = null;
+
+			try {
+				mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			ImageItem thumbnail = mediaEJB.getMediaThumbnail(uri);
+
+			if(thumbnail != null) {
+
+				generateBinaryResponse(context, servletResponse, thumbnail.getImageData(), thumbnail.getMimeType());
+			}
+
+		} 
 		
 	}
 

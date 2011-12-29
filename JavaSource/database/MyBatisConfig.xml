@@ -4,7 +4,7 @@
 
 	<typeAliases>
 		<typeAlias type="database.TagItem" alias="TagItem" />
-		<typeAlias type="database.TagImageItem" alias="TagImageItem" />
+		<typeAlias type="database.ImageItem" alias="ImageItem" />
 		<typeAlias type="database.MediaItem" alias="MediaItem" />
 		<typeAlias type="database.SettingsItem" alias="SettingsItem" />
 		<typeAlias type="database.MediaLocationItem" alias="MediaLocationItem" />

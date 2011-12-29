@@ -164,5 +164,24 @@
 		SELECT COUNT(*) FROM media
 	</select>
 	
+	<insert id="setMediaThumbnail" parameterType="ImageItem">
+		INSERT INTO mediaThumbnail (uri, mimeType, sizeBytes, imageData) VALUES (#{owner}, #{mimeType}, #{sizeBytes}, #{imageData})
+		ON DUPLICATE KEY UPDATE mimeType = #{mimeType}, sizeBytes = #{sizeBytes}, imageData = #{imageData} 	
+	</insert>			
+				
+	<select id="getMediaThumbnail" parameterType="String" resultType="ImageItem">
+		SELECT 
+			uri AS owner,
+			mimeType AS mimeType,
+			sizeBytes AS sizeBytes,
+			imageData AS imageData
+		FROM mediaThumbnail 
+		WHERE uri = #{uri}
+	</select>			
+			
+	<select id="hasMediaThumbnail" parameterType="String" resultType="Integer">
+		SELECT EXISTS(SELECT 1 FROM mediaThumbnail WHERE uri = #{uri})		
+	</select>
+	
 </mapper>
 

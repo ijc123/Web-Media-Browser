@@ -48,8 +48,15 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 		
 		//PreviewImages previewImages = new PreviewImages();
 		
-		largeImagePath = mediaPreviewEJB.getLargePreviewImage(media);
-		smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesList(media);
+		if(media.isVideo()) {
+		
+			largeImagePath = mediaPreviewEJB.getLargePreviewImage(media);
+			smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesList(media);
+		
+		} else if(media.isImage()) {
+			
+			largeImagePath = media.getPath();
+		}
 		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();

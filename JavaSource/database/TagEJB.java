@@ -19,8 +19,8 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.jboss.ejb3.annotation.IgnoreDependency;
 
+import utils.ImageUtil;
 import utils.MapArgument;
-
 import beans.user.LoginBean;
 
 @Stateless
@@ -32,7 +32,7 @@ public class TagEJB {
 	
 	@Inject
 	private LoginBean loginBean;
-		
+			
 	public TagItem getTagByName(String name) {
 		
 		if(name == null) return(null);
@@ -485,14 +485,28 @@ public class TagEJB {
 			output = new ByteArrayOutputStream();
 						
 			IOUtils.copy(input, output);	      
-
-			TagImageItem tagImage = new TagImageItem();
+		
+			ImageItem tagImage;
 			
-			tagImage.setTag(tag.getName());
-			tagImage.setMimeType(mimeType);
-			tagImage.setSizeBytes(output.size());
-			tagImage.setImageData(output.toByteArray());
-			
+			try {
+				
+				ImageUtil imageUtil = new ImageUtil();
+				
+				tagImage = imageUtil.createThumbNail(output.toByteArray(), 200);
+				tagImage.setOwner(tag.getName());
+				
+			} catch (Exception e) {
+				
+				tagImage = new ImageItem();
+				
+				tagImage.setOwner(tag.getName());
+				tagImage.setMimeType(mimeType);
+				tagImage.setSizeBytes(output.size());
+				tagImage.setImageData(output.toByteArray());
+				
+				e.printStackTrace();
+			}
+						
 			SqlSession session = MyBatis.getSession().openSession(); 
 					
 			session.insert("database.TagMapper.setTagImage", tagImage);
@@ -532,11 +546,11 @@ public class TagEJB {
 		
 	}
 	
-	public TagImageItem getTagImage(String tagName) {
+	public ImageItem getTagImage(String tagName) {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		TagImageItem tagImage = (TagImageItem) session.selectOne("database.TagMapper.getTagImage", tagName);
+		ImageItem tagImage = (ImageItem) session.selectOne("database.TagMapper.getTagImage", tagName);
 		
 		session.close();
 		

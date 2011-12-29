@@ -13,11 +13,13 @@
 </head>
 <body>
 <composite:interface>
-	<composite:attribute name="media"  type="database.MediaItem" required="false"/>
+	<composite:attribute name="media"  type="database.MediaItem" required="true"/>
+	<composite:attribute name="rendered" required="false"/>
 </composite:interface>
 <composite:implementation>
-	<rich:dataGrid id="previewImageDataGrid" value="#{smallPreviewImagesBean.imagesURLList(cc.attrs.media)}"
-		var="url" columns="3" elements="3" width="600px" border="0" style="margin-left:auto; margin-right:auto">
+	<rich:dataGrid id="previewImageDataGrid" value="#{smallPreviewImagesBean.getVideoPreviewImagesURLList(cc.attrs.media)}"
+		var="url" columns="3" elements="3" width="600px" border="0" style="margin-left:auto; margin-right:auto" 
+		rendered="#{cc.attrs.rendered}">
 		<rich:panel>
 			<h:link outcome="showpreview" target="_blank" >		
 				<h:graphicImage id="tagImage" url="#{url}" style="height: 150px" />

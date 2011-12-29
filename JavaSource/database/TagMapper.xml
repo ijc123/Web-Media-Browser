@@ -141,13 +141,19 @@
 		WHERE <include refid="accessTypesFilter"/>
 	</select>
 			
-	<insert id="setTagImage" parameterType="TagImageItem">
-		INSERT INTO tagsImage (tag, mimeType, sizeBytes, imageData) VALUES (#{tag}, #{mimeType}, #{sizeBytes}, #{imageData})
+	<insert id="setTagImage" parameterType="ImageItem">
+		INSERT INTO tagsImage (tag, mimeType, sizeBytes, imageData) VALUES (#{owner}, #{mimeType}, #{sizeBytes}, #{imageData})
 		ON DUPLICATE KEY UPDATE mimeType = #{mimeType}, sizeBytes = #{sizeBytes}, imageData = #{imageData} 	
 	</insert>			
 				
-	<select id="getTagImage" parameterType="String" resultType="TagImageItem">
-		SELECT * FROM tagsImage WHERE tag = #{tag}
+	<select id="getTagImage" parameterType="String" resultType="ImageItem">
+		SELECT 
+			tag AS owner,
+			mimeType AS mimeType,
+			sizeBytes AS sizeBytes,
+			imageData AS imageData
+		FROM tagsImage 
+		WHERE tag = #{tag}
 	</select>			
 			
 	<select id="hasTagImage" parameterType="String" resultType="Integer">

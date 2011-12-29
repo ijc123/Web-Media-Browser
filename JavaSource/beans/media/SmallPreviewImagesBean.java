@@ -21,43 +21,44 @@ public class SmallPreviewImagesBean {
 	@Inject
 	MediaPreviewEJB mediaPreviewEJB;
 	
-	public List<String> imagesURLList(MediaItem media) {
+	@Inject
+	FacesContext context;
+	
+	private String createPreviewImageURL(String imageType, String path) {
+		
+		ViewHandler handler = context.getApplication().getViewHandler();
+		String imageURL = handler.getActionURL(context, imageType);
+		
+		String previewURL;
+		
+		try {
+					
+			previewURL = URLEncoder.encode(path, "UTF-8");
+		
+		} catch (UnsupportedEncodingException e) {
+		
+			e.printStackTrace();
+			previewURL = "";
+		}
+		
+		String fullURL = imageURL + "?id=" + previewURL;
+		
+		fullURL = fullURL.substring(1);
+		fullURL = fullURL.substring(fullURL.indexOf('/'));
+		
+		return(fullURL);
+	}
+	
+	
+	public List<String> getVideoPreviewImagesURLList(MediaItem media) {
 		
 		if(media == null) return(new ArrayList<String>());
-		//MediaItem media = getMediaItem();
-	
-//		PreviewImages previewImages = new PreviewImages();
-		
+
 		List<String> images = mediaPreviewEJB.getSmallPreviewImagesList(media);
-/*		
-		if(images.isEmpty()) {
-			
-			previewImages.build(media);
-			images = previewImages.getSmallPreviewImagesList(media);
-		}
-*/		
-		FacesContext context = FacesContext.getCurrentInstance();
-		ViewHandler handler = context.getApplication().getViewHandler();
-		String imageURL = handler.getActionURL(context, "/previewimage");
 		
-		for(int i = 0; i <  images.size(); i++) {
-			
-			String previewURL = "";
-			
-			try {
-						
-				previewURL = URLEncoder.encode(images.get(i), "UTF-8");
-			
-			} catch (UnsupportedEncodingException e) {
-			
-				e.printStackTrace();
-				previewURL = "";
-			}
-			
-			String fullURL = imageURL + "?id=" + previewURL;
-			
-			fullURL = fullURL.substring(1);
-			fullURL = fullURL.substring(fullURL.indexOf('/'));
+		for(int i = 0; i < images.size(); i++) {
+		
+			String fullURL = createPreviewImageURL("/previewimage", images.get(i));
 			
 			images.set(i, fullURL);
 		}
@@ -65,7 +66,12 @@ public class SmallPreviewImagesBean {
 		return(images);
 	}
 		
-	
+	public String getThumbnailURL(MediaItem media) {
+		
+		String fullURL = createPreviewImageURL("/thumbnail", media.getUri());
+				
+		return(fullURL);
+	}
 }
 
 

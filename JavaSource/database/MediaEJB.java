@@ -1,5 +1,9 @@
 package database;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,26 +13,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import beans.user.LoginBean;
-
 import utils.FileUtils;
+import utils.ImageUtil;
 import utils.MapArgument;
+import beans.user.LoginBean;
 
 
 @Stateless
 public class MediaEJB {
 	
-	@EJB
+	@Inject
 	SettingsEJB settingsEJB;
 		
-	@EJB
+	@Inject
 	TagEJB tagEJB;
 	
 	@Inject
@@ -505,33 +509,77 @@ public class MediaEJB {
 		
 	}
 
-	
-	public void Test() {
+	public void storeMediaThumbnail(MediaItem media) {
+
+		if(media == null || !media.isImage()) return;
+
+		File imagefile = new File(media.getPath());
+		FileInputStream fileInput = null;
+		ByteArrayOutputStream byteOutput = null;
+
+		ImageItem tagImage;
+
+		try {
+
+			fileInput = new FileInputStream(imagefile);
+			byteOutput = new ByteArrayOutputStream();
+
+			IOUtils.copy(fileInput, byteOutput);	
+
+			ImageUtil imageUtil = new ImageUtil();
 			
-		List<String> tags = new ArrayList<String>();
-		
-		tags.add("jessica fiorentino");
-		
-		List<MediaItem> result = getMediaByTagQuery(tags);
-		
-		result = getMediaByFilenameQuery("jessica fiorentino", null, null, null, null, null);
-		
-		MediaItem item = getMediaByUri(result.get(0).getUri());
-		
-		long oldSize = item.getSizeBytes();
-		
-		item.setSizeBytes(0);
-		
-		updateMedia(item);
-		
-		item = getMediaByUri(result.get(0).getUri());
-		
-		item.setSizeBytes(oldSize);
-		
-		updateMedia(item);
+			tagImage = imageUtil.createThumbNail(byteOutput.toByteArray(), 200);
+			tagImage.setOwner(media.getUri());
+
+			SqlSession session = MyBatis.getSession().openSession(); 
+
+			session.insert("database.MediaMapper.setMediaThumbnail", tagImage);
+
+			session.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			
+		} finally {
+
+			try {
+				if(fileInput != null) fileInput.close();
+				if(byteOutput != null) byteOutput.close();
+			} catch (IOException ioe) {
+
+			}
+
+		}
+
+	}
 	
+	public boolean hasMediaThumbnail(MediaItem media) {
+		
+		if(!media.isImage()) return(false);
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		Integer result = (Integer) session.selectOne("database.MediaMapper.hasMediaThumbnail", media.getUri());
+		
+		session.close();
+		
+		return(result != 0 ? true : false);
 		
 	}
+	
+	public ImageItem getMediaThumbnail(String uri) {
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		ImageItem tagImage = (ImageItem) session.selectOne("database.MediaMapper.getMediaThumbnail", uri);
+		
+		session.close();
+		
+		return(tagImage);
+		
+	}
+
 	
 	
 	
