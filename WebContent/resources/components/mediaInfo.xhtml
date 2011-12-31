@@ -18,7 +18,7 @@
 </composite:interface>
 <composite:implementation>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank"
-	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.video}">
+	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.video || cc.attrs.media.audio}">
 		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
 	</h:link>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="showpreview" target="_blank"
@@ -33,6 +33,7 @@
         <rich:tab id="previewTab" name="preview" header="Preview" style="text-align: center;">        	      	
    			<cc:videoPreview media="#{cc.attrs.media}" rendered="#{cc.attrs.media.video}"/>
    			<cc:imagePreview media="#{cc.attrs.media}" rendered="#{cc.attrs.media.image}"/>
+   			<cc:audioPreview media="#{cc.attrs.media}" rendered="#{cc.attrs.media.audio}"/>
         </rich:tab>                      
     </rich:tabPanel>		  
 </composite:implementation>

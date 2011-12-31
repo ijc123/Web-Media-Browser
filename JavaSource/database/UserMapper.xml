@@ -49,14 +49,14 @@
 	</delete>
 	
 	<insert id="insertUserTypes" parameterType="Map">
-		INSERT IGNORE INTO usertype (name, type) VALUES 
-		<foreach item="type" index="i" collection="accessTypes" open="(" separator="," close=")">
+		INSERT IGNORE INTO usertype (user, type) VALUES 
+		<foreach item="type" index="i" collection="accessTypes" open="(" separator="),(" close=")">
 			#{name}, #{type}
 		</foreach>
 	</insert>
 	
 	<delete id="deleteUserTypes" parameterType="UserItem">
-		DELETE FROM usertype WHERE name = #{name}
+		DELETE FROM usertype WHERE user = #{name}
 	</delete>
 	
 </mapper>

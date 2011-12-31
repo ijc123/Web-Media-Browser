@@ -42,6 +42,8 @@ public class MediaEJB {
 	@SuppressWarnings("unchecked")
 	public List<MediaItem> getMediaByTagQuery(final List<String> tag) {
 						
+		if(tag.isEmpty()) return(new ArrayList<MediaItem>());
+		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
 		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();

@@ -123,7 +123,7 @@ public class UserEJB {
 			
 		SqlSession session = MyBatis.getSession().openSession(); 
 							
-		session.insert("database.TypeMapper.deleteUser", user);
+		session.insert("database.UserMapper.deleteUser", user);
 	
 		session.close();
 	}
@@ -139,7 +139,7 @@ public class UserEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 							
-		session.insert("database.UserMapper.modifyUser", map);
+		session.insert("database.UserMapper.insertUserTypes", map);
 	
 		session.close();
 	}
