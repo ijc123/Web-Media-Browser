@@ -2,13 +2,18 @@ package database;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Size;
+
 public class CategoryItem implements Cloneable, Comparable<CategoryItem>, Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	@Size(min=1, max=512, message="Invalid category name length.")
 	private String name;
+
 	private String typeName;
 
 	public CategoryItem() {

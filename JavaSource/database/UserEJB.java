@@ -98,7 +98,7 @@ public class UserEJB {
 	private void insertUser(UserItem user) {
 		
 		if(user == null) return;
-		
+						
 		SqlSession session = MyBatis.getSession().openSession(); 
 							
 		session.insert("database.UserMapper.insertUser", user);

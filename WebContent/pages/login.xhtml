@@ -14,12 +14,11 @@
 	<h:form>
 		<rich:panel id="settingsPanel" header="Login">
 			<h:panelGrid columns="2">
-								
 				<h:outputText value="User Name:"/>
-				<h:inputText value="#{credentialsBean.username}"/>
-				
+				<h:inputText id="username" value="#{credentialsBean.username}" required="true"/>
+						
 				<h:outputText value="Password:"/>
-				<h:inputSecret value="#{credentialsBean.password}"/>				 										
+				<h:inputSecret id="password" value="#{credentialsBean.password}" required="true"/>						 										
 			</h:panelGrid>	
 			<h:commandButton value="Login" action="#{loginBean.login}"  type="submit" 
 				style="margin: 10px;"/>			

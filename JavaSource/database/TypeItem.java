@@ -2,10 +2,15 @@ package database;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.Size;
+
 public class TypeItem {
 
 	private int id;
+	
+	@Size(min=1, max=64, message="Invalid type name length.")
 	private String name;
+	
 	private Timestamp creation;
 	private Timestamp modified;
 	

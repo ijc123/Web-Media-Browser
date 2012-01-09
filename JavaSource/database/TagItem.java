@@ -11,6 +11,7 @@ import javax.faces.application.ViewHandler;
 import javax.faces.context.FacesContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.validation.constraints.Size;
 
 public class TagItem implements Serializable {
 
@@ -18,7 +19,10 @@ public class TagItem implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	@Size(min=1, max=50, message="Invalid tag name length.")
 	private String name;
+	
 	private int id;
 	private int used;
 	private int version;

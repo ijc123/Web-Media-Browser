@@ -102,10 +102,10 @@
 				AND media.creation &lt; #{toTimestamp}
 			</if>
 			<if test="minVersion != null">
-				AND media.version > #{minVersion}
+				AND media.version >= #{minVersion}
 			</if>	
 			<if test="maxVersion != null">
-				AND media.version &lt; #{maxVersion}
+				AND media.version &lt;= #{maxVersion}
 			</if>	
 		</where> 			
 		AND <include refid="accessTypesFilter"/>		 

@@ -16,7 +16,7 @@ public class MyBatis {
 		try {
 			
 			// comment this function to dump debug output to console
-			//org.apache.ibatis.logging.LogFactory.useNoLogging();
+			org.apache.ibatis.logging.LogFactory.useNoLogging();
 			
 			reader    = Resources.getResourceAsReader("database/MyBatisConfig.xml");
 			sqlMapper = new SqlSessionFactoryBuilder().build(reader);
