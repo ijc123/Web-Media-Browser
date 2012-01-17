@@ -64,5 +64,8 @@ public class LoginBean implements Serializable {
        return currentUser;
     }
 
-    
+    public void updateCurrentUser() {
+    	
+    	currentUser = userEJB.getUserByName(currentUser.getName());
+    }
 }

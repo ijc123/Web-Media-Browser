@@ -94,6 +94,11 @@
 		DELETE FROM tags WHERE name = #{name}
 	</delete>
 	
+	<update id="deleteTagsWithoutCategory">
+		DELETE FROM tags
+		WHERE name NOT IN (SELECT tag FROM tagscategory)	
+	</update>
+	
 	<insert id="setTagLinked" parameterType="Map">
 		INSERT IGNORE INTO tagslinked (tag, linked) VALUES (#{tag}, #{linked}) 	
 	</insert>

@@ -390,6 +390,16 @@ public class TagEJB {
 		session.close();
 	}
 	
+	public void deleteTagsWithoutCategory() {
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		session.delete("database.TagMapper.deleteTagsWithoutCategory");
+							
+		session.close();
+		
+	}
+	
 
 	public void setTagUsedCounters() {
 		

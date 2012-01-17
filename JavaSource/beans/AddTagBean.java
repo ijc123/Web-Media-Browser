@@ -6,16 +6,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.Min;
 
 import beans.queryTable.QueryTableBean;
-import beans.user.LoginBean;
-
-import database.MediaItem;
 import database.MediaEJB;
+import database.MediaItem;
 
 @ViewScoped
 @Named
@@ -35,7 +33,9 @@ public class AddTagBean implements Serializable {
 	private Date toDate;
 	private Locale locale;
 	
+	@Min(value=0, message="Min Edits should be a positive integer")
 	private Integer minVersion;
+	@Min(value=0, message="Max Edits should be a positive integer")
 	private Integer maxVersion;
 	
 	private List<String> excludeTypes;
@@ -46,7 +46,8 @@ public class AddTagBean implements Serializable {
 		
 		setLocale(Locale.US);
 				
-		minVersion = maxVersion = null;
+		minVersion = 0;
+		maxVersion = 1024;
 		
 		fileNameQuery = "";
 		
@@ -144,41 +145,24 @@ public class AddTagBean implements Serializable {
 		this.toDate = toDate;
 	}
 
-	public String getMinVersion() {
+	public int getMinVersion() {
 		
-		if(minVersion == null) return("");
-		else return(Integer.toString(minVersion));
+		return(minVersion);
 	}
 
-	public void setMinVersion(String minVersion) {
+	public void setMinVersion(int minVersion) {
 		
-		if(minVersion.isEmpty()) {
-			
-			this.minVersion = null;
-			
-		} else {
-			
-			this.minVersion = Integer.parseInt(minVersion);
-		}			
+		this.minVersion = minVersion;				
 	}
 
-	public String getMaxVersion() {
+	public int getMaxVersion() {
 		
-		if(maxVersion == null) return("");
-		else return(Integer.toString(maxVersion));
+		return(maxVersion);
 	}
 
-	public void setMaxVersion(String maxVersion) {
+	public void setMaxVersion(int maxVersion) {
 		
-		if(maxVersion.isEmpty()) {
-			
-			this.maxVersion = null;
-			
-		} else {
-			
-			this.maxVersion = Integer.parseInt(maxVersion);
-		}	
-
+		this.maxVersion = maxVersion;	
 	}
 
 	public List<String> getExcludeTypes() {		

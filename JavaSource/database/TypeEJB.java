@@ -1,5 +1,6 @@
 package database;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,12 @@ public class TypeEJB {
 	
 	@Inject
 	LoginBean loginBean;
+	
+	@Inject 
+	UserEJB userEJB;
+	
+	@Inject
+	TagEJB tagEJB;
 	
 	public boolean updateAllTypes(List<TypeItem> type) {
 		
@@ -64,7 +71,31 @@ public class TypeEJB {
 				insertType(t);
 			}
 			
+		}			
+		
+		// update root access types
+		UserItem root = userEJB.getUserByName("root");
+		
+		List<String> accessTypes = new ArrayList<String>();
+		
+		for(int i = 0; i < type.size(); i++) {
+			
+			accessTypes.add(type.get(i).getName());
 		}
+		
+		root.setAccessTypes(accessTypes);
+		
+		userEJB.updateUser(root);
+		
+		// make sure the changes to the root user types are propagated 
+		// into the current session
+		if(loginBean.getCurrentUser().getName().equals("root")) {
+			
+			loginBean.updateCurrentUser();
+		}
+		
+		// remove all tags which are now without a category 
+		tagEJB.deleteTagsWithoutCategory();
 		
 		session.close();
 		

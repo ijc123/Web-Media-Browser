@@ -1,6 +1,5 @@
 package database;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +26,8 @@ public class UserEJB {
 	
 	public UserItem getUser(String userName, String password) {
 		
-		Map<String, String> map = new HashMap<String, String>();
-		
-		map.put("name", userName);
-		map.put("password", password);
-		
+		Map<String, Object> map = MapArgument.create("name", userName,
+													 "password", password);			
 		SqlSession session = MyBatis.getSession().openSession(); 
 							
 		UserItem user = (UserItem)session.selectOne("database.UserMapper.getUser", map);
@@ -41,6 +37,37 @@ public class UserEJB {
 		return(user);
 	}
 	
+	public UserItem getUserByName(String userName) {
+				
+		SqlSession session = MyBatis.getSession().openSession(); 
+							
+		UserItem user = (UserItem)session.selectOne("database.UserMapper.getUserByName", userName);
+	
+		session.close();
+		
+		return(user);
+	}
+	
+	public boolean updateUser(UserItem user) {
+		
+		if(user == null) return(false);
+		
+		UserItem oldUser = getUserByName(user.getName());
+		
+		if(oldUser == null) {
+			
+			insertUser(user);
+		
+		} else {
+		
+			modifyUser(user);
+			deleteUserTypes(user);
+			insertUserTypes(user);
+		}
+		
+		return(true);
+	}
+
 	public boolean updateAllUsers(List<UserItem> user) {
 		
 		if(user == null) return(false);
@@ -63,7 +90,7 @@ public class UserEJB {
 					
 					delete = false;
 					
-					updateUser(t);
+					modifyUser(t);
 					deleteUserTypes(t);
 					insertUserTypes(t);
 					
@@ -106,7 +133,7 @@ public class UserEJB {
 		session.close();
 	}
 	
-	private void updateUser(UserItem user) {
+	private void modifyUser(UserItem user) {
 		
 		if(user == null) return;
 		

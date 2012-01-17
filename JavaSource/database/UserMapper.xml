@@ -34,6 +34,11 @@
 		<include refid="selectUser"/>
 		WHERE user.name = #{name} AND user.password = #{password}
 	</select>
+	
+	<select id="getUserByName" parameterType="String" resultMap="userItemResults">
+		<include refid="selectUser"/>
+		WHERE user.name = #{name} 
+	</select>
 		
 	<insert id="insertUser" parameterType="UserItem">
 		INSERT IGNORE INTO user (name, password, level) VALUES (#{name}, #{password}, #{level}) 	

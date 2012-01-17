@@ -143,11 +143,15 @@
 		DELETE FROM mediatype WHERE uri = #{uri} AND type = #{type} 	
 	</delete>
 
-	<update id="dropTempTable">
+	<update id="dropTempTableDiskMedia">
 		DROP TEMPORARY TABLE IF EXISTS diskmedia
 	</update>
 	
-	<update id="createTempTable">
+	<update id="dropTempTableNewMedia">
+		DROP TEMPORARY TABLE IF EXISTS newmedia
+	</update>
+	
+	<update id="createTempTableDiskMedia">
 		CREATE TEMPORARY TABLE diskmedia (uri VARCHAR(512) NOT NULL, fileName VARCHAR(512) NOT NULL,
 		sizeBytes BIGINT UNSIGNED NOT NULL, typeName VARCHAR(64) NOT NULL)
 	</update>

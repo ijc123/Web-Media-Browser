@@ -35,19 +35,23 @@
                     cellHeight="22px" style="width:200px"/>	
                 
                 <h:outputText value="Min Edits:"/>   
-                <h:inputText id="minVersion" value="#{addTagBean.minVersion}" />
+                <h:inputText id="minVersion" value="#{addTagBean.minVersion}">
+                	<f:convertNumber for="minVersion" integerOnly="true" groupingUsed="false"/>
+                </h:inputText>
                 
                 <h:outputText value="Max Edits:"/> 
-                <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}" />
+                <h:inputText id="maxVersion" value="#{addTagBean.maxVersion}">
+                	<f:convertNumber for="maxVersion" integerOnly="true" groupingUsed="false"/>
+                </h:inputText>
                 
                 <h:outputText value="Exclude Type(s):"/> 
                 <h:selectManyListbox id="subscriptions" size="5" value="#{addTagBean.excludeTypes}">
 				  <f:selectItems value="#{loginBean.currentUser.accessTypes}" />				  
 				</h:selectManyListbox>																				
-			</h:panelGrid>
+			</h:panelGrid>		
 			<h:commandButton value="search" onclick="pager.SetToZero();" 
 				action="#{addTagBean.doQuery}" type="button"  
-				onfocus="this.type = 'submit';" onblur="this.type = 'button';"/>	
+				onfocus="this.type = 'submit';" onblur="this.type = 'button';"/>					
 			<cc:taggableQueryTable id="queryTable" mediaList="#{addTagBean.mediaList}"/>
 		</rich:panel>
 		 <ui:debug />

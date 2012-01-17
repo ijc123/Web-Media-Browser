@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.naming.InitialContext;
@@ -86,6 +88,8 @@ public class MediaItem implements Serializable, Cloneable {
 			e.printStackTrace();
 		}
 					
+		
+		sortTagsByCategory(tagItems);
 		
 		return(tagItems);
 		
@@ -195,5 +199,22 @@ public class MediaItem implements Serializable, Cloneable {
 		
 		if(getMimeType().startsWith("image")) return(true);
 		else return(false);
+	}
+	
+	private Comparator<TagItem> TAG_CATEGORY_ORDER =
+			 
+	         new Comparator<TagItem>() {
+			 
+			 	@Override
+			 	public int compare(TagItem a, TagItem b) {
+			 		
+			 		return a.getCategory().get(0).getFullName().compareTo(b.getCategory().get(0).getFullName());
+			 	}
+		 };
+	
+	private void sortTagsByCategory(List<TagItem> tagItem) {
+		
+		Collections.sort(tagItem, TAG_CATEGORY_ORDER);
+		
 	}
 }

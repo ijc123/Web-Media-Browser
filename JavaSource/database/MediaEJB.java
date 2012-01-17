@@ -398,8 +398,7 @@ public class MediaEJB {
 		
 
 	public void synchronize(SettingsItem settings) {
-			
-			
+						
 		// update last synchronized date to now
 		java.util.Date curDate = Calendar.getInstance().getTime();
 		Timestamp now = new Timestamp(curDate.getTime());
@@ -422,9 +421,10 @@ public class MediaEJB {
 		
 		//SqlSession session = MyBatis.getSession().openSession(); 
 		SqlSession session = MyBatis.getSession().openSession(); 
-					
-		session.update("database.MediaMapper.dropTempTable");
-		session.update("database.MediaMapper.createTempTable");
+							
+		session.update("database.MediaMapper.dropTempTableNewMedia");
+		session.update("database.MediaMapper.dropTempTableDiskMedia");
+		session.update("database.MediaMapper.createTempTableDiskMedia");
 		
 		for(int i = 0; i < diskMedia.size(); i++) {
 

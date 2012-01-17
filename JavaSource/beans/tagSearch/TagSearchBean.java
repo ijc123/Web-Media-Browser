@@ -339,6 +339,12 @@ public class TagSearchBean implements Serializable {
 			updateTagMap = false;
 		}
 		
+		// type has no associated sub categories
+		if(category.getName().isEmpty()) {
+			
+			return(new ArrayList<TagItem>());
+		}
+		
 		if(!isShowAllCategoriesSelected) {
 			
 			// only get the tags for the selected category
