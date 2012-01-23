@@ -4,12 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -41,10 +38,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 	
 	@Inject
 	private MediaPreviewEJB mediaPreviewEJB;
-	
-	@Inject
-	private FacesContext context;
-			
+				
 	private List<MediaTableItem> mediaList;
 	private DataModel<MediaTableItem> queryTable;
 	private Comparator<MediaItem> currentSortMode;
@@ -317,7 +311,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 				
 	}
 	
-	
+/*	
 	  private UIComponent findComponent(UIComponent c, String id) {
 		    if (id.equals(c.getId())) {
 		      return c;
@@ -331,5 +325,5 @@ public class QueryTableBean extends MultiTagPickerSupport
 		    }
 		    return null;
 		  }
-	
+*/	
 }

@@ -25,7 +25,7 @@ import com.xuggle.xuggler.IStreamCoder;
 import com.xuggle.xuggler.IVideoPicture;
 import com.xuggle.xuggler.IVideoResampler;
 
-public class Transcode extends Thread {
+public class Transcode2 {
 
 	private CoderInfo videoDecoder;
 	private CoderInfo audioDecoder;
@@ -42,9 +42,8 @@ public class Transcode extends Thread {
 	private OutputStream outputStream;
 	private RandomAccessFile outputFile;
 
-	public Transcode(String threadName, String inputVideoFile, String outputDir, String publishURL) {
+	public Transcode2(String inputVideoFile, String outputDir, String publishURL) {
 
-		super(threadName);
 		
 		this.outputDir = outputDir;
 		this.inputVideoFile = inputVideoFile;
@@ -58,13 +57,21 @@ public class Transcode extends Thread {
 
 	}
 
-	public Transcode(String threadName, String inputVideoFile, OutputStream outputStream) {
-		
-		super(threadName);
+	public Transcode2(String inputVideoFile, OutputStream outputStream) {
 		
 		this.inputVideoFile = inputVideoFile;
+		this.outputStream = outputStream;	
+				
+		videoDecoder = audioDecoder = videoEncoder = audioEncoder = null;		
+		running = false;
+		segmentedOutput = false;
+		
+	}
 	
-		this.outputStream = outputStream;
+	public Transcode2(String inputVideoFile, RandomAccessFile outputFile) {
+				
+		this.inputVideoFile = inputVideoFile;	
+		this.outputFile = outputFile;
 
 		videoDecoder = audioDecoder = videoEncoder = audioEncoder = null;		
 		running = false;
@@ -72,36 +79,13 @@ public class Transcode extends Thread {
 		
 	}
 	
-	public Transcode(String threadName, String inputVideoFile, String outputFileName) {
-		
-		super(threadName);
-		
-		this.inputVideoFile = inputVideoFile;
-		
-		try {
-			
-			outputFile = new RandomAccessFile(outputFileName, "rw");
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		videoDecoder = audioDecoder = videoEncoder = audioEncoder = null;		
-		running = false;
-		segmentedOutput = false;
-		
-	}
-	
-	public void stopRunning() {
+	public void stop() {
 		
 		running = false;
 	}
 	
-	@Override
-	public void run() {
-
+	public void start() {
+			
 		running = true;
 		
 		System.out.println("Transcoding: " + inputVideoFile + " to " + publishURL);
@@ -229,8 +213,7 @@ public class Transcode extends Thread {
 			 */
 			if(decodePacket.getStreamIndex() == videoDecoder.streamIndex)
 			{
-
-
+				
 				int offset = 0;
 				while(offset < decodePacket.getSize())
 				{
@@ -729,247 +712,6 @@ public class Transcode extends Thread {
 
 	}
 
-	/*
-	private IContainer createWriter() {
-
-		IStreamCoder mOutAudioCoder;
-		IStreamCoder mOutVideoCoder; 
-
-		String outputURL =  "rtmp://localhost:1936/live2/abcd2";
-
-		ISimpleMediaFile outputInfo = new SimpleMediaFile();
-		outputInfo.setHasAudio(false);
-		outputInfo.setAudioBitRate(32000);
-		outputInfo.setAudioChannels(1);
-		outputInfo.setAudioSampleRate(22050);
-		outputInfo.setAudioCodec(ICodec.ID.CODEC_ID_AAC);
-		outputInfo.setHasVideo(true);
-		// Unfortunately the Trans-coder needs to know the width and height
-		// you want to output as; even if you don't know yet.
-		outputInfo.setVideoWidth(320);
-		outputInfo.setVideoHeight(240);
-		outputInfo.setVideoBitRate(200000);
-		outputInfo.setVideoCodec(ICodec.ID.CODEC_ID_H264); 
-
-		IContainer writeContainer = IContainer.make();
-
-		IContainerFormat outFormat = IContainerFormat.make();
-		outFormat.setOutputFormat("flv", outputURL, null);		
-		int retval = writeContainer.open(outputURL, IContainer.Type.WRITE, outFormat);
-		if(retval < 0) {	 
-
-			throw new RuntimeException("XUGGLER: could not open output: " 
-					+ outputURL);
-		}
-
-		if(outputInfo.hasAudio())
-		{
-			// Add an audio stream
-			IStream outStream = writeContainer.addNewStream(0);
-			if(outStream == null) {
-
-				throw new RuntimeException("XUGGLER: could not add audio stream to output: " 
-						+ outputURL);
-			}
-
-			IStreamCoder outCoder = outStream.getStreamCoder();
-			ICodec.ID outCodecId = outputInfo.getAudioCodec();
-			ICodec outCodec = ICodec.findEncodingCodec(outCodecId);          
-			if(outCodec == null)
-			{
-				throw new RuntimeException("XUGGLER: Could not encode using the codec:" 
-						+ outputInfo.getAudioCodec());
-			}
-
-			outCoder.setCodec(outCodec);
-			outCoder.setBitRate(outputInfo.getAudioBitRate());
-
-			outCoder.setSampleRate(outputInfo.getAudioSampleRate());
-
-			outCoder.setChannels(outputInfo.getAudioChannels());
-
-			outCoder.open();
-			// if we get here w/o an exception, record the coder
-			mOutAudioCoder = outCoder;
-		}
-
-		if(outputInfo.hasVideo())
-		{
-			// Add an audio stream
-			IStream outStream = writeContainer.addNewStream(1);
-			if(outStream == null) {
-
-				throw new RuntimeException("XUGGLER: could not add video stream to output: " 
-				+ outputURL);
-			}
-
-			IStreamCoder outCoder = outStream.getStreamCoder();
-			ICodec.ID outCodecId = outputInfo.getVideoCodec();
-			ICodec outCodec = ICodec.findEncodingCodec(outCodecId);
-			if(outCodec == null)
-			{
-				throw new RuntimeException("XUGGLER: Could not encode using the codec: " 
-				+ outputInfo.getAudioCodec());
-			}
-
-			outCoder.setCodec(outCodec);
-			outCoder.setWidth(outputInfo.getVideoWidth());
-			outCoder.setHeight(outputInfo.getVideoHeight());
-			outCoder.setPixelType(outputInfo.getVideoPixelFormat());
-			outCoder.setGlobalQuality(outputInfo.getVideoGlobalQuality());
-			outCoder.setBitRate(outputInfo.getVideoBitRate());
-			outCoder.setNumPicturesInGroupOfPictures(10);
-			outCoder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, true);
-
-			outCoder.setTimeBase(IRational.make(1, 25)); // default to FLV
-
-			outCoder.setProperty("b", "96k");
-			outCoder.setProperty("flags", "+loop");
-			outCoder.setProperty("cmp", "+chroma");
-			outCoder.setProperty("partitions", "+parti4x4+partp8x8+partb8x8");
-			outCoder.setProperty("subq", 6);
-			outCoder.setProperty("trellis", 1);
-			outCoder.setProperty("refs", 1);
-			outCoder.setProperty("coder", 0);
-			outCoder.setProperty("me_range", 20);
-			outCoder.setProperty("keyint_min", 25);
-			outCoder.setProperty("sc_threshold", 20);
-			outCoder.setProperty("i_qfactor", 0.71);
-			outCoder.setProperty("bt", "200k");
-			outCoder.setProperty("maxrate", "96k");
-			outCoder.setProperty("qcomp", 0.6);
-			outCoder.setProperty("qmin", 10);
-			outCoder.setProperty("qmax", 51);
-			outCoder.setProperty("qdiff", 4);
-			outCoder.setProperty("level", 30);
-			outCoder.setProperty("ar", true);
-			outCoder.setProperty("re", true);
-			outCoder.setProperty("g", 250);
-			outCoder.setProperty("fps", 25);
-
-			outCoder.open();
-			// if we get here w/o an exception, record the coder
-			mOutVideoCoder = outCoder;
-		}
-
-		retval = writeContainer.writeHeader();
-		if (retval < 0)
-		{
-			throw new RuntimeException("XUGGLER: could not write header for output");
-		} 
-	}
-
-
-	public void someFunc(String inputFile, String outputFile) throws IOException {
-
-		IContainer readContainer = IContainer.make();
-
-		ByteArrayOutputStream byte_out = new ByteArrayOutputStream();
-		DataOutputStream os = new DataOutputStream(byte_out);
-
-		//read a rtmp stream
-		readContainer.open(inputFile,IContainer.Type.READ, null, true, false);
-		IPacket packet = IPacket.make();
-
-		//get a write container which writes into DataOutputStream os
-		IContainer writeContainer = createWriter(os, readContainer);
-
-		//set a break flag
-		boolean breakFlag = false;
-
-		//fetch packets and write them to DataOutputStream os using the
-		//writer got in previous step
-		while(readContainer.readNextPacket(packet) >= 0 &&
-				packet.isComplete() && !breakFlag) 
-		{
-			if (byte_out.size() < 10000000) {
-				writeContainer.writePacket(packet);
-				System.out.println(byte_out.size());
-			} else {
-				//if data read from rtmp stream is approx 20000000 bytes then dump
-				//the data from DataOutputStream os into a byte array defined in the
-				//next command
-				byte[] ba = new byte[20000000];
-				ba = byte_out.toByteArray();
-				System.out.println("bytes read into byte array = " + ba.length);
-				System.out.println("dumping byte array into a flv file - (bafile.flv)");
-				//after getting the data into a byte array save this byte array into
-				//COSAR or for now simply write the byte array into a file names
-				//bafile.flv
-				FileOutputStream fos = new FileOutputStream(outputFile);
-				fos.write(ba);
-				//wrap up by breaking out of the loop
-				breakFlag=true;
-			}
-		}
-		//free the container of its job after giving it the peanut
-		//(writeTrailer)
-		writeContainer.writeTrailer();
-		writeContainer.close();
-
-		//leave the stream alone...
-		readContainer.close();
-
-
-	}
-
-	private static IContainer createWriter(DataOutputStream name, IContainer readContainer) {
-
-		IContainer writeContainer = IContainer.make();
-
-		//function does all the crazy stuff of getting a xuggler IContainer writer
-		IContainerFormat format = IContainerFormat.make();
-		format.setOutputFormat("flv", null, null);
-		writeContainer.open(name, format);
-
-		IStream inVideoStream = readContainer.getStream(0);
-		IStreamCoder inVideocoder = inVideoStream.getStreamCoder();
-
-		inVideocoder.setCodec(ICodec.ID.CODEC_ID_H264);
-		inVideocoder.setTimeBase(inVideoStream.getTimeBase());
-		inVideocoder.setHeight(320);
-		inVideocoder.setWidth(240);
-
-		IStream outVideoStream = writeContainer.addNewStream(0);
-		outVideoStream.setStreamCoder(inVideocoder);
-
-		int video = inVideocoder.open();
-
-		if (video >= 0) {
-			System.out.println("Good videoStream");
-		} else {
-			System.out.println("Wrong videoStream");
-		}
-
-		IStream inAudioStream = readContainer.getStream(1);
-		IStreamCoder inAudioCoder = inAudioStream.getStreamCoder();
-
-		inAudioCoder.setCodec(ICodec.ID.CODEC_ID_MP3);
-		inAudioCoder.setSampleRate(44100);
-
-		inAudioCoder.setTimeBase(inAudioStream.getTimeBase());
-
-		IStream outAudioStream = writeContainer.addNewStream(1);
-		outAudioStream.setStreamCoder(inAudioCoder);
-
-		int audio = inAudioCoder.open();
-		if (audio >= 0) {
-			System.out.println("Good audioStream");
-		} else {
-			System.out.println("Wrong audioStream");
-		}
-		int header = writeContainer.writeHeader();
-
-		if (header == 0) {
-			System.out.println("good header");
-		} else {
-			System.out.println("wrong header" + header);
-		}
-
-		return writeContainer;
-	}
-	 */
-	
 	private class CoderInfo {
 
 		public IStreamCoder coder;

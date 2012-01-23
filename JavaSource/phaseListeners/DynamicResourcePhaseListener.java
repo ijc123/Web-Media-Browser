@@ -25,7 +25,7 @@ import database.ImageItem;
 
 
 public class DynamicResourcePhaseListener implements PhaseListener {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final boolean debugOutput = true;
 
@@ -39,71 +39,71 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 		FacesContext context = event.getFacesContext();
 		ExternalContext external = event.getFacesContext().getExternalContext();
 		HttpServletResponse servletResponse = (HttpServletResponse) external.getResponse();
-		
+
 		String viewId = event.getFacesContext().getViewRoot().getViewId();
-		
+
 		if (viewId.startsWith("/tagimage")) {
-						
+
 			String tagName = external.getRequestParameterMap().get("id");
-			
+
 			if(debugOutput) System.out.println("Loading Tag Image: " + tagName);
-			
+
 			TagEJB tagEJB = null;
-			
+
 			try {
 				tagEJB = (TagEJB) new InitialContext().lookup("java:module/TagEJB");
 			} catch (NamingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			ImageItem tagImage = tagEJB.getTagImage(tagName);
-				
+
 			if(tagImage != null) {
-			
+
 				generateBinaryResponse(context, servletResponse, tagImage.getImageData(), tagImage.getMimeType());
 			}
-		
+
 		} else if(viewId.startsWith("/previewimage")) {
-						
+
 			String path = external.getRequestParameterMap().get("id");
-			
+
 			if(debugOutput) System.out.println("Loading Preview Image: " + path);
-				
+
 			generateBinaryResponse(context, servletResponse, path, "image/jpeg");
-			
+
 		} else if(viewId.startsWith("/video")) {
-			
+
 			String path = external.getRequestParameterMap().get("id");
-			
+
 			if(debugOutput) System.out.println("Loading Video: " + path);
-			
+
 			String mimeType = MimeType.getMimeTypeFromExt(path);
-			
+
 			if (mimeType == null) return;
-				
+
 			generateBinaryResponse(context, servletResponse, path, mimeType);
-			
+
 		} else if(viewId.startsWith("/iosvideo")) {
-		
+
 			String file = external.getRequestParameterMap().get("id");
-			
+
 			String path = HTTPLiveStreaming.getOutputDir() + file;
-						
+
 			//String path = "g:/transcode/" + file;
-			
+
 			if(debugOutput) System.out.println("Loading IOS Video Segment: " + path);
-			
+
 			if(file.endsWith("m3u8")) {
-				
+
 				generateBinaryResponse(context, servletResponse, path, "application/x-mpegURL");
-			
+
 			} else {
-				
+
 				generateBinaryResponse(context, servletResponse, path, "video/MP2T");
-				
+
 			}
-			
+
 		} else if (viewId.startsWith("/thumbnail")) {
 
 			String uri = external.getRequestParameterMap().get("id");
@@ -127,149 +127,110 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 			}
 
 		} 
-		
+
 	}
 
 	public void beforePhase(PhaseEvent event) {
 
 	}
 
-	void generateBinaryResponse(FacesContext context, HttpServletResponse servletResponse, String path, String mimeType) {
-						
-		InputStream in = null;
-		OutputStream out = null;
-		
+	private void generateBinaryResponse(FacesContext context, HttpServletResponse servletResponse, String path, String mimeType) {
+
+		InputStream input = null;
+
 		try {
-			
+
 			File dataFile = new File(path);
-			
+
 			if(!dataFile.exists()) {
-				
+
 				System.out.println("DynamicResourcePhaseListner: " + path + " not found");
+
 				servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, path + " not found");
+
 				context.responseComplete();
 				return;
 			}
-			
-			
-			servletResponse.setContentType(mimeType);
-			
-			in = new FileInputStream(dataFile);
-			out = servletResponse.getOutputStream();
-			
-			int length = (int) dataFile.length();
-			int maxbufferSize = 16384; // 128kb
-			
-			byte[] buffer = new byte[Math.min(length, maxbufferSize)];
 
-			int bytesRead = 0;
-			
-			while((bytesRead = in.read(buffer)) != -1) {
-			    out.write(buffer, 0, bytesRead);
-			}
-			
-			servletResponse.setContentLength(length);
-			context.responseComplete();
-			
-		} catch (FileNotFoundException e) {
-			
-			e.printStackTrace();
-			
+			input = new FileInputStream(dataFile);
+
 		} catch (IOException e) {
-		
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
-		} finally {
-			
-			if(in != null) {
-				
-				try {
-					
-					in.close();
-					
-				} catch (IOException e) {
-		
-					e.printStackTrace();
-				}
-			}
-			
-			if(out != null) {
-				
-				try {
-					
-					out.close();
-					
-				} catch (IOException e) {
-			
-					e.printStackTrace();
-				}
-				
-			}
 		}
-	
+
+		generateBinaryResponse(context, servletResponse, input, mimeType);
+
 	}
-	
-	void generateBinaryResponse(FacesContext context, HttpServletResponse servletResponse, byte[] data, String mimeType) {
-		
-		InputStream in = null;
-		OutputStream out = null;
-		
+
+	private void generateBinaryResponse(FacesContext context, HttpServletResponse servletResponse, byte[] data, String mimeType) {
+
+		InputStream	input = new ByteArrayInputStream(data);
+
+		generateBinaryResponse(context, servletResponse, input, mimeType);
+	}
+
+	private void generateBinaryResponse(FacesContext context, HttpServletResponse servletResponse, InputStream input, String mimeType) {
+
+		OutputStream output = null;
+
 		try {
-					
+
 			servletResponse.setContentType(mimeType);
-			
-			in = new ByteArrayInputStream(data);
-			out = servletResponse.getOutputStream();
-			
-			int length = (int) data.length;
+
+			output = servletResponse.getOutputStream();
+
 			int maxbufferSize = 16384; // 128kb
-			
-			byte[] buffer = new byte[Math.min(length, maxbufferSize)];
+
+			byte[] buffer = new byte[maxbufferSize];
 
 			int bytesRead = 0;
-			
-			while((bytesRead = in.read(buffer)) != -1) {
-			    out.write(buffer, 0, bytesRead);
+			int sizeBytes = 0;
+
+			while((bytesRead = input.read(buffer)) != -1) {
+
+				output.write(buffer, 0, bytesRead);
+				sizeBytes += bytesRead;
 			}
-			
-			servletResponse.setContentLength(length);
+
+			servletResponse.setContentLength(sizeBytes);
 			context.responseComplete();
-			
+
 		} catch (FileNotFoundException e) {
-			
+
 			e.printStackTrace();
-			
+
 		} catch (IOException e) {
-		
+
 			e.printStackTrace();
-			
+
 		} finally {
-			
-			if(in != null) {
-				
+
+			if(input != null) {
+
 				try {
-					
-					in.close();
-					
+
+					input.close();
+
 				} catch (IOException e) {
-		
+
 					e.printStackTrace();
 				}
 			}
-			
-			if(out != null) {
-				
+
+			if(output != null) {
+
 				try {
-					
-					out.close();
-					
+
+					output.close();
+
 				} catch (IOException e) {
-			
+
 					e.printStackTrace();
 				}
-				
+
 			}
 		}
-	
-	}
+
+	} 
 }

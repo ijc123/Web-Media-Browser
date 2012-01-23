@@ -104,8 +104,9 @@
 			    </f:facet>
 			</rich:dataGrid>
 			<h:commandButton value="Search" action="#{tagSearchBean.queryTableSearch}" 
-				style="margin: 10px;" onclick="pager.SetToZero();"
-				type="button"  onfocus="this.type = 'submit';" onblur="this.type = 'button';"/>
+				style="margin: 10px;" onclick="pager.SetToZero();" type="button">
+				<f:ajax execute="@form" render="@form" />	
+			</h:commandButton>
 			<h:commandButton value="Clear" type="button" onclick="tagSearch.ClearSearchTags('#{cc.clientId}')"/>	
 		</rich:panel>   
 	   	<rich:panel id="queryTablePanel" header="Search Results">

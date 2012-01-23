@@ -28,9 +28,7 @@
  		<f:facet name="header">
         	<a4j:commandLink value="Select" onclick="toggleSelectAll('#{cc.clientId}');return false;"/>
         </f:facet>
-        <h:selectBooleanCheckbox id="selected" value="#{media.selected}">
-        	<f:ajax execute="@this" render="@this" event="change"/>
-        </h:selectBooleanCheckbox>
+        <h:selectBooleanCheckbox id="selected" value="#{media.selected}"/>
     </h:column> 
     <h:column>
         <f:facet name="header">

@@ -23,6 +23,14 @@
   <servlet-name>Faces Servlet</servlet-name>
   <url-pattern>*.jsf</url-pattern>
  </servlet-mapping>
+ <servlet>
+   <servlet-name>Video Streaming</servlet-name>
+   <servlet-class>servlet.VideoStreamingServlet</servlet-class>
+ </servlet>
+ <servlet-mapping>
+   <servlet-name>Video Streaming</servlet-name>
+   <url-pattern>/streamvideo</url-pattern>
+ </servlet-mapping>
  <mime-mapping>
   <extension>M3U8</extension>
   <mime-type>application/x-mpegURL</mime-type>
