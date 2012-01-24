@@ -60,15 +60,15 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();
-		String imageURL = handler.getActionURL(context, "/previewimage");
-	
+		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
+		
 		previewURL = "";
 		
 		try {
 					
-			previewURL = URLEncoder.encode(largeImagePath, "UTF-8");
+			String path = URLEncoder.encode(largeImagePath, "UTF-8");
 			
-			String fullURL = imageURL + "?id=" + previewURL;
+			String fullURL = actionURL + "?path=" + path;
 			
 			fullURL = fullURL.substring(1);
 			fullURL = fullURL.substring(fullURL.indexOf('/'));

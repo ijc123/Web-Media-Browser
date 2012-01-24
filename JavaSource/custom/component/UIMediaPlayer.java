@@ -46,13 +46,13 @@ public class UIMediaPlayer extends UIOutput {
 		localHost = "0:0:0:0:0:0:0:1";
 	}
 	
-	private String getTranscodeUrl(String path, String type) {
+	private String getMediaDataUrl(String path) {
 		
 		FacesContext context = FacesContext.getCurrentInstance();
 		ViewHandler handler = context.getApplication().getViewHandler();
-		String actionURL = handler.getActionURL(context, "/streamvideo").replace(".jsf", "");
+		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
 		
-		String location = actionURL + "?path=" + path + "&type=" + type;
+		String location = actionURL + "?path=" + path;
 		
 		return(location);
 	}
@@ -71,7 +71,7 @@ public class UIMediaPlayer extends UIOutput {
 			
 		} else {
 			
-			location = getTranscodeUrl(media.getPath(), "mp4");
+			location = getMediaDataUrl(media.getPath());
 		}
 		
 		rw.startElement("embed", this);
@@ -117,13 +117,12 @@ public class UIMediaPlayer extends UIOutput {
 		
 			// we are on the local machine, no need to stream the video's 
 			// just load them directly
-			//location = media.getPath();
-			
-			location = getTranscodeUrl(media.getPath(), "mp4");
+			location = media.getPath();
+			//location = getMediaDataUrl(media.getPath());
 			
 		} else {
 			
-			location = getTranscodeUrl(media.getPath(), "mp4");
+			location = getMediaDataUrl(media.getPath());
 		}
 		
 		rw.startElement("object", this);
@@ -188,7 +187,7 @@ public class UIMediaPlayer extends UIOutput {
 			</OBJECT>
 		 */
 		
-		String location = getTranscodeUrl(media.getPath(), "mp4");
+		String location = getMediaDataUrl(media.getPath());
 				
 		rw.startElement("object", this);
 
@@ -281,7 +280,7 @@ public class UIMediaPlayer extends UIOutput {
 		</video>
 	 	*/
 		
-		String location = getTranscodeUrl(media.getPath(), "mp4");
+		String location = getMediaDataUrl(media.getPath());
 		
 		rw.startElement("video", this);
 		
@@ -353,8 +352,8 @@ public class UIMediaPlayer extends UIOutput {
 			
 		} else if(useragent.indexOf("safari") != -1) {
 	
-			renderHTML5Video(rw, clientId, id, media, autostart, ipAddress);
-			//renderSafari(rw, clientId, id, media, autostart, ipAddress);
+			//renderHTML5Video(rw, clientId, id, media, autostart, ipAddress);
+			renderSafari(rw, clientId, id, media, autostart, ipAddress);
 			
 		} else {
 			

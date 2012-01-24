@@ -24,12 +24,12 @@
   <url-pattern>*.jsf</url-pattern>
  </servlet-mapping>
  <servlet>
-   <servlet-name>Video Streaming</servlet-name>
-   <servlet-class>servlet.VideoStreamingServlet</servlet-class>
+   <servlet-name>Load Data Segment</servlet-name>
+   <servlet-class>servlet.LoadDataSegmentServlet</servlet-class>
  </servlet>
  <servlet-mapping>
-   <servlet-name>Video Streaming</servlet-name>
-   <url-pattern>/streamvideo</url-pattern>
+   <servlet-name>Load Data Segment</servlet-name>
+   <url-pattern>/loaddatasegment</url-pattern>
  </servlet-mapping>
  <mime-mapping>
   <extension>M3U8</extension>
