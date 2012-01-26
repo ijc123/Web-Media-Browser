@@ -42,7 +42,7 @@ public class FileInfo {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-	public void setDirectory(boolean isDirectory) {
+	public void setIsDirectory(boolean isDirectory) {
 		this.isDirectory = isDirectory;
 	}
 	public boolean isDirectory() {

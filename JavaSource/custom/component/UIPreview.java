@@ -18,7 +18,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 
-import utils.FileUtils;
+import utils.FileUtilsLocal;
 
 import database.SettingsEJB;
 
@@ -61,7 +61,7 @@ public class UIPreview extends UIOutput {
 
 		String previewPath = settingsEJB.getSettings().getPreviewRootDirectory();
 		
-		FileUtils f = new FileUtils(previewPath);
+		FileUtilsLocal f = new FileUtilsLocal(previewPath);
 		
 		String hash = Integer.toString(filePath.hashCode());
 		

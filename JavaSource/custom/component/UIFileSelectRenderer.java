@@ -15,6 +15,7 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import utils.FileUtils;
+import utils.FileUtilsLocal;
 
 
 @FacesRenderer(componentFamily = "javax.faces.SelectOne", rendererType = "custom.component.FileSelectOne")
@@ -35,13 +36,13 @@ public class UIFileSelectRenderer extends Renderer {
 				
 		String currentPath = (String) fileSelect.getValue();
 				
-		FileUtils f = new FileUtils(currentPath);
+		FileUtilsLocal f = new FileUtilsLocal(currentPath);
 		
 		String rootDir = fileSelect.getRootDir();
 				
 		if(rootDir == "") {
 			
-			String[] result = FileUtils.splitPath(currentPath);
+			String[] result = FileUtilsLocal.splitPath(currentPath);
 			rootDir = result[0].toUpperCase() + "/";
 			fileSelect.setRootDir(rootDir);
 						
@@ -69,7 +70,7 @@ public class UIFileSelectRenderer extends Renderer {
 		rw.writeAttribute("size", 1, null);	
 		rw.writeAttribute("style", "width:400px", null);
 		
-		ArrayList<String> rootPaths = f.getRootPaths();
+		ArrayList<String> rootPaths = FileUtils.getRootPaths();
 		
 		for(int i = 0; i < rootPaths.size(); i++) {
 			
@@ -192,7 +193,7 @@ public class UIFileSelectRenderer extends Renderer {
 		
 		if(selected != null && selected.endsWith("/")) {
 			
-			FileUtils f = new FileUtils((String)fileSelect.getValue());
+			FileUtilsLocal f = new FileUtilsLocal((String)fileSelect.getValue());
 							
 			if(selected.equals("../"))
 			{

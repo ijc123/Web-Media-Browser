@@ -17,10 +17,8 @@
 package servlet;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +29,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import ftp.VirtualInputFile;
+import ftp.VirtualInputFileFactory;
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.
@@ -126,7 +127,7 @@ public class LoadDataSegmentServlet extends HttpServlet {
 
         // Get requested file by path info.
     	String requestedFile = request.getParameter("path");
-        	
+        	    	
         // Check if file is actually supplied to the request URL.
         if (requestedFile == null) {
             // Do your thing if the file is not supplied to the request URL.
@@ -136,25 +137,29 @@ public class LoadDataSegmentServlet extends HttpServlet {
         }
 
         // URL-decode the file name (might contain spaces and on) and prepare file object.
-        File file = new File(requestedFile);
-
-        // Check if file actually exists in filesystem.
-        if (!file.exists()) {
+        VirtualInputFile file = null;
+        String fileName;
+        long length;
+        long lastModified;
+      
+        try {
+        	        
+        	file = VirtualInputFileFactory.create(requestedFile);
+        	fileName = file.getName();
+            length = file.length();
+            lastModified = file.lastModified();
+                     	
+        } catch (IOException e) {
+            
             // Do your thing if the file appears to be non-existing.
             // Throw an exception, or send 404, or show default/warning page, or just ignore it.
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-        
         
         // Prepare some variables. The ETag is an unique identifier of the file.
-        String fileName = file.getName();
-        long length = file.length();
-        long lastModified = file.lastModified();
         String eTag = fileName + "_" + length + "_" + lastModified;
-
-
+        
         // Validate request headers for caching ---------------------------------------------------
 
         // If-None-Match header should contain "*" or ETag. If so, then return 304.
@@ -294,12 +299,11 @@ public class LoadDataSegmentServlet extends HttpServlet {
         // Send requested file (part(s)) to client ------------------------------------------------
 
         // Prepare streams.
-        RandomAccessFile input = null;
+        VirtualInputFile input = file;
         OutputStream output = null;
 
         try {
             // Open streams.
-            input = new RandomAccessFile(file, "r");
             output = response.getOutputStream();
                         
             if (ranges.isEmpty() || ranges.get(0) == full) {
@@ -422,7 +426,7 @@ public class LoadDataSegmentServlet extends HttpServlet {
      * @param length Length of the byte range.
      * @throws IOException If something fails at I/O level.
      */
-    protected void copy(RandomAccessFile input, OutputStream output, long start, long length)
+    protected void copy(VirtualInputFile input, OutputStream output, long start, long length)
         throws IOException
     {
     	   	

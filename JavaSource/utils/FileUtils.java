@@ -6,22 +6,32 @@ import java.util.ArrayList;
 
 import database.MediaItem;
 
-public class FileUtils {
 
-	private String curPath;
+
+public abstract class FileUtils {
+
+	protected String curPath;
 	
-	public FileUtils() {
+	abstract public boolean createDirectory(final String name) throws IOException;
+	abstract public boolean exists(final String fileName) throws IOException;
+	abstract public boolean delete(final String filePath) throws IOException;	
+	abstract public boolean rename(final String oldName, final String newName) throws IOException;
+	
+	abstract public void getDirectoryContents(ArrayList<String> directory, 
+			ArrayList<String> file) throws IOException; 
+		
+	protected FileUtils() {
 		
 		curPath = "";
 	}
-	
-	public FileUtils(String path) {
 		
-		setPath(path);
+	protected FileUtils(String path) {
+		
+		curPath = path;
 	}
 	
 	public void setPath(final String path) {
-				
+		
 		curPath = path;
 		curPath = curPath.replace('\\', '/');
 		
@@ -71,113 +81,8 @@ public class FileUtils {
 	
 	}
 	
-	public boolean createDirectory(final String name) throws IOException {
-		
-		File dir = new File(curPath + name);
-		
-		boolean success = dir.mkdir();
-		
-		if(success == false) {
-			
-			String exception = String.format("Unable to create directory '%s'.", curPath + name);
-			
-			throw new IOException(exception);
-		}
-				
-		return(success);
-	}
-	
-	public boolean exists(final String fileName) {
-		
-		File file = new File(curPath + fileName);
-		
-		return(file.exists());
-	}
-	
-	public boolean delete(final String filePath) throws IOException {
-		
-		
-		File path = new File(curPath + filePath);
-		
-		boolean success = path.delete();
-		
-		if(success == false) {
-			
-			String exception = String.format("Unable to delete  '%s'.", curPath + filePath);
-			
-			throw new IOException(exception);
-		}
-				
-		return(success);
-		
-	}
-	
-	public boolean rename(final String oldName, final String newName) throws IOException {
-	
-		File oldItem = new File(curPath + oldName);
-		File newItem = new File(curPath + newName);
-		
-		boolean success = oldItem.renameTo(newItem);
-		
-		if(success == false) {
-			
-			String exception = String.format("Unable to rename '%s' to '%s'.", curPath + oldName, curPath + newName);
-			
-			throw new IOException(exception);
-		}
-				
-		return(success);
-	
-	}
-	
-	public ArrayList<String> getRootPaths() {
-		
-		ArrayList<String> rootPath = new ArrayList<String>();
-		
-		File[] roots = File.listRoots();
-		
-		for(int i = 0; i < roots.length; i++) {
-			
-			rootPath.add(roots[i].getPath().replace('\\', '/'));
-			
-		}
-	
-		return(rootPath);
-	}
-	
 	public void getDirectoryContents(ArrayList<String> directory, 
-			ArrayList<String> file) 
-	{
-				
-		File location = new File(curPath);
-		
-		File[] item = location.listFiles();
-		
-		if(item == null) return;
-		
-		for(int i = 0; i < item.length; i++) {
-			
-			if(item[i].isDirectory()) {
-				
-				if(directory != null) {
-				
-					directory.add(item[i].getName());
-				}
-				
-			} else {
-				
-				if(file != null) {
-					
-					file.add(item[i].getName());
-				}
-			}
-			
-		}
-				
-	}
-	
-	public void getDirectoryContents(ArrayList<String> directory, 
-			ArrayList<String> file, String wildCard) 
+			ArrayList<String> file, String wildCard) throws IOException
 	{
 		
 		getDirectoryContents(directory, file);
@@ -209,7 +114,7 @@ public class FileUtils {
 		}
 			
 	}
-	
+		
 	private boolean wildCardMatch(String text, String pattern)
     {
         // Create the cards by splitting using a RegEx. If more speed 
@@ -233,14 +138,11 @@ public class FileUtils {
         
         return true;
     }
-/*	
-	public enum FileInfoMode {
-		DIRECTORIES_ONLY,
-		FILES_ONLY,
-		FILES_AND_DIRECTORIES
-	}
-*/	
-	public void getRecursiveMediaItems(ArrayList<MediaItem> media, boolean video, boolean audio, boolean images, String typeName) {
+
+	public void getRecursiveMediaItems(ArrayList<MediaItem> media, 
+			boolean video, boolean audio, boolean images, String typeName)
+		throws IOException
+	{
 				
 		ArrayList<String> directory = new ArrayList<String>();
 		ArrayList<String> filename = new ArrayList<String>();
@@ -255,27 +157,7 @@ public class FileUtils {
 			
 			moveUp();
 		}
-/*				
-		if(mode != FileInfoMode.FILES_ONLY) {
-			
-			for(int i = 0; i < directory.size(); i++) {
-					
-				FileInfo info = new FileInfo();
-				File curFile = new File(getPath() + directory.get(i));
-				
-				info.setDirectory(true);
-				info.setPath(getPath());
-				info.setFileName(directory.get(i));
-				info.setUri(curFile.toURI().toString());
-				info.setSizeBytes(0);
-				
-				media.add(info);
-			}
-			
-		}
-		
-		if(mode != FileInfoMode.DIRECTORIES_ONLY) {
-*/		
+	
 		for(int i = 0; i < filename.size(); i++) {
 			
 			File curFile = new File(getPath() + filename.get(i));
@@ -303,10 +185,29 @@ public class FileUtils {
 		
 	}
 	
-	// 0 = drive
-	// 1 = directory
-	// 2 = filename
-	// 3 = extension
+	public static ArrayList<String> getRootPaths() {
+		
+		ArrayList<String> rootPath = new ArrayList<String>();
+		
+		File[] roots = File.listRoots();
+		
+		for(int i = 0; i < roots.length; i++) {
+			
+			rootPath.add(roots[i].getPath().replace('\\', '/'));
+			
+		}
+	
+		return(rootPath);
+	}
+		 
+	/**
+	 * @param path
+	 * @return
+	 * 0 = drive
+	 * 1 = directory
+	 * 2 = filename
+	 * 3 = extension
+	 */
 	public static String[] splitPath(String path) {
 		
 		String[] result = new String[]{null, null, null, null};
@@ -337,3 +238,4 @@ public class FileUtils {
 	
 
 }
+

@@ -19,7 +19,7 @@ import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 
-import utils.FileUtils;
+import utils.FileUtilsLocal;
 
 
 
@@ -188,20 +188,22 @@ public class HTTPLiveStreaming {
 		}
 */
 		
-		FileUtils f = new FileUtils(getOutputDir());
+		FileUtilsLocal f = new FileUtilsLocal(getOutputDir());
 		
 		ArrayList<String> oldTsFiles = new ArrayList<String>();
 		
-		f.getDirectoryContents(null, oldTsFiles, "*.ts");
-		
-		for(int i = 0; i < oldTsFiles.size(); i++) {
-			
-			try {
+		try {
+
+			f.getDirectoryContents(null, oldTsFiles, "*.ts");
+
+			for(int i = 0; i < oldTsFiles.size(); i++) {
+
 				f.delete(oldTsFiles.get(i));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return(false);

@@ -15,7 +15,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.jboss.ejb3.annotation.IgnoreDependency;
 
-import utils.FileUtils;
+import utils.FileUtilsLocal;
 
 // Note: Shouldn't really use disk i/o in EJB's
 // since files are not a transactional resource
@@ -86,7 +86,7 @@ public class MediaPreviewEJB {
 
 		try {
 
-			FileUtils f = new FileUtils(previewRoot);
+			FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
 			f.createDirectory(outputPath);
 			f.moveDown(outputPath);
@@ -119,39 +119,45 @@ public class MediaPreviewEJB {
 
 	public List<String> getSmallPreviewImagesList(final MediaItem inputMedia) {
 
-		List<String> result = new ArrayList<String>();
-
-		if(!inputMedia.getMimeType().startsWith("video")) return(result);
-
-		FileUtils f = new FileUtils(previewRoot);
-
-		String outputPath = getMediaPreviewPath(inputMedia);
-
-		f.moveDown(outputPath);
-
 		ArrayList<String> previewImagesList = new ArrayList<String>();
 
-		f.getDirectoryContents(null, previewImagesList);
+		try {
 
-		if(previewImagesList.size() == 0) return(previewImagesList);
+			List<String> result = new ArrayList<String>();
 
-		// last element is the large preview image		
-		previewImagesList.remove(previewImagesList.size() - 1);
+			if(!inputMedia.getMimeType().startsWith("video")) return(result);
 
-		for(int i = 0; i < previewImagesList.size(); i++) {
+			FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
-			previewImagesList.set(i, f.getPath() + previewImagesList.get(i));
+			String outputPath = getMediaPreviewPath(inputMedia);
+
+			f.moveDown(outputPath);
+
+			f.getDirectoryContents(null, previewImagesList);
+
+			if(previewImagesList.size() == 0) return(previewImagesList);
+
+			// last element is the large preview image		
+			previewImagesList.remove(previewImagesList.size() - 1);
+
+			for(int i = 0; i < previewImagesList.size(); i++) {
+
+				previewImagesList.set(i, f.getPath() + previewImagesList.get(i));
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return(previewImagesList);
-
 	}
 
 	public String getLargePreviewImage(final MediaItem inputMedia) {
 
 		if(!inputMedia.getMimeType().startsWith("video")) return(null);
 
-		FileUtils f = new FileUtils(previewRoot);
+		FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
 		String outputPath = getMediaPreviewPath(inputMedia);
 
@@ -159,14 +165,22 @@ public class MediaPreviewEJB {
 
 		String fileName = inputMedia.getFileName();
 
-		String[] splitPath = FileUtils.splitPath(fileName);
+		String[] splitPath = FileUtilsLocal.splitPath(fileName);
 
 		String largePreviewImage = splitPath[2] + "_s.jpg"; 
 
-		if(!f.exists(largePreviewImage)) return(null);
-		else {
+		try {
+			
+			if(!f.exists(largePreviewImage)) return(null);
+			else {
 
-			return(f.getPath() + largePreviewImage);
+				return(f.getPath() + largePreviewImage);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return(null);
 		}
 
 

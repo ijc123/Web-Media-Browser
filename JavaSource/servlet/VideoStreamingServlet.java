@@ -16,7 +16,6 @@
  */
 package servlet;
 
-import video.Transcode2;
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.
@@ -30,6 +29,6 @@ public class VideoStreamingServlet extends LoadChunkedDataServlet {
 
     
 	private static final long serialVersionUID = 1L;
-	private Transcode2 transcode;
+
 
 }

@@ -117,8 +117,8 @@ public class UIMediaPlayer extends UIOutput {
 		
 			// we are on the local machine, no need to stream the video's 
 			// just load them directly
-			location = media.getPath();
-			//location = getMediaDataUrl(media.getPath());
+			//location = media.getPath();
+			location = getMediaDataUrl(media.getPath());
 			
 		} else {
 			

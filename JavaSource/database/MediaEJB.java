@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import utils.FileUtils;
+import utils.FileUtilsLocal;
 import utils.ImageUtil;
 import utils.MapArgument;
 import beans.user.LoginBean;
@@ -398,7 +398,10 @@ public class MediaEJB {
 		
 
 	public void synchronize(SettingsItem settings) {
-						
+
+			
+		try {
+					
 		// update last synchronized date to now
 		java.util.Date curDate = Calendar.getInstance().getTime();
 		Timestamp now = new Timestamp(curDate.getTime());
@@ -414,9 +417,10 @@ public class MediaEJB {
 			MediaLocationItem m = mediaLocation.get(i);
 			String typeName = m.getTypeName();
 			
-			FileUtils f = new FileUtils(m.getLocation());
-		
+			FileUtilsLocal f = new FileUtilsLocal(m.getLocation());
+					
 			f.getRecursiveMediaItems(diskMedia, m.isVideo(), m.isAudio(), m.isImages(), typeName);
+		
 		}
 		
 		//SqlSession session = MyBatis.getSession().openSession(); 
@@ -453,6 +457,11 @@ public class MediaEJB {
 		
 		settingsEJB.setSettings(settings);
 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 	}
 
 	public void setMediaVersions() {
