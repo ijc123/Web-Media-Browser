@@ -6,12 +6,14 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 
+import virtualFile.FileInfo;
+
 @FacesComponent("custom.component.FileSelectOne")
 public class UIFileSelectOne extends UISelectOne {
 	
 	private String rootDir;
-	private ArrayList<String> directories = null;
-	private ArrayList<String> files = null;
+	private ArrayList<FileInfo> directories = null;
+	private ArrayList<FileInfo> files = null;
 	private boolean hideFiles;
 	private boolean hideDirectories;
 	private int size;
@@ -48,8 +50,8 @@ public class UIFileSelectOne extends UISelectOne {
 		Object[] values = (Object[])state;
 		
 		super.restoreState(context, values[0]);
-		directories = (ArrayList<String>)values[1];
-		files = (ArrayList<String>)values[2];
+		directories = (ArrayList<FileInfo>)values[1];
+		files = (ArrayList<FileInfo>)values[2];
 		hideFiles = (Boolean)values[3];
 		hideDirectories = (Boolean)values[4];
 		size = (Integer)values[5];
@@ -59,22 +61,22 @@ public class UIFileSelectOne extends UISelectOne {
 	
 	
 
-	public void setDirectories(ArrayList<String> directories) {
+	public void setDirectories(ArrayList<FileInfo> directories) {
 		this.directories = directories;
 	}
 
 
-	public ArrayList<String> getDirectories() {
+	public ArrayList<FileInfo> getDirectories() {
 		return directories;
 	}
 
 
-	public void setFiles(ArrayList<String> files) {
+	public void setFiles(ArrayList<FileInfo> files) {
 		this.files = files;
 	}
 
 
-	public ArrayList<String> getFiles() {
+	public ArrayList<FileInfo> getFiles() {
 		return files;
 	}
 	

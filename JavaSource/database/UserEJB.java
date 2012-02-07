@@ -113,6 +113,7 @@ public class UserEJB {
 			if(t.getId() == 0) {
 				
 				insertUser(t);
+				insertUserTypes(t);
 			}
 			
 		}

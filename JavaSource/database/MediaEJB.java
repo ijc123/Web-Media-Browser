@@ -20,9 +20,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import utils.FileUtilsLocal;
 import utils.ImageUtil;
 import utils.MapArgument;
+import virtualFile.FileUtilsLocal;
 import beans.user.LoginBean;
 
 

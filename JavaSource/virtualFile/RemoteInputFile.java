@@ -1,4 +1,4 @@
-package ftp;
+package virtualFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,7 +91,7 @@ public class RemoteInputFile implements VirtualInputFile {
 	@Override
 	public String getName() {
 		
-		return ftp.getFileName();
+		return ftp.getLocation().getFilename();
 	}
 
 
@@ -102,6 +102,12 @@ public class RemoteInputFile implements VirtualInputFile {
 		Calendar modified = ftp.getFileInfo().getTimestamp();
 				
 		return modified.getTimeInMillis();
+	}
+
+	@Override
+	public String getUri() {
+				
+		return(ftp.getLocation().getLocationWithoutUserInfo());
 	}
 	
 /*

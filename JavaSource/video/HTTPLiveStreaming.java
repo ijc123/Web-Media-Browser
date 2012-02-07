@@ -19,7 +19,8 @@ import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 
-import utils.FileUtilsLocal;
+import virtualFile.FileInfo;
+import virtualFile.FileUtilsLocal;
 
 
 
@@ -129,10 +130,8 @@ public class HTTPLiveStreaming {
 				transcodedFile.close();
 				
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 
@@ -190,15 +189,15 @@ public class HTTPLiveStreaming {
 		
 		FileUtilsLocal f = new FileUtilsLocal(getOutputDir());
 		
-		ArrayList<String> oldTsFiles = new ArrayList<String>();
+		ArrayList<FileInfo> oldTsFiles = new ArrayList<FileInfo>();
 		
 		try {
 
 			f.getDirectoryContents(null, oldTsFiles, "*.ts");
 
 			for(int i = 0; i < oldTsFiles.size(); i++) {
-
-				f.delete(oldTsFiles.get(i));
+							
+				f.deleteFile(oldTsFiles.get(i).getName());
 			}
 
 		} catch (IOException e) {

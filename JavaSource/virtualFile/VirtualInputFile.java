@@ -1,4 +1,4 @@
-package ftp;
+package virtualFile;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -15,5 +15,8 @@ public interface VirtualInputFile extends Closeable {
 	public void seek(long pos) throws IOException;
 	
 	public String getName();
+	public String getUri();
 	public long lastModified() throws IOException;
+	
+
 }

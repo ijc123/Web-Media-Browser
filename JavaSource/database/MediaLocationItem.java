@@ -7,6 +7,8 @@ public class MediaLocationItem {
 	private boolean video;
 	private boolean audio;
 	private boolean images;
+	private String username;
+	private String password;
 	
 	public MediaLocationItem() {
 		
@@ -47,6 +49,44 @@ public class MediaLocationItem {
 	}
 	public void setImages(boolean images) {
 		this.images = images;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public String getURI() {
+	
+		String uri = location;
+		
+		if(location.startsWith("ftp://")) {
+			
+			if(username != null && password != null) {
+				
+				uri = uri.replace("ftp://", "ftp://" + username + ":" + password + "@");
+			}
+			
+		}
+	
+		return(uri);
+	}
+	
+	public boolean isRemote() {
+	
+		if(location.startsWith("ftp://")) return(true);
+		else return(false);
 	}
 	
 }

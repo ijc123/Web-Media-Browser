@@ -1,11 +1,11 @@
-package utils;
+package virtualFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.net.ftp.FTPFile;
 
-import ftp.MyFTPClient;
+
 
 public class FileUtilsRemote extends FileUtils {
 	
@@ -13,18 +13,17 @@ public class FileUtilsRemote extends FileUtils {
 	
 	public FileUtilsRemote(String url) {
 		
-		super();
+		super(url);
 		
 		ftp = new MyFTPClient(url);
 		
-		setPath(ftp.getPath());
-				
 	}
 			
+	@Override
 	public boolean createDirectory(final String name) throws IOException {
 		
 		ftp.connect();
-		ftp.cwd(curPath);
+		ftp.cwd(location.getPath());
 		
 		boolean success = ftp.makeDirectory(name);
 		
@@ -33,24 +32,26 @@ public class FileUtilsRemote extends FileUtils {
 		return(success);
 	}
 	
-	public boolean exists(final String fileName) throws IOException {
+	@Override
+	public boolean exists(String name) throws IOException {
 		
 		ftp.connect();
-		ftp.cwd(curPath);
+		ftp.cwd(location.getPath());
 		
-		FTPFile[] file = ftp.listFiles(fileName);
+		FTPFile[] file = ftp.listFiles(name);
 		
 		ftp.disconnect();
 		
 		return(file.length == 0 ? true : false);
 	}
 	
-	public boolean delete(final String filePath) throws IOException {
+	@Override
+	public boolean deleteFile(String name) throws IOException {
 				
 		ftp.connect();
-		ftp.cwd(curPath);
+		ftp.cwd(location.getPath());
 		
-		boolean success = ftp.deleteFile(filePath);
+		boolean success = ftp.deleteFile(name);
 		
 		ftp.disconnect();
 				
@@ -58,10 +59,12 @@ public class FileUtilsRemote extends FileUtils {
 		
 	}
 	
-	public boolean rename(final String oldName, final String newName) throws IOException {
+	@Override
+	public boolean renameFile(final String oldName, final String newName) throws IOException {
 	
 		ftp.connect();
-		ftp.cwd(curPath);
+		
+		ftp.cwd(location.getPath());
 		
 		boolean success = ftp.rename(oldName, newName);
 				
@@ -71,29 +74,32 @@ public class FileUtilsRemote extends FileUtils {
 	
 	}
 	
-	public void getDirectoryContents(ArrayList<String> directory, 
-			ArrayList<String> file) throws IOException 
+	@Override
+	public void getDirectoryContents(ArrayList<FileInfo> directory, 
+			ArrayList<FileInfo> file) throws IOException 
 	{
 			
 		ftp.connect();
-		ftp.cwd(curPath);
+		ftp.cwd(location.getPath());
 		
 		FTPFile[] fileList = ftp.listFiles();
-			
+				
 		for(int i = 0; i < fileList.length; i++) {
+			
+			String uri = ftp.getLocation().getLocationWithoutUserInfo() + fileList[i].getName(); 
 			
 			if(fileList[i].isDirectory()) {
 				
 				if(directory != null) {
 				
-					directory.add(fileList[i].getName());
+					directory.add(new FileInfo(fileList[i], uri));
 				}
 				
 			} else {
 				
 				if(file != null) {
 					
-					file.add(fileList[i].getName());
+					file.add(new FileInfo(fileList[i], uri));
 				}
 			}
 			
@@ -101,5 +107,20 @@ public class FileUtilsRemote extends FileUtils {
 			
 		ftp.disconnect();
 	}
+
+	@Override
+	public boolean deleteDirectory(String name) throws IOException {
+		
+		ftp.connect();
+		
+		boolean success = ftp.removeDirectory(location.getPath() + name);
+		
+		ftp.disconnect();
+				
+		return(success);
+		
+	}
+
+	
 
 }

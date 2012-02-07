@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:cc="http://java.sun.com/jsf/composite/components"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:a4j="http://richfaces.org/a4j">
+<head>
+<title>Not present in rendered output</title>
+</head>
+<body>
+
+<composite:interface componentType="fileSelect">
+	<composite:attribute name="location" type="java.lang.String"/>
+</composite:interface>
+	
+<composite:implementation>
+	<h:panelGrid columns="1" id="fileSelectPanel">
+	<h:selectOneListbox id="selectDrive" size="1" value="#{cc.root}" 
+		style="width: 100%">	
+	  	<f:selectItems id="drives" value="#{cc.fileRoots}"
+	  		var="n"
+	  		itemValue="#{n}">
+	  	</f:selectItems>
+	  	<f:ajax event="change" render="fileSelectPanel" execute="selectDrive"/>
+	</h:selectOneListbox>
+    <h:inputText id="location" value="#{cc.attrs.location}" 
+    	style="width: 100%" disabled="true"/>
+	<rich:collapsiblePanel header="Ftp" switchType="client" expanded="false">		        
+		<h:panelGrid id="ftpPanel" columns="2">
+			<h:outputText value="Host" />
+			<h:inputText id="ftpAdress" value="#{cc.ftpAdress}" /> 
+			
+			<h:outputText value="Username" />
+			<h:inputText id="username" value="#{cc.username}"/>
+			
+			<h:outputText value="Password"/>
+			<h:inputText id="password" value="#{cc.password}"/>  
+			
+			<h:commandButton value="connect" action="#{cc.setFtpLocation}">
+				<f:ajax render="fileSelectPanel" execute="ftpPanel"/>
+			</h:commandButton>
+		</h:panelGrid>
+	</rich:collapsiblePanel>
+	<h:selectOneListbox id="selectFile" size="10" style="width: 100%" value="#{cc.selectedFile}">
+		<f:selectItems id="fileListing" value="#{cc.fileListing}"
+	  		var="n"
+	  		itemValue="#{n}">
+	  	</f:selectItems>
+		<f:ajax	event="dblclick" execute="selectFile" render="fileSelectPanel"/>
+	</h:selectOneListbox>
+    </h:panelGrid>
+    <h:panelGrid columns="2" id="confirmPanel">
+    	<h:commandButton value="Ok" type="submit"/>
+    	<h:commandButton value="Cancel" type="submit"/>
+    </h:panelGrid>
+</composite:implementation>
+
+</body>
+</html>

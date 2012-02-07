@@ -1,9 +1,14 @@
 if(!locationPickerButton) var locationPickerButton = {
 
-	Redraw: function(clientId) {
+	RedrawButton: function(clientId) {
 		
 		clientId = clientId + ':mediaLocation';
 		
 		jsf.ajax.request(clientId, null, {render: clientId});
+	},
+
+	RedrawPopup: function(selectId, ftpId) {
+		
+		jsf.ajax.request(ftpId, null, {execute: ftpId, render: selectId});
 	}
 };

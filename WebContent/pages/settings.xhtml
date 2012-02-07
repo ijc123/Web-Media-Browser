@@ -15,10 +15,10 @@
 	<h:form>
 		<rich:panel id="settingsPanel" header="Settings">
 			<h:panelGrid columns="2">
-								
+				
 				<h:outputText value="Preview Root Directory:"/>
 				<cc:locationPickerButton location="#{settingsBean.settings.previewRootDirectory}"/>
-				
+															
 				<h:outputText value="Media Root Directories:"/>
 				<cc:mediaLocationsTable/>				 										
 			</h:panelGrid>				

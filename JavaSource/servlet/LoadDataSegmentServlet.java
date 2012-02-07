@@ -30,8 +30,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ftp.VirtualInputFile;
-import ftp.VirtualInputFileFactory;
+import virtualFile.VirtualInputFile;
+import virtualFile.VirtualInputFileFactory;
+
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.

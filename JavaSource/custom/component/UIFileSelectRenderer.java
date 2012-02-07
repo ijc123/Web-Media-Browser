@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-
 import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
@@ -14,8 +13,11 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
-import utils.FileUtils;
-import utils.FileUtilsLocal;
+import virtualFile.FileInfo;
+import virtualFile.FileUtils;
+import virtualFile.FileUtilsFactory;
+import virtualFile.FileUtilsLocal;
+import database.MediaLocationItem;
 
 
 @FacesRenderer(componentFamily = "javax.faces.SelectOne", rendererType = "custom.component.FileSelectOne")
@@ -34,25 +36,30 @@ public class UIFileSelectRenderer extends Renderer {
 
 		UIFileSelectOne fileSelect = (UIFileSelectOne) component;
 				
-		String currentPath = (String) fileSelect.getValue();
-				
-		FileUtilsLocal f = new FileUtilsLocal(currentPath);
-		
+		MediaLocationItem media = (MediaLocationItem) fileSelect.getValue();
 		String rootDir = fileSelect.getRootDir();
-				
+							
+		String uri = media.getURI();
+		
+		FileUtils f = FileUtilsFactory.create(uri);
+		
 		if(rootDir == "") {
-			
-			String[] result = FileUtilsLocal.splitPath(currentPath);
-			rootDir = result[0].toUpperCase() + "/";
-			fileSelect.setRootDir(rootDir);
-						
+					
+			if(f.getClass().getName().equals("FileUtilsLocal")) {
+							
+				FileUtilsLocal fL = (FileUtilsLocal)f;
+				
+				fileSelect.setRootDir(fL.getDrive());
+			}
 		}
 			
-		ArrayList<String> directories = new ArrayList<String>();
-		ArrayList<String> files = new ArrayList<String>();
-		
+		ArrayList<FileInfo> directories = new ArrayList<FileInfo>();
+		ArrayList<FileInfo> files = new ArrayList<FileInfo>();
+				
 		f.getDirectoryContents(directories, files);
-		directories.add(0,"..");
+		
+		FileInfo moveUp = new FileInfo("..", "", 0, true);
+		directories.add(0, moveUp);
 		
 		ResponseWriter rw = context.getResponseWriter();
 
@@ -70,7 +77,7 @@ public class UIFileSelectRenderer extends Renderer {
 		rw.writeAttribute("size", 1, null);	
 		rw.writeAttribute("style", "width:400px", null);
 		
-		ArrayList<String> rootPaths = FileUtils.getRootPaths();
+		ArrayList<String> rootPaths = FileUtilsLocal.getRootPaths();
 		
 		for(int i = 0; i < rootPaths.size(); i++) {
 			
@@ -105,7 +112,7 @@ public class UIFileSelectRenderer extends Renderer {
 		rw.writeAttribute("readonly", "readonly", null);
 		rw.writeAttribute("id", "fullPath", null);
 		rw.writeAttribute("name", "fullPath", null);
-		rw.writeAttribute("value", currentPath, null);
+		rw.writeAttribute("value", uri, null);
 		rw.writeAttribute("style", "width:400px", null);
 		rw.endElement("input");
 		
@@ -128,12 +135,12 @@ public class UIFileSelectRenderer extends Renderer {
 	
 				rw.startElement("option", fileSelect);
 		
-				String ajaxScript = getAjaxSelectionScript(fileSelect, directories.get(i) + "/");
+				String ajaxScript = getAjaxSelectionScript(fileSelect, directories.get(i).getName() + "/");
 				
 				rw.writeAttribute("ondblclick", ajaxScript, null);
 				
 				//rw.writeAttribute("value", directories.get(i) + "/", null);
-				rw.writeText(directories.get(i) + "/", null);
+				rw.writeText(directories.get(i).getName() + "/", null);
 												
 				rw.endElement("option");
 			}
@@ -151,12 +158,12 @@ public class UIFileSelectRenderer extends Renderer {
 	
 				rw.startElement("option", fileSelect);
 				
-				String ajaxScript = getAjaxSelectionScript(fileSelect, files.get(i));
+				String ajaxScript = getAjaxSelectionScript(fileSelect, files.get(i).getName());
 				
 				rw.writeAttribute("ondblclick", ajaxScript, null);
 	
 				//rw.writeAttribute("value", files.get(i), null);
-				rw.writeText(files.get(i), null);					
+				rw.writeText(files.get(i).getName(), null);					
 				
 				rw.endElement("option");
 			}
@@ -193,7 +200,11 @@ public class UIFileSelectRenderer extends Renderer {
 		
 		if(selected != null && selected.endsWith("/")) {
 			
-			FileUtilsLocal f = new FileUtilsLocal((String)fileSelect.getValue());
+			MediaLocationItem media = (MediaLocationItem) fileSelect.getValue();
+			
+			String uri = media.getURI();
+			
+			FileUtils f = FileUtilsFactory.create(uri);
 							
 			if(selected.equals("../"))
 			{

@@ -18,8 +18,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 
-import utils.FileUtilsLocal;
-
+import virtualFile.FileUtilsLocal;
 import database.SettingsEJB;
 
 @FacesComponent("custom.component.UIPreview")
@@ -61,31 +60,33 @@ public class UIPreview extends UIOutput {
 
 		String previewPath = settingsEJB.getSettings().getPreviewRootDirectory();
 		
-		FileUtilsLocal f = new FileUtilsLocal(previewPath);
+		FileUtilsLocal input = new FileUtilsLocal(filePath);
+		FileUtilsLocal output = new FileUtilsLocal(previewPath);
+	
+				
+		String hash = Integer.toString(filePath.hashCode());	
+			
+		String fileName = input.getFilenameWithoutExtension();
 		
-		String hash = Integer.toString(filePath.hashCode());
+		output.moveDown(hash);
+		output.setFilename(fileName + "_small");
+		output.setExtension("jpg");
 		
-		int dot = filePath.lastIndexOf('.');
-		int sep = filePath.lastIndexOf('/');
-		String fileName = filePath.substring(sep + 1, dot);
-		String previewImage = hash + "/" + fileName + "_small.jpg"; 
-		String outputPath = previewPath + hash + "/";
+		String outputPath = output.getLocationWithoutFilename();
 		
-		if(!f.exists(previewImage)) {
+		if(!output.exists(output.getFilename())) {
 						
-			f.createDirectory(hash);
+			output.createDirectory(hash);
 			
 			String font = "H:/mtn-200808a-win32/cyberbit.ttf";
 
 			String batch = String.format(
 					"H:/mtn-200808a-win32/mtn -c 10 -r 1 -w 800 -P -i -f %s -O %s \"%s\"",
-					font, outputPath, filePath);
+					font, output.getLocationWithoutFilename(), filePath);
 									
 			runExternalProcess(batch);
-			
-			f.moveDown(hash);
-			
-			f.rename(fileName + "_s.jpg", fileName + "_small.jpg");
+									
+			output.renameFile(fileName + "_s.jpg", fileName + "_small.jpg");
 			
 			batch = String.format(
 					"H:/mtn-200808a-win32/mtn -c 2 -r 32 -f %s -O %s -P -w 800 \"%s\"",
@@ -93,7 +94,7 @@ public class UIPreview extends UIOutput {
 		
 			runExternalProcess(batch);
 			
-			f.rename(fileName + "_s.jpg", fileName + "_large.jpg");
+			output.renameFile(fileName + "_s.jpg", fileName + "_large.jpg");
 		}
 		
 		ResponseWriter rw = context.getResponseWriter();

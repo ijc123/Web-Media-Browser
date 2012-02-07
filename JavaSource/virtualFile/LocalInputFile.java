@@ -1,4 +1,4 @@
-package ftp;
+package virtualFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,5 +65,11 @@ public class LocalInputFile implements VirtualInputFile {
 	public long lastModified() throws IOException {
 		
 		return(info.lastModified());
+	}
+
+	@Override
+	public String getUri() {
+		
+		return(info.toURI().toString());
 	}
 }

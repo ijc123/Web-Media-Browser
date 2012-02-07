@@ -1,53 +1,33 @@
-package utils;
+package virtualFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import database.MediaItem;
 
+public abstract class FileUtils implements LocationInterface {
 
-
-public abstract class FileUtils {
-
-	protected String curPath;
+	protected Location location;
 	
 	abstract public boolean createDirectory(final String name) throws IOException;
-	abstract public boolean exists(final String fileName) throws IOException;
-	abstract public boolean delete(final String filePath) throws IOException;	
-	abstract public boolean rename(final String oldName, final String newName) throws IOException;
+	abstract public boolean exists(final String name) throws IOException;
+	abstract public boolean deleteFile(final String name) throws IOException;
+	abstract public boolean deleteDirectory(final String name) throws IOException;
+	abstract public boolean renameFile(final String oldName, final String newName) throws IOException;	
 	
-	abstract public void getDirectoryContents(ArrayList<String> directory, 
-			ArrayList<String> file) throws IOException; 
+	abstract public void getDirectoryContents(ArrayList<FileInfo> directory, 
+			ArrayList<FileInfo> file) throws IOException; 
 		
-	protected FileUtils() {
 		
-		curPath = "";
+	protected FileUtils(String uri) {
+		
+		location = LocationFactory.create(uri);
 	}
-		
-	protected FileUtils(String path) {
-		
-		curPath = path;
-	}
-	
-	public void setPath(final String path) {
-		
-		curPath = path;
-		curPath = curPath.replace('\\', '/');
-		
-		if(!curPath.endsWith("/")) {
 			
-			curPath = curPath + "/";
-		}
-	}
-	
-	public String getPath() {
-		
-		return(curPath);
-	}
-	
 	// move a directory up in the tree
 	public boolean moveUp() {
+		
+		String curPath = location.getPath();
 		
 		int pos = curPath.substring(0, curPath.length() - 1).lastIndexOf("/");
 		
@@ -56,6 +36,8 @@ public abstract class FileUtils {
 		StringBuffer s = new StringBuffer(curPath);
 		
 		curPath = s.delete(pos + 1, curPath.length()).toString();
+		
+		location.setPath(curPath);
 		
 		return(true);
 	}
@@ -76,13 +58,16 @@ public abstract class FileUtils {
 			
 			downDir = downDir.substring(1);
 		}
-				
+		
+		String curPath = location.getPath();
+		
 		curPath = curPath + downDir;
 	
+		location.setPath(curPath);
 	}
 	
-	public void getDirectoryContents(ArrayList<String> directory, 
-			ArrayList<String> file, String wildCard) throws IOException
+	public void getDirectoryContents(ArrayList<FileInfo> directory, 
+			ArrayList<FileInfo> file, String wildCard) throws IOException
 	{
 		
 		getDirectoryContents(directory, file);
@@ -91,7 +76,7 @@ public abstract class FileUtils {
 		
 		while(directory != null && i < directory.size()) {
 		
-			if(wildCardMatch(directory.get(i), wildCard) == false) {
+			if(wildCardMatch(directory.get(i).getName(), wildCard) == false) {
 			
 				directory.remove(i);
 				i--;
@@ -104,7 +89,7 @@ public abstract class FileUtils {
 		
 		while(file != null && i < file.size()) {
 		
-			if(wildCardMatch(file.get(i), wildCard) == false) {
+			if(wildCardMatch(file.get(i).getName(), wildCard) == false) {
 			
 				file.remove(i);
 				i--;
@@ -144,29 +129,29 @@ public abstract class FileUtils {
 		throws IOException
 	{
 				
-		ArrayList<String> directory = new ArrayList<String>();
-		ArrayList<String> filename = new ArrayList<String>();
+		ArrayList<FileInfo> directory = new ArrayList<FileInfo>();
+		ArrayList<FileInfo> file = new ArrayList<FileInfo>();
 				
-		getDirectoryContents(directory, filename);
+		getDirectoryContents(directory, file);
 		
 		for(int i = 0; i < directory.size(); i++) {
 			
-			moveDown(directory.get(i));
+			moveDown(directory.get(i).getName());
 						
 			getRecursiveMediaItems(media, video, audio, images, typeName);
 			
 			moveUp();
 		}
 	
-		for(int i = 0; i < filename.size(); i++) {
+		for(int i = 0; i < file.size(); i++) {
 			
-			File curFile = new File(getPath() + filename.get(i));
+			FileInfo curFile = file.get(i);
 			
 			MediaItem diskMedia = new MediaItem();
-
-			diskMedia.setUri(curFile.toURI().toString());
-			diskMedia.setFileName(filename.get(i));
-			diskMedia.setSizeBytes(curFile.length());
+			
+			diskMedia.setUri(curFile.getUri());
+			diskMedia.setFileName(curFile.getName());
+			diskMedia.setSizeBytes(curFile.getSizeBytes());
 			
 			ArrayList<String> typeNames = new ArrayList<String>();
 			
@@ -184,58 +169,77 @@ public abstract class FileUtils {
 		
 		
 	}
-	
-	public static ArrayList<String> getRootPaths() {
 		
-		ArrayList<String> rootPath = new ArrayList<String>();
+	@Override
+	public void setPath(String path) {
 		
-		File[] roots = File.listRoots();
-		
-		for(int i = 0; i < roots.length; i++) {
-			
-			rootPath.add(roots[i].getPath().replace('\\', '/'));
-			
-		}
-	
-		return(rootPath);
-	}
-		 
-	/**
-	 * @param path
-	 * @return
-	 * 0 = drive
-	 * 1 = directory
-	 * 2 = filename
-	 * 3 = extension
-	 */
-	public static String[] splitPath(String path) {
-		
-		String[] result = new String[]{null, null, null, null};
-		
-		int drive = path.indexOf('/');
-		int dot = path.lastIndexOf('.');
-		int sep = path.lastIndexOf('/');
-		
-		if(drive != -1) {
-			
-			result[0] = path.substring(0, drive);
-			
-			if(sep != -1) {
-			
-				result[1] = path.substring(drive, sep);
-			}
-		}
-		
-		if(dot != -1) {
-					
-			result[2] = path.substring(sep + 1, dot);						
-			result[3] = path.substring(dot + 1);
-		}	
-		
-		return(result);
-	
+		location.setPath(path);
 	}
 	
+	@Override
+	public String getPath() {
+	
+		return(location.getPath());
+	}
+	
+	@Override
+	public String getPathWithFilename() {
+		
+		return(location.getPathWithFilename());
+	}
+	
+	@Override
+	public void setFilename(String filename) {
+		
+		location.setFilename(filename);
+	}
+	
+	@Override
+	public void setFilenameWithoutExtension(String filename) {
+		
+		location.setFilenameWithoutExtension(filename);
+	}
+	
+	@Override
+	public String getFilenameWithoutExtension() {
+		
+		return(location.getFilenameWithoutExtension());
+	}
+	
+	@Override
+	public String getFilename() {
+		
+		return(location.getFilename());
+	}
+	
+	@Override
+	public void setExtension(String extension) {
+		
+		location.setExtension(extension);
+	}
+	
+	@Override
+	public String getExtension() {
+		
+		return(location.getExtension());
+	}
+	
+	@Override
+	public boolean isWithoutFilename() {
+		
+		return(location.isWithoutFilename());
+	}
+	
+	@Override
+	public String getLocation() {
+		
+		return(location.getLocation());
+	}
 
+	@Override
+	public String getLocationWithoutFilename() {
+	
+		return(location.getLocationWithoutFilename());	
+	}
 }
 

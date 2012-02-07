@@ -10,13 +10,15 @@
 			type as typeName,
 			video as video,
 			audio as audio,
-			images as images
+			images as images,
+			username as username,
+			password as password
 		FROM medialocation
 	</select>
 	
 	<insert id="setMediaLocations" parameterType="MediaLocationItem">
-		INSERT INTO medialocation (location, type, video, audio, images)
-		VALUES (#{location}, #{typeName}, #{video}, #{audio}, #{images})
+		INSERT INTO medialocation (location, type, video, audio, images, username, password)
+		VALUES (#{location}, #{typeName}, #{video}, #{audio}, #{images}, #{username}, #{password})
 	</insert>
 	
 	<delete id="deleteMediaLocations">
