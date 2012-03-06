@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class LocalInputFile implements VirtualInputFile {
+public class LocalInputFile extends VirtualInputFile {
 
 	private File info;
 	private RandomAccessFile file;

@@ -17,13 +17,14 @@
 </composite:interface>
 <composite:implementation>
 	<h:outputStylesheet library="css" name="querytable.css"/>
-	<rich:dataTable id="mediaLocationsTable" value="#{settingsBean.dataModel}" 
-	var="mediaLocation" iterationStatusVar="it" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1">  
+	<h:dataTable id="mediaLocationsTable" value="#{settingsBean.dataModel}" 
+	var="mediaLocation" styleClass="tableStyle" columnClasses="tdStyle1, tdStyle1"
+	rowStatePreserved="true">  
 	<h:column>
  		<f:facet name="header">
         	 <h:outputText value="location"/>
         </f:facet>
-		<cc:locationPickerButton location="#{mediaLocation.location}" style="width:100%"/>        	
+        <cc:locationPickerButton location="#{mediaLocation.location}"/>
     </h:column> 
     <h:column>
  		<f:facet name="header">
@@ -53,13 +54,15 @@
     </h:column>   
     <h:column>  
     	<f:facet name="header">
-        	<a4j:commandButton execute="@this" render="mediaLocationsTable"
-        	action="#{settingsBean.addMediaLocation}" value="add"/>        		
-        </f:facet>   
-    	<a4j:commandButton execute="@this" render="mediaLocationsTable" 
-    	action="#{settingsBean.deleteMediaLocation}" value="delete"/>         
+        	<h:commandButton action="#{settingsBean.addMediaLocation}" value="add">
+        		<f:ajax execute="@this" render="mediaLocationsTable"/>
+        	</h:commandButton>         		
+        </f:facet>
+        <h:commandButton action="#{settingsBean.deleteMediaLocation}" value="delete">
+        	<f:ajax execute="@this" render="@form"/>
+        </h:commandButton>
     </h:column>  
-	</rich:dataTable>
+	</h:dataTable>
 	
 </composite:implementation>
 </body>

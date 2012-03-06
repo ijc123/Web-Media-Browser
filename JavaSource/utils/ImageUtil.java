@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -20,13 +21,22 @@ import database.ImageItem;
 
 public class ImageUtil {
 	
-	public ImageItem createThumbNail(byte[] inputImageData, int thumbHeight) throws Exception 
+	public ImageItem createThumbNail(final byte[] inputImageData, int thumbHeight) throws Exception 
 	{
 
 		InputStream inputStream = new ByteArrayInputStream(inputImageData);
 
 		Image image = javax.imageio.ImageIO.read(inputStream);
 
+		ImageItem thumbNail = createThumbNail(image, thumbHeight);
+		
+		inputStream.close();
+		
+		return(thumbNail);
+	}
+
+	public ImageItem createThumbNail(final Image image, int thumbHeight) throws IOException {
+		
 		int imageWidth    = image.getWidth(null);
 		int imageHeight   = image.getHeight(null);
 		double imageRatio = (double)imageWidth / (double)imageHeight;
@@ -80,9 +90,11 @@ public class ImageUtil {
 
 		imageOutputStream.close();
 		byteOutputStream.close();
-		inputStream.close();
+		
 
 		return(outputImage);
+		
 	}
-
+	
+	
 }

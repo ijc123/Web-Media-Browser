@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.net.SocketException;
 import java.util.Calendar;
 
-public class RemoteInputFile implements VirtualInputFile {
+import org.apache.commons.net.ftp.FTP;
+
+public class RemoteInputFile extends VirtualInputFile {
 
 	private InputStream input;
 	private MyFTPClient ftp;
@@ -15,6 +17,7 @@ public class RemoteInputFile implements VirtualInputFile {
 		ftp = new MyFTPClient(url);
 		
 		ftp.connect();
+		ftp.setFileType(FTP.BINARY_FILE_TYPE);
 		
 		input = null;
 	}

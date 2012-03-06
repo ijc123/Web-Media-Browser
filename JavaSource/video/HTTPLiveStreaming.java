@@ -193,7 +193,7 @@ public class HTTPLiveStreaming {
 		
 		try {
 
-			f.getDirectoryContents(null, oldTsFiles, "*.ts");
+			f.getDirectoryContents(oldTsFiles, "*.ts");
 
 			for(int i = 0; i < oldTsFiles.size(); i++) {
 							

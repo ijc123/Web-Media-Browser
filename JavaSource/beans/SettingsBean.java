@@ -1,6 +1,8 @@
 package beans;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.SocketException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +51,19 @@ public class SettingsBean implements Serializable {
 
 	public void synchronize() {
 			
-		mediaEJB.synchronize(settings);
+		//System.out.println(settings.getPreviewRootDirectory());
+		
+		//mediaEJB.synchronize(settings);
+		
+		video.FrameGrabber frameGrabber = new video.FrameGrabber();
+		
+		try {
+			frameGrabber.start("file:///j:/Girls/Barbamiska/Barbamiska,%20Chinita,%20Angel%20Rivas,%20Lilo%20-%20Creampie%20Orgy%20%2312.avi", 320, "G:/preview/fapmap/grey.avi", 60);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 		
 	}
 	

@@ -5,14 +5,16 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets" 
 	xmlns:my="/WEB-INF/mytags"
 	xmlns:rich="http://richfaces.org/rich"
-	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:cdk="http://bleathem.ca/test">
 <h:head>
 	<meta http-equiv="pragma" content="no-cache" />
 	<title>Settings</title>
 </h:head>
 <h:body>	
-	<h:form>
-		<cc:locationPickerButton location="c:/"/>				 												
+	<h:form>	
+		<cc:locationPickerButton location="#{fileSelectTestBean.location}"/>						 										
 	</h:form>
 </h:body>
 </html>

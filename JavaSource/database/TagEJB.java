@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
-import org.jboss.ejb3.annotation.IgnoreDependency;
+//import org.jboss.ejb3.annotation.IgnoreDependency;
 
 import utils.ImageUtil;
 import utils.MapArgument;
@@ -27,7 +27,7 @@ import beans.user.LoginBean;
 public class TagEJB {
 
 	@EJB
-	@IgnoreDependency
+	//@IgnoreDependency
 	private MediaEJB mediaEJB;
 	
 	@Inject

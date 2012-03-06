@@ -75,8 +75,7 @@ public class FileUtilsRemote extends FileUtils {
 	}
 	
 	@Override
-	public void getDirectoryContents(ArrayList<FileInfo> directory, 
-			ArrayList<FileInfo> file) throws IOException 
+	public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException 
 	{
 			
 		ftp.connect();
@@ -86,23 +85,10 @@ public class FileUtilsRemote extends FileUtils {
 				
 		for(int i = 0; i < fileList.length; i++) {
 			
-			String uri = ftp.getLocation().getLocationWithoutUserInfo() + fileList[i].getName(); 
+			String uri = location.getLocation() + fileList[i].getName(); 
 			
-			if(fileList[i].isDirectory()) {
-				
-				if(directory != null) {
-				
-					directory.add(new FileInfo(fileList[i], uri));
-				}
-				
-			} else {
-				
-				if(file != null) {
-					
-					file.add(new FileInfo(fileList[i], uri));
-				}
-			}
-			
+			contents.add(new FileInfo(fileList[i], uri));
+						
 		}
 			
 		ftp.disconnect();

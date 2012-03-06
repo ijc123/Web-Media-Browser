@@ -93,7 +93,7 @@ public abstract class Location implements LocationInterface {
 	
 	public boolean isWithoutFilename() {
 		
-		return(!getFilename().isEmpty());
+		return(getFilename().isEmpty());
 	}
 	
 }

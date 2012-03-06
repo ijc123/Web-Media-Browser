@@ -22,12 +22,13 @@
 	<h:commandButton id="mediaLocation" value="#{cc.attrs.location}" style="#{cc.attrs.style}">
        	<rich:componentControl target="pickFilePopup" operation="show" />
    	</h:commandButton>
-   	<rich:popupPanel id="pickFilePopup" modal="true" autosized="true" resizeable="false"
-        onmaskclick="#{rich:component('pickFilePopup')}.hide(); locationPickerButton.RedrawButton('#{cc.clientId}');">
+   	<rich:popupPanel id="pickFilePopup" modal="false" autosized="true" resizeable="false"
+        onmaskclick="#{rich:component('pickFilePopup')}.hide(); locationPickerButton.RedrawButton('#{cc.clientId}');" 
+        domElementAttachment="parent">
         <f:facet name="header">
             <h:outputText value="Select Location" />
-        </f:facet>
-        <cc:fileSelect location="#{cc.attrs.location}"/>
+        </f:facet>      
+        <my:fileSelectOne location="#{cc.attrs.location}" hideFiles="true"/>
         <h:commandButton value="ok" onclick="#{rich:component('pickFilePopup')}.hide(); locationPickerButton.RedrawButton('#{cc.clientId}'); return false;"/>        
    	</rich:popupPanel>         	
 </composite:implementation>

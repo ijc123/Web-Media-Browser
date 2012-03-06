@@ -19,6 +19,12 @@ public class LocationLocal extends Location {
 		int dotPos = location.lastIndexOf('.');
 		int sepPos = location.lastIndexOf('/');
 		
+		if(dotPos < sepPos) {
+			
+			// directory name contains a dot
+			dotPos = -1;
+		}
+		
 		if(drivePos != -1) {
 			
 			setDrive(location.substring(0, drivePos));

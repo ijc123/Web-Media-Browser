@@ -84,8 +84,7 @@ public class FileUtilsLocal extends FileUtils {
 	}
 		
 	@Override
-	public void getDirectoryContents(ArrayList<FileInfo> directory, 
-			ArrayList<FileInfo> file) throws IOException
+	public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException
 	{
 				
 		File dir = new File(location.getLocation());
@@ -95,22 +94,8 @@ public class FileUtilsLocal extends FileUtils {
 		if(item == null) return;
 		
 		for(int i = 0; i < item.length; i++) {
-			
-			if(item[i].isDirectory()) {
-				
-				if(directory != null) {
-				
-					directory.add(new FileInfo(item[i]));
-				}
-				
-			} else {
-				
-				if(file != null) {
-					
-					file.add(new FileInfo(item[i]));
-				}
-			}
-			
+							
+			contents.add(new FileInfo(item[i]));			
 		}
 				
 	}
@@ -129,7 +114,7 @@ public class FileUtilsLocal extends FileUtils {
 		
 		for(int i = 0; i < roots.length; i++) {
 			
-			rootPath.add(roots[i].getPath().replace('\\', '/'));
+			rootPath.add(roots[i].getPath().replace('\\', '/').toLowerCase());
 			
 		}
 	

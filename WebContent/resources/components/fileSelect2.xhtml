@@ -13,41 +13,40 @@
 </head>
 <body>
 
-<composite:interface>
+<composite:interface componentType="fileSelect">
 	<composite:attribute name="location" type="java.lang.String"/>
 </composite:interface>
 	
 <composite:implementation>	
 	<h:panelGrid columns="1" id="fileSelectPanel">
-	<h:selectOneListbox id="selectDrive" size="1" value="#{fileSelectBean.root}" 
+	<h:selectOneListbox id="selectDrive" size="1" value="#{cc.root}" 
 		style="width: 100%">	
-	  	<f:selectItems id="drives" value="#{fileSelectBean.fileRoots}"
+	  	<f:selectItems id="drives" 
 	  		var="n"
 	  		itemValue="#{n}">
 	  	</f:selectItems>
 	  	<f:ajax event="change" render="fileSelectPanel" execute="selectDrive"/>
 	</h:selectOneListbox>
-    <h:inputText id="location" value="#{fileSelectBean.location}" 
-    	style="width: 100%" disabled="true"/>
+    <h:inputText id="location" style="width: 100%" disabled="true"/>
 	<rich:collapsiblePanel header="Ftp" switchType="client" expanded="false">		        
 		<h:panelGrid id="ftpPanel" columns="2">
 			<h:outputText value="Host" />
-			<h:inputText id="ftpAdress" value="#{fileSelectBean.ftpAdress}" /> 
+			<h:inputText id="ftpAdress"/> 
 			
 			<h:outputText value="Username" />
-			<h:inputText id="username" value="#{fileSelectBean.username}"/>
+			<h:inputText id="username"/>
 			
 			<h:outputText value="Password"/>
-			<h:inputText id="password" value="#{fileSelectBean.password}"/>  
+			<h:inputText id="password"/>  
 			
-			<h:commandButton value="connect" action="#{fileSelectBean.setFtpLocation}">
+			<h:commandButton value="connect" action="#{cc.setFtpLocation}">
 				<f:ajax render="fileSelectPanel" execute="ftpPanel"/>
 			</h:commandButton>
 		</h:panelGrid>
 	</rich:collapsiblePanel>
 	<h:selectOneListbox id="selectFile" size="10" style="width: 100%" 
-	value="#{fileSelectBean.selectedFile}">
-		<f:selectItems id="fileListing" value="#{fileSelectBean.fileListing}"
+	value="#{cc.selectedFile}">
+		<f:selectItems id="fileListing" 
 	  		var="n"
 	  		itemValue="#{n}">
 	  	</f:selectItems>

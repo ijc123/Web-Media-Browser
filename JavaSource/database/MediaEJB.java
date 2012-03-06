@@ -22,7 +22,8 @@ import org.apache.ibatis.session.SqlSession;
 
 import utils.ImageUtil;
 import utils.MapArgument;
-import virtualFile.FileUtilsLocal;
+import virtualFile.FileUtils;
+import virtualFile.FileUtilsFactory;
 import beans.user.LoginBean;
 
 
@@ -417,7 +418,7 @@ public class MediaEJB {
 			MediaLocationItem m = mediaLocation.get(i);
 			String typeName = m.getTypeName();
 			
-			FileUtilsLocal f = new FileUtilsLocal(m.getLocation());
+			FileUtils f = FileUtilsFactory.create(m.getLocation());
 					
 			f.getRecursiveMediaItems(diskMedia, m.isVideo(), m.isAudio(), m.isImages(), typeName);
 		

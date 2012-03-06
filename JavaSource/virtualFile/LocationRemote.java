@@ -1,11 +1,7 @@
 package virtualFile;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 public class LocationRemote extends Location {
 
@@ -41,9 +37,15 @@ public class LocationRemote extends Location {
 			
 			//uri = new URI(location);
 						
-			setHost(url.getHost());			
-			setPath(url.getPath());		
-			setFilename(url.getQuery());									
+			setHost(url.getHost());		
+			
+			String path = url.getPath().substring(0, url.getPath().lastIndexOf('/') + 1);
+			
+			setPath(path);		
+			
+			String filename = url.getFile().substring(url.getPath().lastIndexOf('/') + 1);
+			
+			setFilename(filename);									
 			setPort(url.getPort());		
 			
 			String userInfo = url.getUserInfo();

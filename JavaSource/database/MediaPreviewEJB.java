@@ -13,7 +13,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.jboss.ejb3.annotation.IgnoreDependency;
+
 
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
@@ -29,7 +29,7 @@ public class MediaPreviewEJB {
 	SettingsEJB settings;
 	
 	@EJB
-	@IgnoreDependency
+	//@IgnoreDependency
 	MediaEJB mediaEJB;
 
 	private String previewRoot;
@@ -139,7 +139,7 @@ public class MediaPreviewEJB {
 
 			f.moveDown(outputPath);
 
-			f.getDirectoryContents(null, previewImagesList);
+			f.getDirectoryContents(previewImagesList);
 
 			if(previewImagesList.size() == 0) return(previewImagesPath);
 

@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
+import javax.el.ELContext;
+import javax.el.ValueExpression;
+import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,7 +19,7 @@ import virtualFile.FileUtilsFactory;
 import virtualFile.FileUtilsLocal;
 import virtualFile.LocationRemote;
 
-@ViewScoped
+@RequestScoped
 @Named
 public class FileSelectBean implements Serializable {
 
@@ -43,42 +43,46 @@ public class FileSelectBean implements Serializable {
 		
 	public FileSelectBean() {
 								
-		fileRoots = FileUtilsLocal.getRootPaths();
 		
-		if(!fileRoots.isEmpty()) {
-			
-			if(fileRoots.contains("C:/")) {
-				
-				root = "C:/";
-				location = "C:/";
-			
-			} else {
-			
-				root = fileRoots.get(0);
-				location = fileRoots.get(0);
-			}
-			
-		} else {
-			
-			root = "";
-			location = "";
-		}
-		
-		ftpAdress = "ftp://";
 	}
 	
 	@PostConstruct
 	void Init() {
 	
-		UIInput locationComponent = (UIInput) context.getViewRoot().findComponent("j_idt6:j_idt7:location");
+		getStoredLocation();
+		//UIInput locationComponent = (UIInput) context.getViewRoot().findComponent("j_idt6:j_idt7:location");		
+		//String input = (String)locationComponent.getValue();
 		
-		String input = (String)locationComponent.getValue();
-		
-		String blub = context.getApplication().evaluateExpressionGet(context, "#{cc.attrs.location}", String.class);
-				
-		int i = 0;
-	
+		fileRoots = FileUtilsLocal.getRootPaths();
 	}
+
+	protected void getStoredLocation() {
+				
+		location = "c:/";//context.getApplication().evaluateExpressionGet(context, "#{cc.attrs.location}", String.class);
+	
+		FileUtils f = FileUtilsFactory.create(location);
+			
+		if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
+			
+			FileUtilsLocal fl = (FileUtilsLocal)f;
+			root = fl.getDrive().toUpperCase() + "/";
+			
+		} else {
+			
+			root = fileRoots.get(0);
+		}			
+	}
+	
+	protected void setStoredLocation() {
+		
+		ELContext elContext = context.getELContext();
+		ValueExpression valueExpression = context.getApplication().getExpressionFactory()
+		    .createValueExpression(elContext, "#{cc.attrs.location}", String.class);
+
+		valueExpression.setValue(elContext, location);
+		
+	}
+	
 	
 	public String getFtpAdress() {
 		return ftpAdress;
@@ -103,15 +107,7 @@ public class FileSelectBean implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-	
+		
 	public List<String> getFileRoots() {
 	
 		return(fileRoots);
@@ -126,11 +122,11 @@ public class FileSelectBean implements Serializable {
 		
 		FileUtils f = FileUtilsFactory.create(location);
 		
-		ArrayList<FileInfo> file = new ArrayList<FileInfo>();
+	
 		ArrayList<FileInfo> directory = new ArrayList<FileInfo>();
 		
 		try {
-			f.getDirectoryContents(directory, file);
+			f.getDirectoryContents(directory);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +149,18 @@ public class FileSelectBean implements Serializable {
 	public void setRoot(String root) {
 		
 		this.root = root;
-		location = root;		
+		location = root;	
+		
+		setStoredLocation();
+	}
+	
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		
+		this.location = location;	
 	}
 	
 	public void setFtpLocation() {
@@ -162,6 +169,7 @@ public class FileSelectBean implements Serializable {
 		
 		location = l.getLocation();
 	
+		setStoredLocation();
 	}
 
 	public String getSelectedFile() {
@@ -170,8 +178,6 @@ public class FileSelectBean implements Serializable {
 	}
 
 	public void setSelectedFile(String selectedFile) {
-		
-		//this.selectedFile = selectedFile;
 		
 		FileUtils f = FileUtilsFactory.create(location);
 		
@@ -187,6 +193,9 @@ public class FileSelectBean implements Serializable {
 			
 			location = f.getLocation();		
 		}
+		
+		setStoredLocation();
+		
 	}
 
 

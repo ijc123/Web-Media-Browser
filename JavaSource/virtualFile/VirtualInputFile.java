@@ -1,22 +1,22 @@
 package virtualFile;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 
-public interface VirtualInputFile extends Closeable {
+public abstract class VirtualInputFile extends InputStream  {
 
-	public void close() throws IOException; 	
-	public long length() throws IOException;
+	public abstract void close() throws IOException; 	
+	public abstract long length() throws IOException;
 	
-	public int read() throws IOException; 	
-	public int read(byte[] b) throws IOException;	 
-	public int read(byte[] b, int off, int len) throws IOException;
+	public abstract int read() throws IOException; 	
+	public abstract int read(byte[] b) throws IOException;	 
+	public abstract int read(byte[] b, int off, int len) throws IOException;
 	
-	public void seek(long pos) throws IOException;
+	public abstract void seek(long pos) throws IOException;
 	
-	public String getName();
-	public String getUri();
-	public long lastModified() throws IOException;
+	public abstract String getName();
+	public abstract String getUri();
+	public abstract long lastModified() throws IOException;
 	
 
 }

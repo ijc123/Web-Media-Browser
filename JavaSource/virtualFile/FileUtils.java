@@ -15,8 +15,7 @@ public abstract class FileUtils implements LocationInterface {
 	abstract public boolean deleteDirectory(final String name) throws IOException;
 	abstract public boolean renameFile(final String oldName, final String newName) throws IOException;	
 	
-	abstract public void getDirectoryContents(ArrayList<FileInfo> directory, 
-			ArrayList<FileInfo> file) throws IOException; 
+	abstract public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException; 
 		
 		
 	protected FileUtils(String uri) {
@@ -66,38 +65,24 @@ public abstract class FileUtils implements LocationInterface {
 		location.setPath(curPath);
 	}
 	
-	public void getDirectoryContents(ArrayList<FileInfo> directory, 
-			ArrayList<FileInfo> file, String wildCard) throws IOException
+	public void getDirectoryContents(ArrayList<FileInfo> contents, String wildCard) throws IOException
 	{
 		
-		getDirectoryContents(directory, file);
+		getDirectoryContents(contents);
 		
 		int i = 0;
 		
-		while(directory != null && i < directory.size()) {
+		while(contents != null && i < contents.size()) {
 		
-			if(wildCardMatch(directory.get(i).getName(), wildCard) == false) {
+			if(wildCardMatch(contents.get(i).getName(), wildCard) == false) {
 			
-				directory.remove(i);
+				contents.remove(i);
 				i--;
 			}
 		
 			i++;
 		}
 		
-		i = 0;
-		
-		while(file != null && i < file.size()) {
-		
-			if(wildCardMatch(file.get(i).getName(), wildCard) == false) {
-			
-				file.remove(i);
-				i--;
-			}
-		
-			i++;
-		}
-			
 	}
 		
 	private boolean wildCardMatch(String text, String pattern)
@@ -129,23 +114,27 @@ public abstract class FileUtils implements LocationInterface {
 		throws IOException
 	{
 				
-		ArrayList<FileInfo> directory = new ArrayList<FileInfo>();
-		ArrayList<FileInfo> file = new ArrayList<FileInfo>();
+		ArrayList<FileInfo> contents = new ArrayList<FileInfo>();
 				
-		getDirectoryContents(directory, file);
+		getDirectoryContents(contents);
 		
-		for(int i = 0; i < directory.size(); i++) {
+		for(int i = 0; i < contents.size(); i++) {
 			
-			moveDown(directory.get(i).getName());
-						
+			if(!contents.get(i).isDirectory()) continue;
+			
+			moveDown(contents.get(i).getName());
+					
 			getRecursiveMediaItems(media, video, audio, images, typeName);
-			
+		
 			moveUp();
-		}
-	
-		for(int i = 0; i < file.size(); i++) {
 			
-			FileInfo curFile = file.get(i);
+		}
+		
+		for(int i = 0; i < contents.size(); i++) {
+			
+			if(contents.get(i).isDirectory()) continue;
+			
+			FileInfo curFile = contents.get(i);
 			
 			MediaItem diskMedia = new MediaItem();
 			

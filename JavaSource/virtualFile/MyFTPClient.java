@@ -69,7 +69,9 @@ public class MyFTPClient extends FTPClient {
 		
 		cwd(location.getPath());
 		
-		FTPFile[] file = listFiles(location.getFilename());
+		String filename = location.getFilename();
+		
+		FTPFile[] file = listFiles(filename);	
 		
 		if(file.length > 0) {
 			

@@ -51,6 +51,7 @@ public class LoadDataSegmentServlet extends HttpServlet {
 	// Constants ----------------------------------------------------------------------------------
 
     protected static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
+    //protected static final int DEFAULT_BUFFER_SIZE = 1048576;
     protected static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     protected static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     
@@ -433,11 +434,11 @@ public class LoadDataSegmentServlet extends HttpServlet {
     	   	
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int read;
-
+                   
         if (input.length() == length) {
             // Write full range.
             while ((read = input.read(buffer)) > 0) {
-                output.write(buffer, 0, read);
+                output.write(buffer, 0, read);               
             }
         } else {
             // Write partial range.

@@ -2,12 +2,12 @@ package custom.component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
@@ -17,17 +17,596 @@ import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
 import virtualFile.FileUtilsLocal;
-import database.MediaLocationItem;
+import virtualFile.LocationRemote;
 
 
 @FacesRenderer(componentFamily = "javax.faces.SelectOne", rendererType = "custom.component.FileSelectOne")
 @ResourceDependencies({
 	@ResourceDependency(library="javax.faces", name="jsf.js"),
+	@ResourceDependency(name = "jquery.js", library = "", target = ""),
+	@ResourceDependency(name = "jquery-ui-1.8.10.custom.css", library = "css/ui-lightness", target = ""),
+	@ResourceDependency(name = "jquery-ui-1.8.10.custom.min.js", library = "javascript", target = ""),	
 	@ResourceDependency(library="javascript", name="fileSelectOne.js")   
 	})
 public class UIFileSelectRenderer extends Renderer {
 
+	private static String convertToString(Object object) {
+		return object != null ? object.toString() : "";
+	}
 	
+	@Override
+	public void encodeEnd(FacesContext facesContext, UIComponent component)
+			throws IOException {
+		
+		UIFileSelectOne fileSelect = (UIFileSelectOne) component;
+		
+		if(fileSelect.isFirstRender()) {
+			
+			getContents(fileSelect);
+			
+			fileSelect.setFirstRender(false);
+		}
+				
+		ResponseWriter responseWriter = facesContext.getResponseWriter();
+		String clientId = component.getClientId(facesContext);
+		responseWriter.startElement("table", component);
+		{
+			
+			String value = convertToString(clientId);
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+		{
+			
+			String value = convertToString(clientId);
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("style", "width:300px", null);
+		
+		responseWriter.startElement("tbody", component);
+
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		// drive select
+		
+		responseWriter.startElement("select", component);
+		{
+			String value = convertToString(clientId) + ":selectDrive";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":selectDrive";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		{
+			String value = "jsf.ajax.request(this,event,{execute: '"
+					+ convertToString(clientId) + "', render: '"
+					+ convertToString(clientId) + "'})";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("onchange", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("size", "1", null);
+
+		responseWriter.writeAttribute("style", "width: 100%", null);
+		responseWriter.writeAttribute("value", fileSelect.getRootDrive(), null);
+		
+		List<String> roots = fileSelect.getRoots();
+		
+		for(int i = 0; i < roots.size(); i++) {
+			
+			String root = roots.get(i);
+			
+			responseWriter.startElement("option", component);
+	
+			responseWriter.writeAttribute("value", root, null);			
+			
+			if(root.equals(fileSelect.getRootDrive())) {
+				
+				responseWriter.writeAttribute("selected", "selected", null);
+			}
+						
+			responseWriter.writeText(root, null);
+											
+			responseWriter.endElement("option");
+		}
+		
+		
+		responseWriter.endElement("select");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		// location
+		
+		responseWriter.startElement("input", component);
+		responseWriter.writeAttribute("disabled", "disabled", null);
+
+		{
+			String value = convertToString(clientId) + ":location";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":location";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("style", "width: 100%", null);
+
+		responseWriter.writeAttribute("type", "text", null);
+
+		responseWriter.writeAttribute("value", fileSelect.getLocation(), null);
+
+		responseWriter.endElement("input");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.startElement("div", component);
+		responseWriter.writeAttribute("class", "rf_jq_filepicker", null);
+
+		{
+			String value = convertToString(clientId) + ":ftpAccordeon";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+				
+		
+		responseWriter.writeAttribute("style", "rf_jq_filepicker", null);
+
+		responseWriter.startElement("h3", component);
+
+		responseWriter.startElement("a", component);
+		responseWriter.writeURIAttribute("href", "#", null);
+
+		responseWriter.writeText("FTP", null);
+
+		responseWriter.endElement("a");
+		responseWriter.endElement("h3");
+		responseWriter.startElement("div", component);
+
+		responseWriter.startElement("table", component);
+		{
+			String value = convertToString(clientId) + ":ftpPanel";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		responseWriter.startElement("tbody", component);
+
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.writeText("Host", null);
+
+		responseWriter.endElement("td");
+		responseWriter.startElement("td", component);
+
+		// ftp adress
+		
+		responseWriter.startElement("input", component);
+		{
+			String value = convertToString(clientId) + ":ftpAdress";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":ftpAdress";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("type", "text", null);
+		responseWriter.writeAttribute("value", fileSelect.getFtpServer(), null);
+
+		responseWriter.endElement("input");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.writeText("Username", null);
+
+		responseWriter.endElement("td");
+		responseWriter.startElement("td", component);
+
+		// Ftp username
+		
+		responseWriter.startElement("input", component);
+		{
+			String value = convertToString(clientId) + ":username";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":username";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("type", "text", null);
+		responseWriter.writeAttribute("value", fileSelect.getFtpUsername(), null);
+
+		responseWriter.endElement("input");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.writeText("Password", null);
+
+		responseWriter.endElement("td");
+		responseWriter.startElement("td", component);
+
+		// ftp password
+		
+		responseWriter.startElement("input", component);
+		{
+			String value = convertToString(clientId) + ":password";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":password";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("type", "text", null);
+		responseWriter.writeAttribute("value", fileSelect.getFtpPassword(), null);
+
+		responseWriter.endElement("input");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.startElement("input", component);
+		{
+			String value = convertToString(clientId) + ":ftpConnect";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":ftpConnect";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		{
+			String value = "jsf.ajax.request(this,event,{execute: '"
+					+ convertToString(clientId) + "', render: '"
+					+ convertToString(clientId) + "'});return false";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("onclick", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("type", "submit", null);
+
+		responseWriter.writeAttribute("value", "connect", null);
+
+		responseWriter.endElement("input");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+		responseWriter.writeAttribute("style", "color: red; font: italic;",
+				null);
+
+		responseWriter.writeText(!fileSelect.getFtpConnectMessage().isEmpty() ? "Error: " : "", null);
+
+		responseWriter.endElement("td");
+		responseWriter.startElement("td", component);
+		responseWriter.writeAttribute("style", "color: red; font: italic;",
+				null);
+
+		responseWriter.writeText(fileSelect.getFtpConnectMessage(), null);
+
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.endElement("tbody");
+		responseWriter.endElement("table");
+		responseWriter.endElement("div");
+		responseWriter.startElement("script", component);
+		responseWriter.writeAttribute("type", "text/javascript", null);
+				
+		
+		{
+			Object text = "jQuery(function() {\n\t\t\t\t\t                $(document.getElementById('"
+					+ convertToString(clientId)
+					+ ":ftpAccordeon')).accordion({ collapsible: true, active: false });\n\t\t\t\t\t            });";
+			if (text != null) {
+				responseWriter.writeText(text, null);
+			}
+		}
+
+		responseWriter.endElement("script");
+		responseWriter.endElement("div");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.startElement("tr", component);
+
+		responseWriter.startElement("td", component);
+
+		responseWriter.startElement("select", component);
+		{
+			String value = convertToString(clientId) + ":selectFile";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("id", value, null);
+			}
+
+		}
+
+		{
+			String value = convertToString(clientId) + ":selectFile";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("name", value, null);
+			}
+
+		}
+
+		{
+			String value = "jsf.ajax.request(this,event,{execute: '"
+					+ convertToString(clientId) + "', render: '"
+					+ convertToString(clientId) + "'})";
+			if (null != value && value.length() > 0) {
+				responseWriter.writeAttribute("ondblclick", value, null);
+			}
+
+		}
+
+		responseWriter.writeAttribute("size", "10", null);
+
+		responseWriter.writeAttribute("style", "width: 100%", null);
+
+		List<String> contents = fileSelect.getContents();
+				
+		for(int i = 0; i < contents.size(); i++) {
+			
+			String name = contents.get(i);
+			
+			responseWriter.startElement("option", component);
+	
+			responseWriter.writeAttribute("value", name, null);
+									
+			responseWriter.writeText(name, null);
+											
+			responseWriter.endElement("option");
+		}
+		
+		
+		responseWriter.endElement("select");
+		responseWriter.endElement("td");
+		responseWriter.endElement("tr");
+		responseWriter.endElement("tbody");
+		responseWriter.endElement("table");
+
+	}
+	
+	@Override
+	public void decode(FacesContext context, UIComponent component) {
+		
+		
+		UIFileSelectOne fileSelect = (UIFileSelectOne)component;
+		String clientId = fileSelect.getClientId(context);
+						
+		String location = fileSelect.getLocation();
+		
+		FileUtils f = FileUtilsFactory.create(location);
+		
+		if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
+			
+			FileUtilsLocal fl = (FileUtilsLocal)f;
+			
+			fileSelect.setRootDrive(fl.getDrive() + "/");
+		
+		} else {
+			
+			if(fileSelect.getRootDrive() == null) {
+			
+				fileSelect.setRootDrive(FileUtilsLocal.getRootPaths().get(0));
+			}
+		}
+		
+		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
+		
+		// changed directory?
+		
+		String selected = requestMap.get(clientId + ":selectFile");
+		
+		if(selected != null && selected.endsWith("/")) {						
+							
+			if(selected.equals("../"))
+			{
+				f.moveUp();
+					
+			} else {
+				
+				f.moveDown(selected); 
+			}				
+			
+		} else {
+							
+			// changed the root drive?
+			
+			String selectDrive = requestMap.get(clientId + ":selectDrive");
+			
+			if(selectDrive != null && !selectDrive.equals(fileSelect.getRootDrive())) {
+				
+				fileSelect.setRootDrive(selectDrive);
+				f = FileUtilsFactory.create(selectDrive);
+					
+			}
+					
+			// pressed the ftp button?
+			
+			String source = requestMap.get("javax.faces.source");
+					
+			if(source != null && source.equals(clientId + ":ftpConnect")) {
+				
+				String ftpServer = requestMap.get(clientId + ":ftpAdress");
+				
+				fileSelect.setFtpServer(ftpServer);
+				
+				String ftpUsername = requestMap.get(clientId + ":username");
+				
+				fileSelect.setFtpUsername(ftpUsername);
+				
+				String ftpPassword = requestMap.get(clientId + ":password");
+				
+				fileSelect.setFtpPassword(ftpPassword);
+							
+				LocationRemote l = new LocationRemote(ftpServer, ftpUsername, ftpPassword);
+				
+				f = FileUtilsFactory.create(l.getLocation());
+			} 
+		
+		}
+				
+		fileSelect.setLocation(f.getLocation());
+		getContents(fileSelect);
+	
+	}
+	
+	private void getContents(UIFileSelectOne fileSelect) {
+/*		
+		if(fileSelect.isFirstRender()) {
+		
+			fileSelect.setLocation((String)fileSelect.getValue());
+			
+		}
+*/				
+		String location = (String) fileSelect.getLocation();
+		
+		List<String> roots = FileUtilsLocal.getRootPaths();		
+		fileSelect.setRoots(roots);
+				
+		if(location.isEmpty()) {
+		
+			if(roots.contains("c:/")) location = "c:/";
+			else location = roots.get(0);
+			
+			fileSelect.setLocation(location);
+		}
+		
+		FileUtils f = FileUtilsFactory.create(location);
+		
+		if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
+			
+			FileUtilsLocal fl = (FileUtilsLocal)f;
+			
+			fileSelect.setRootDrive(fl.getDrive() + "/");
+		}
+		
+		ArrayList<FileInfo> contents = new ArrayList<FileInfo>();
+		ArrayList<String> sortedContents = new ArrayList<String>();
+		
+		try {
+			
+			f.getDirectoryContents(contents);
+			
+			if(!fileSelect.isHideDirectories()) {
+			
+				sortedContents.add("../");
+				
+				for(int i = 0; i < contents.size(); i++) {
+					
+					if(contents.get(i).isDirectory()) {
+						
+						sortedContents.add(contents.get(i).getName() + "/");
+					}				
+				}								
+			}
+			
+			if(!fileSelect.isHideFiles()) {
+				
+				for(int i = 0; i < contents.size(); i++) {
+					
+					if(!contents.get(i).isDirectory()) {
+						
+						sortedContents.add(contents.get(i).getName());					
+					}					
+				}								
+			}
+			
+			fileSelect.setContents(sortedContents);
+			
+			fileSelect.setFtpConnectMessage("");
+			
+		} catch (IOException e) {
+			
+			fileSelect.setFtpConnectMessage(e.getMessage());
+			
+			fileSelect.setContents(sortedContents);
+			
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+/*	
 	public void encodeBegin(FacesContext context, UIComponent component)
 			throws IOException {
 
@@ -186,14 +765,7 @@ public class UIFileSelectRenderer extends Renderer {
 	public void decode(FacesContext context, UIComponent component) {
 		
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-/*	
-		Iterator it = requestMap.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry<String,String> pairs = (Map.Entry<String, String>)it.next();
-	        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-	        //it.remove(); // avoids a ConcurrentModificationException
-	    }
-*/	
+
 		String selected = requestMap.get("selectionString");
 		
 		UIFileSelectOne fileSelect = (UIFileSelectOne)component;
@@ -225,7 +797,15 @@ public class UIFileSelectRenderer extends Renderer {
 			fileSelect.setRootDir(rootDir);
 			fileSelect.setValue(rootDir.toLowerCase());
 		}
+	
+			FileUtils f = FileUtilsFactory.create(location);
 		
+		if(f.getClass().getName().equals("FileUtilsLocal")) {
+			
+			FileUtilsLocal fl = (FileUtilsLocal)f;
+			
+			fileSelect.setRootDrive(fl.getDrive());
+		}
 	}
 	
 	public static String getFormId(FacesContext context, UIComponent component) {
@@ -268,13 +848,6 @@ public class UIFileSelectRenderer extends Renderer {
 		String script = request + render + comma + selection + end;
 		
 		return script;
-	}
-/*
-	protected final String getSelectDirectoryScript(String formID) {
-		
-		return "setSelectedDirectory(document.forms['" + formID + "']);";
-
-		
 	}
 */
 }
