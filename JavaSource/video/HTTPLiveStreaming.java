@@ -186,13 +186,13 @@ public class HTTPLiveStreaming {
 			index.delete();
 		}
 */
-		
-		FileUtilsLocal f = new FileUtilsLocal(getOutputDir());
-		
-		ArrayList<FileInfo> oldTsFiles = new ArrayList<FileInfo>();
-		
+				
 		try {
 
+			FileUtilsLocal f = new FileUtilsLocal(getOutputDir());
+			
+			ArrayList<FileInfo> oldTsFiles = new ArrayList<FileInfo>();
+			
 			f.getDirectoryContents(oldTsFiles, "*.ts");
 
 			for(int i = 0; i < oldTsFiles.size(); i++) {

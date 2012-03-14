@@ -1,6 +1,7 @@
 package virtualFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import database.MediaItem;
@@ -18,9 +19,9 @@ public abstract class FileUtils implements LocationInterface {
 	abstract public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException; 
 		
 		
-	protected FileUtils(String uri) {
+	protected FileUtils(String location) throws MalformedURLException {
 		
-		location = LocationFactory.create(uri);
+		this.location = new Location(location);
 	}
 			
 	// move a directory up in the tree
@@ -36,13 +37,18 @@ public abstract class FileUtils implements LocationInterface {
 		
 		curPath = s.delete(pos + 1, curPath.length()).toString();
 		
-		location.setPath(curPath);
+		try {
+			location.setPath(curPath);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return(true);
 	}
 	
 	// move a directory down in the tree
-	public void moveDown(final String directory) {
+	public void moveDown(final String directory) throws MalformedURLException {
 		
 		if(directory == null) return;
 		
@@ -138,7 +144,7 @@ public abstract class FileUtils implements LocationInterface {
 			
 			MediaItem diskMedia = new MediaItem();
 			
-			diskMedia.setUri(curFile.getUri());
+			diskMedia.setUri(curFile.getLocation().getURL());
 			diskMedia.setFileName(curFile.getName());
 			diskMedia.setSizeBytes(curFile.getSizeBytes());
 			
@@ -160,7 +166,7 @@ public abstract class FileUtils implements LocationInterface {
 	}
 		
 	@Override
-	public void setPath(String path) {
+	public void setPath(String path) throws MalformedURLException {
 		
 		location.setPath(path);
 	}
@@ -178,13 +184,13 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public void setFilename(String filename) {
+	public void setFilename(String filename) throws MalformedURLException {
 		
 		location.setFilename(filename);
 	}
 	
 	@Override
-	public void setFilenameWithoutExtension(String filename) {
+	public void setFilenameWithoutExtension(String filename) throws MalformedURLException {
 		
 		location.setFilenameWithoutExtension(filename);
 	}
@@ -202,7 +208,7 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public void setExtension(String extension) {
+	public void setExtension(String extension) throws MalformedURLException {
 		
 		location.setExtension(extension);
 	}
@@ -230,5 +236,24 @@ public abstract class FileUtils implements LocationInterface {
 	
 		return(location.getLocationWithoutFilename());	
 	}
+	
+	@Override
+	public String getURL() {
+		
+		return(location.getURL());
+	}
+	
+	@Override
+	public String getHost() {
+	
+		return(location.getHost());	
+	}
+	
+	@Override
+	public void setHost(String host) throws MalformedURLException {
+	
+		location.setHost(host);
+	}
+	
 }
 

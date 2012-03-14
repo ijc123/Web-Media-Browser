@@ -9,16 +9,13 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
-
-
+import utils.ImagePreviewBuilder;
+import video.FrameGrabber;
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
 import virtualFile.FileUtilsLocal;
+import virtualFile.Location;
 
 // Note: Shouldn't really use disk i/o in EJB's
 // since files are not a transactional resource
@@ -84,37 +81,29 @@ public class MediaPreviewEJB {
 			return;
 		}
 
-		String inputPath = inputMedia.getPath();
 		String outputPath = getMediaPreviewPath(inputMedia);
-
+		
+		FrameGrabber frameGrabber = new FrameGrabber();
+		ImagePreviewBuilder previewBuilder = new ImagePreviewBuilder();
+		
 		try {
 
 			FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
 			f.createDirectory(outputPath);
 			f.moveDown(outputPath);
+			
+			Location inputLocation = new Location(inputMedia.getUri());
+						
+			f.setFilename(inputLocation.getFilename());
+			
+			Location outputLocation = new Location(f.getURL());
+							
+			frameGrabber.start(inputLocation, 400, outputLocation, 60);
+			previewBuilder.start(outputLocation);
 
-			String font = "H:/mtn-200808a-win32/cyberbit.ttf";
-
-			String batch = String.format(
-					"H:/mtn-200808a-win32/mtn -c 2 -r 32 -w 800 -P -I -f %s -O \"%s\" \"%s\"",
-					font, f.getLocation(), inputPath);
-
-			CommandLine cmdLine = CommandLine.parse(batch);
-
-			DefaultExecutor executor = new DefaultExecutor();
-
-			ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
-			executor.setWatchdog(watchdog);
-
-			executor.execute(cmdLine);
-
-		} catch (ExecuteException e) {
-
-			e.printStackTrace();
-
-		} catch (IOException e) {
-
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -139,13 +128,10 @@ public class MediaPreviewEJB {
 
 			f.moveDown(outputPath);
 
-			f.getDirectoryContents(previewImagesList);
+			f.getDirectoryContents(previewImagesList, "*.png");
 
 			if(previewImagesList.size() == 0) return(previewImagesPath);
-
-			// last element is the large preview image		
-			previewImagesList.remove(previewImagesList.size() - 1);
-
+			
 			for(int i = 0; i < previewImagesList.size(); i++) {
 
 				FileInfo imageFile = previewImagesList.get(i);
@@ -167,20 +153,20 @@ public class MediaPreviewEJB {
 
 		if(!inputMedia.getMimeType().startsWith("video")) return(null);
 
-		FileUtils f = FileUtilsFactory.create(previewRoot);
-
-		String outputPath = getMediaPreviewPath(inputMedia);
-
-		f.moveDown(outputPath);
-		
-		f.setFilename(inputMedia.getFileName());
-	
-		String newFilename = f.getFilenameWithoutExtension() + "_s";
-		
-		f.setFilenameWithoutExtension(newFilename);
-		f.setExtension("jpg");
-
 		try {
+			
+			FileUtils f = FileUtilsFactory.create(previewRoot);
+
+			String outputPath = getMediaPreviewPath(inputMedia);
+
+			f.moveDown(outputPath);
+			
+			f.setFilename(inputMedia.getFileName());
+		
+			String newFilename = f.getFilenameWithoutExtension() + "_s";
+			
+			f.setFilenameWithoutExtension(newFilename);
+			f.setExtension("jpg");
 			
 			if(!f.exists(f.getFilename())) return(null);
 			else {

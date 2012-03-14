@@ -1,49 +1,56 @@
 package virtualFile;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.URL;
 
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 public class MyFTPClient extends FTPClient {
 
-	private LocationRemote location;
+	String host;
+	String username;
+	String password;
+	int port;
+	 
+	public MyFTPClient(URL url) {
+
+		super();
+
+		Location location;
 		
-	public MyFTPClient(String url) {
-
-		super();
-
-		location = new LocationRemote(url);
+		try {
+			location = new Location(url.toString());
+			host = location.getHost();
+			username = location.getUsername();
+			password = location.getPassword();
+			port = url.getPort();
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
 	}
-	
-	public MyFTPClient(String url, String username, String password) {
-
-		super();
-
-		location = new LocationRemote(url, username, password);
-			
-	}
-	
+		
 	public void connect() throws SocketException, IOException {
 
 		if(isConnected()) return;
 		
 		try {
 			
-			if(location.getPort() == -1) {
+			if(port == -1) {
 			
-				super.connect(location.getHost());
+				super.connect(host);
 				
 			} else {
 				
-				super.connect(location.getHost(), location.getPort());
+				super.connect(host, port);
 			}
 			
-			login(location.getUsername(), location.getPassword());
+			login(username, password);
 		
 			// After connection attempt, you should check the reply code to verify
 			// success.
@@ -51,7 +58,7 @@ public class MyFTPClient extends FTPClient {
 
 			if(!FTPReply.isPositiveCompletion(reply)) {
 				disconnect();			
-				throw new IOException("FTP server refused connection: " + location.getLocation());			
+				throw new IOException("FTP server refused connection: " + host);			
 			}
 			
 			
@@ -62,26 +69,7 @@ public class MyFTPClient extends FTPClient {
 		}
 
 	}
-	
-	public FTPFile getFileInfo() throws IOException {
 		
-		if(location.isWithoutFilename()) return(null);
-		
-		cwd(location.getPath());
-		
-		String filename = location.getFilename();
-		
-		FTPFile[] file = listFiles(filename);	
-		
-		if(file.length > 0) {
-			
-			return(file[0]);
-		}
-		
-		return(null);
-	}
-	
-	
 	@Override
 	public void disconnect() {
 
@@ -98,17 +86,4 @@ public class MyFTPClient extends FTPClient {
 
 	}
 	
-
-	public InputStream retrieveFileStream() throws IOException {
-		
-		cwd(location.getPath());
-		
-		return(retrieveFileStream(location.getFilename()));
-	}
-
-	LocationRemote getLocation() {
-		
-		return(location);
-	}
-
 }

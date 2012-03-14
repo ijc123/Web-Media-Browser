@@ -3,11 +3,12 @@ package utils;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import javax.imageio.IIOImage;
@@ -19,28 +20,45 @@ import javax.imageio.stream.ImageOutputStream;
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
+import virtualFile.Location;
 
 
 public class ImagePreviewBuilder {
 
-	void start(String path) {
-		
-		FileUtils source = FileUtilsFactory.create(path);
-		
-
-		ArrayList<FileInfo> thumbs = new ArrayList<FileInfo>();
-		
+	private Comparator<FileInfo> FILENAME_ORDER =
+			new Comparator<FileInfo>() {
+			 
+			 	@Override
+			 	public int compare(FileInfo a, FileInfo b) {
+			 		
+			 		return a.getLocation().getLocation().compareTo(b.getLocation().getLocation());
+			 	}
+		 	};
+	
+	
+	public void start(Location output) {
+				
 		try {
 		
+			output.setExtension("jpg");
+			
+			FileUtils source = FileUtilsFactory.create(output);
+			
+			ArrayList<FileInfo> thumbs = new ArrayList<FileInfo>();
+			
 			source.getDirectoryContents(thumbs, "*.png");
+			
+			Collections.sort(thumbs, FILENAME_ORDER);
 			
 			BufferedImage preview = null;
 					  		
 			for(int i = 0; i < thumbs.size(); i++) {
 			
 				FileInfo f = thumbs.get(i);
+								
+				File thumbImgFile = new File(f.getLocation().getLocation());
 				
-				BufferedImage thumbImg = ImageIO.read(new File(f.getUri()));
+				BufferedImage thumbImg = ImageIO.read(thumbImgFile);
 				
 				int thumbWidth = thumbImg.getWidth();
 				int thumbHeight = thumbImg.getHeight();
@@ -65,7 +83,9 @@ public class ImagePreviewBuilder {
 				
 				
 			}
-				    
+				  
+			if(preview == null) return;
+			
 			Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
 			ImageWriter writer = (ImageWriter)iter.next();
 
@@ -73,14 +93,18 @@ public class ImagePreviewBuilder {
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			iwp.setCompressionQuality(1);
 
-			FileOutputStream fileOutputStream = new FileOutputStream(path);
+			FileOutputStream fileOutputStream = new FileOutputStream(output.getLocation());
 			ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(fileOutputStream);
 
 			writer.setOutput(imageOutputStream);
 			writer.write(null, new IIOImage(preview, null, null), iwp);			
 		    
+			imageOutputStream.close();
+			fileOutputStream.close();
+						
 		} catch (IOException e) {
 			
+			e.printStackTrace();
 		}
 	}
 }

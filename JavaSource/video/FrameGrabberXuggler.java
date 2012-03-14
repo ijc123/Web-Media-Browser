@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import utils.ImageUtil;
 import virtualFile.Location;
-import virtualFile.LocationFactory;
 import virtualFile.VirtualInputFile;
 
 import com.xuggle.xuggler.IContainer;
@@ -52,7 +51,7 @@ public class FrameGrabberXuggler extends Decoder {
 			
 		curFrame = 0;
 		
-		location = LocationFactory.create(input.getUri());
+		location = input.getLocation();
 			
 		setDecodeMode(DecodeMode.IGNORE_AUDIO);
 	}
@@ -111,7 +110,7 @@ public class FrameGrabberXuggler extends Decoder {
 			
 			if(success < 0) {
 				
-				throw new RuntimeException("FRAME GRABBER: " + IError.errorNumberToType(success) + " " + input.getUri()); 
+				throw new RuntimeException("FRAME GRABBER: " + IError.errorNumberToType(success) + " " + input.getLocation().getLocation()); 
 			}
 					
 		} catch (IOException e) {

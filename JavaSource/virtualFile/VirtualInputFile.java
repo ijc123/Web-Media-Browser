@@ -15,7 +15,8 @@ public abstract class VirtualInputFile extends InputStream  {
 	public abstract void seek(long pos) throws IOException;
 	
 	public abstract String getName();
-	public abstract String getUri();
+	public abstract Location getLocation();
+	
 	public abstract long lastModified() throws IOException;
 	
 

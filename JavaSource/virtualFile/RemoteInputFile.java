@@ -3,21 +3,46 @@ package virtualFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Calendar;
 
 import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPFile;
 
 public class RemoteInputFile extends VirtualInputFile {
 
 	private InputStream input;
 	private MyFTPClient ftp;
+	private FTPFile file;
+	private Location location;
 	
-	public RemoteInputFile(String url) throws SocketException, IOException {
+	public RemoteInputFile(Location location) throws SocketException, IOException {
+		
+		this.location = location;
+				
+		if(location.getFilename().isEmpty()) {
 			
+			throw new IOException("no remote input file specified");
+		}
+		
+		URL url = URI.create(location.getURL()).toURL();
+		
 		ftp = new MyFTPClient(url);
 		
 		ftp.connect();
 		ftp.setFileType(FTP.BINARY_FILE_TYPE);
+		
+		ftp.cwd(location.getPath());	
+		
+		FTPFile[] temp = ftp.listFiles(location.getFilename());	
+		
+		if(temp.length == 0) {
+			
+			throw new IOException("remote file does not exist: " + location.getLocation());
+		}
+		
+		file = temp[0];
 		
 		input = null;
 	}
@@ -25,8 +50,8 @@ public class RemoteInputFile extends VirtualInputFile {
 	private void enableReading() throws IOException {
 	
 		if(input == null) {
-			
-			input = ftp.retrieveFileStream();
+																
+			input = ftp.retrieveFileStream(location.getFilename());
 		}
 	}
 	
@@ -54,9 +79,9 @@ public class RemoteInputFile extends VirtualInputFile {
 	
 	public long length() throws IOException {
 		
-		disableReading();
+			
 		//Returns the length of this file.	
-		return(ftp.getFileInfo().getSize());
+		return(file.getSize());
 		
 	}
 
@@ -94,58 +119,25 @@ public class RemoteInputFile extends VirtualInputFile {
 	@Override
 	public String getName() {
 		
-		return ftp.getLocation().getFilename();
+		return location.getFilename();
 	}
 
 
 	@Override
 	public long lastModified() throws IOException {
 		
-		disableReading();
-		Calendar modified = ftp.getFileInfo().getTimestamp();
+		Calendar modified = file.getTimestamp();
 				
 		return modified.getTimeInMillis();
 	}
 
 	@Override
-	public String getUri() {
-				
-		return(ftp.getLocation().getLocationWithoutUserInfo());
-	}
-	
-/*
-	public void setLength(long newLength) {
+	public Location getLocation() {
 		
-		//Sets the length of this file.
-		System.out.println("void setLength(long newLength)");
-	}
-	
-
-	public int skipBytes(int n) {
-	
-		System.out.println("int skipBytes(int n)");
-		return 0;
-	}
-	
-
-	public void write(int val) throws IOException {
-		System.out.println("write(int val)");
-	
+		return(location);
 	}
 
 
-	public void write(byte[] val) throws IOException {
-		System.out.println("write(byte[] val)");
-
-	}
-
-
-	public void write(byte[] val, int off, int len) throws IOException {
-		System.out.println("write(byte[] val," + Integer.toString(off) + "," + Integer.toString(len) + ")");
-		
-	}
-	
-*/
 
 }
 

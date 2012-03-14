@@ -11,11 +11,11 @@ public class VirtualInputFileFactory {
 		
 		if(location.startsWith("ftp://")) {
 			
-			inputFile = new RemoteInputFile(location);
+			inputFile = new RemoteInputFile(new Location(location));
 			
 		} else {
 			
-			inputFile = new LocalInputFile(location);
+			inputFile = new LocalInputFile(new Location(location));
 		}
 		
 		return(inputFile);

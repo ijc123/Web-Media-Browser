@@ -12,6 +12,11 @@ import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import utils.ImagePreviewBuilder;
+import video.FrameGrabber;
+import virtualFile.FileUtilsLocal;
+import virtualFile.Location;
+
 import database.MediaLocationItem;
 import database.MediaEJB;
 import database.SettingsEJB;
@@ -51,20 +56,31 @@ public class SettingsBean implements Serializable {
 
 	public void synchronize() {
 			
-		//System.out.println(settings.getPreviewRootDirectory());
+		System.out.println(settings.getPreviewRootDirectory());
 		
-		//mediaEJB.synchronize(settings);
-		
-		video.FrameGrabber frameGrabber = new video.FrameGrabber();
+		mediaEJB.synchronize(settings);
+
+/*	
+		FrameGrabber frameGrabber = new FrameGrabber();
+		ImagePreviewBuilder previewBuilder = new ImagePreviewBuilder();
 		
 		try {
-			frameGrabber.start("file:///j:/Girls/Barbamiska/Barbamiska,%20Chinita,%20Angel%20Rivas,%20Lilo%20-%20Creampie%20Orgy%20%2312.avi", 320, "G:/preview/fapmap/grey.avi", 60);
+
+			Location inputLocation = new Location("file:///j:/Girls/Mira/Mira%20-%20Pix%20And%20Video.mp4");
+			String outputPath = "G:/previewtemp/dummy/";
+			
+			String outputFilename = outputPath + inputLocation.getFilename();
+			
+			Location outputLocation = new Location(outputFilename);
+						
+			//frameGrabber.start(inputLocation, 400, outputLocation, 60);
+			previewBuilder.start(outputLocation);
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-		
+*/		
 	}
 	
 	public DataModel<MediaLocationItem> getDataModel() {

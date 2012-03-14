@@ -1,6 +1,7 @@
 package custom.component;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
 import virtualFile.FileUtilsLocal;
-import virtualFile.LocationRemote;
+import virtualFile.Location;
 
 
 @FacesRenderer(componentFamily = "javax.faces.SelectOne", rendererType = "custom.component.FileSelectOne")
@@ -453,80 +454,92 @@ public class UIFileSelectRenderer extends Renderer {
 						
 		String location = fileSelect.getLocation();
 		
-		FileUtils f = FileUtilsFactory.create(location);
-		
-		if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
-			
-			FileUtilsLocal fl = (FileUtilsLocal)f;
-			
-			fileSelect.setRootDrive(fl.getDrive() + "/");
-		
-		} else {
-			
-			if(fileSelect.getRootDrive() == null) {
-			
-				fileSelect.setRootDrive(FileUtilsLocal.getRootPaths().get(0));
-			}
-		}
-		
-		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-		
-		// changed directory?
-		
-		String selected = requestMap.get(clientId + ":selectFile");
-		
-		if(selected != null && selected.endsWith("/")) {						
-							
-			if(selected.equals("../"))
-			{
-				f.moveUp();
-					
+		FileUtils f;
+		try {
+			f = FileUtilsFactory.create(location);
+
+			if (f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
+
+				FileUtilsLocal fl = (FileUtilsLocal) f;
+
+				fileSelect.setRootDrive(fl.getHost() + "/");
+
 			} else {
-				
-				f.moveDown(selected); 
-			}				
-			
-		} else {
-							
-			// changed the root drive?
-			
-			String selectDrive = requestMap.get(clientId + ":selectDrive");
-			
-			if(selectDrive != null && !selectDrive.equals(fileSelect.getRootDrive())) {
-				
-				fileSelect.setRootDrive(selectDrive);
-				f = FileUtilsFactory.create(selectDrive);
-					
+
+				if (fileSelect.getRootDrive() == null) {
+
+					fileSelect.setRootDrive(FileUtilsLocal.getRootPaths().get(0));
+				}
 			}
-					
-			// pressed the ftp button?
-			
-			String source = requestMap.get("javax.faces.source");
-					
-			if(source != null && source.equals(clientId + ":ftpConnect")) {
-				
-				String ftpServer = requestMap.get(clientId + ":ftpAdress");
-				
-				fileSelect.setFtpServer(ftpServer);
-				
-				String ftpUsername = requestMap.get(clientId + ":username");
-				
-				fileSelect.setFtpUsername(ftpUsername);
-				
-				String ftpPassword = requestMap.get(clientId + ":password");
-				
-				fileSelect.setFtpPassword(ftpPassword);
-							
-				LocationRemote l = new LocationRemote(ftpServer, ftpUsername, ftpPassword);
-				
-				f = FileUtilsFactory.create(l.getLocation());
-			} 
-		
+
+			Map<String, String> requestMap = 
+					context.getExternalContext().getRequestParameterMap();
+
+			// changed directory?
+
+			String selected = requestMap.get(clientId + ":selectFile");
+
+			if (selected != null && selected.endsWith("/")) {
+
+				if (selected.equals("../")) {
+					f.moveUp();
+
+				} else {
+
+					f.moveDown(selected);
+				}
+
+			} else {
+
+				// changed the root drive?
+
+				String selectDrive = requestMap.get(clientId + ":selectDrive");
+
+				if (selectDrive != null && 
+						!selectDrive.equals(fileSelect.getRootDrive())) {
+
+					fileSelect.setRootDrive(selectDrive);
+					f = FileUtilsFactory.create(selectDrive);
+
+				}
+
+				// pressed the ftp button?
+
+				String source = requestMap.get("javax.faces.source");
+
+				if (source != null && source.equals(clientId + ":ftpConnect")) {
+
+					String ftpServer = requestMap.get(clientId + ":ftpAdress");
+
+					fileSelect.setFtpServer(ftpServer);
+
+					String ftpUsername = requestMap.get(clientId + ":username");
+
+					fileSelect.setFtpUsername(ftpUsername);
+
+					String ftpPassword = requestMap.get(clientId + ":password");
+
+					fileSelect.setFtpPassword(ftpPassword);
+
+					Location l;
+
+					l = new Location(ftpServer);
+					l.setUsername(ftpUsername);
+					l.setPassword(ftpPassword);
+
+					f = FileUtilsFactory.create(l.getLocation());
+
+				}
+
+			}
+
+			fileSelect.setLocation(f.getLocation());
+			getContents(fileSelect);
+
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-				
-		fileSelect.setLocation(f.getLocation());
-		getContents(fileSelect);
-	
 	}
 	
 	private void getContents(UIFileSelectOne fileSelect) {
@@ -550,20 +563,20 @@ public class UIFileSelectRenderer extends Renderer {
 			fileSelect.setLocation(location);
 		}
 		
-		FileUtils f = FileUtilsFactory.create(location);
-		
-		if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
-			
-			FileUtilsLocal fl = (FileUtilsLocal)f;
-			
-			fileSelect.setRootDrive(fl.getDrive() + "/");
-		}
-		
 		ArrayList<FileInfo> contents = new ArrayList<FileInfo>();
 		ArrayList<String> sortedContents = new ArrayList<String>();
 		
 		try {
 			
+			FileUtils f = FileUtilsFactory.create(location);
+			
+			if(f.getClass().getName().equals("virtualFile.FileUtilsLocal")) {
+				
+				FileUtilsLocal fl = (FileUtilsLocal)f;
+				
+				fileSelect.setRootDrive(fl.getHost() + "/");
+			}
+						
 			f.getDirectoryContents(contents);
 			
 			if(!fileSelect.isHideDirectories()) {

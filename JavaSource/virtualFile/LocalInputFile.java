@@ -8,10 +8,13 @@ public class LocalInputFile extends VirtualInputFile {
 
 	private File info;
 	private RandomAccessFile file;
+	private Location location;
 
-	public LocalInputFile(String path) throws IOException {
-			
-		info = new File(path);
+	public LocalInputFile(Location location) throws IOException {
+		
+		this.location = location;
+		
+		info = new File(location.getLocation());
 		
 		file = new RandomAccessFile(info, "r");
 		
@@ -68,8 +71,8 @@ public class LocalInputFile extends VirtualInputFile {
 	}
 
 	@Override
-	public String getUri() {
+	public Location getLocation() {
 		
-		return(info.toURI().toString());
+		return(location);
 	}
 }

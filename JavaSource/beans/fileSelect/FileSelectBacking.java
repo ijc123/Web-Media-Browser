@@ -14,12 +14,11 @@ import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
 import virtualFile.FileUtilsLocal;
-import virtualFile.LocationRemote;
 
 @FacesComponent("fileSelect")
 public class FileSelectBacking extends UIInput implements NamingContainer {
 
-
+/*
 	private String location;
 
 	private String ftpAdress;
@@ -254,6 +253,6 @@ public class FileSelectBacking extends UIInput implements NamingContainer {
 		UISelectItems select = (UISelectItems) findComponent("fileListing");
 		select.setValue(getFileListing());
 	}
-
+*/
 
 }

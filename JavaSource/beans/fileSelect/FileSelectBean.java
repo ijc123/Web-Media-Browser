@@ -1,31 +1,15 @@
 package beans.fileSelect;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.el.ELContext;
-import javax.el.ValueExpression;
 import javax.enterprise.context.RequestScoped;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 import javax.inject.Named;
-
-import virtualFile.FileInfo;
-import virtualFile.FileUtils;
-import virtualFile.FileUtilsFactory;
-import virtualFile.FileUtilsLocal;
-import virtualFile.LocationRemote;
 
 @RequestScoped
 @Named
 public class FileSelectBean implements Serializable {
 
-	/**
-	 * 
-	 */
+/*
 	private static final long serialVersionUID = 1L;
 
 	private String location;
@@ -198,7 +182,7 @@ public class FileSelectBean implements Serializable {
 		
 	}
 
-
+*/
 
 	
 }

@@ -5,7 +5,6 @@ import java.io.File;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import virtualFile.Location;
-import virtualFile.LocationFactory;
 
 /**
  * A simple application to generate a single thumbnail image from a media file.
@@ -37,10 +36,9 @@ public class FrameGrabber {
 	};
 
 
-	public void start(String mrl, int imageWidth, String outputFileName, int nrFrames) throws Exception {
+	public void start(Location inputVideoName, int imageWidth, Location outputImageName, int nrFrames) throws Exception {
 
-		Location output = LocationFactory.create(outputFileName);
-		
+	
 		MediaPlayerFactory factory = new MediaPlayerFactory(VLC_ARGS);
 		MediaPlayer mediaPlayer = factory.newHeadlessMediaPlayer();
 
@@ -50,7 +48,9 @@ public class FrameGrabber {
 
 		mediaPlayer.addMediaPlayerEventListener(e);
 		
-		if(mediaPlayer.startMedia(mrl)) {
+		String inputLocation = inputVideoName.getLocation();
+					
+		if(mediaPlayer.startMedia(inputLocation)) {
 
 			for(int i = 0; i < nrFrames; i++) {
 							
@@ -59,23 +59,35 @@ public class FrameGrabber {
 				mediaPlayer.setPosition(snapShotPos);
 				MediaPlayerBarrier.Event event = barrier.waitForEvent(MediaPlayerBarrier.Event.POSITION_CHANGE_DONE); 
 				
-				if(event == MediaPlayerBarrier.Event.ERROR) break;
+				if(event == MediaPlayerBarrier.Event.ERROR) {
+					
+					mediaPlayer.stop();
+					mediaPlayer.release();
+					factory.release();
+					throw new Exception("Error while grabbing frames");					
+				}
 				
-				String frameName = output.getLocationWithoutFilename() +
-						output.getFilenameWithoutExtension() + Integer.toString(i) + ".png";
+				String frameNr = String.format("%04d", Integer.valueOf(i));
+				
+				String frameName = outputImageName.getLocationWithoutFilename() +
+						outputImageName.getFilenameWithoutExtension() + frameNr + ".png";
 				
 				File snapshotFile = new File(frameName);
 				
 				mediaPlayer.saveSnapshot(snapshotFile, imageWidth, 0);
 				event = barrier.waitForEvent(MediaPlayerBarrier.Event.SNAPSHOT_DONE); 
 				
-				if(event == MediaPlayerBarrier.Event.ERROR) break;
+				if(event == MediaPlayerBarrier.Event.ERROR) {
+					
+					mediaPlayer.stop();
+					mediaPlayer.release();
+					factory.release();
+					throw new Exception("Error while grabbing frames");
+				}
 			}
 
 			mediaPlayer.stop();
 		}
-
-		
 
 		mediaPlayer.release();
 		factory.release();
