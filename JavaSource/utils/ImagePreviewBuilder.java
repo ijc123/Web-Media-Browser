@@ -5,7 +5,6 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,7 +30,7 @@ public class ImagePreviewBuilder {
 			 	@Override
 			 	public int compare(FileInfo a, FileInfo b) {
 			 		
-			 		return a.getLocation().getLocation().compareTo(b.getLocation().getLocation());
+			 		return a.getLocation().getEncodedURL().compareTo(b.getLocation().getEncodedURL());
 			 	}
 		 	};
 	
@@ -56,7 +55,7 @@ public class ImagePreviewBuilder {
 			
 				FileInfo f = thumbs.get(i);
 								
-				File thumbImgFile = new File(f.getLocation().getLocation());
+				File thumbImgFile = new File(f.getLocation().getEncodedURL());
 				
 				BufferedImage thumbImg = ImageIO.read(thumbImgFile);
 				
@@ -93,7 +92,7 @@ public class ImagePreviewBuilder {
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			iwp.setCompressionQuality(1);
 
-			FileOutputStream fileOutputStream = new FileOutputStream(output.getLocation());
+			FileOutputStream fileOutputStream = new FileOutputStream(output.getDiskPath());
 			ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(fileOutputStream);
 
 			writer.setOutput(imageOutputStream);
@@ -102,7 +101,7 @@ public class ImagePreviewBuilder {
 			imageOutputStream.close();
 			fileOutputStream.close();
 						
-		} catch (IOException e) {
+		} catch (Exception e) {
 			
 			e.printStackTrace();
 		}

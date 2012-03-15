@@ -48,7 +48,7 @@ public class FrameGrabber {
 
 		mediaPlayer.addMediaPlayerEventListener(e);
 		
-		String inputLocation = inputVideoName.getLocation();
+		String inputLocation = inputVideoName.getEncodedURL();
 					
 		if(mediaPlayer.startMedia(inputLocation)) {
 
@@ -69,7 +69,7 @@ public class FrameGrabber {
 				
 				String frameNr = String.format("%04d", Integer.valueOf(i));
 				
-				String frameName = outputImageName.getLocationWithoutFilename() +
+				String frameName = outputImageName.getDiskPathWithouthFilename() +
 						outputImageName.getFilenameWithoutExtension() + frameNr + ".png";
 				
 				File snapshotFile = new File(frameName);

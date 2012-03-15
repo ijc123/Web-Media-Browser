@@ -1,12 +1,14 @@
 package virtualFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import database.MediaItem;
 
-public abstract class FileUtils implements LocationInterface {
+public abstract class FileUtils {
 
 	protected Location location;
 	
@@ -19,7 +21,7 @@ public abstract class FileUtils implements LocationInterface {
 	abstract public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException; 
 		
 		
-	protected FileUtils(String location) throws MalformedURLException {
+	protected FileUtils(String location) throws IOException, URISyntaxException {
 		
 		this.location = new Location(location);
 	}
@@ -42,13 +44,19 @@ public abstract class FileUtils implements LocationInterface {
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return(true);
 	}
 	
 	// move a directory down in the tree
-	public void moveDown(final String directory) throws MalformedURLException {
+	public void moveDown(final String directory) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
 		if(directory == null) return;
 		
@@ -128,7 +136,12 @@ public abstract class FileUtils implements LocationInterface {
 			
 			if(!contents.get(i).isDirectory()) continue;
 			
-			moveDown(contents.get(i).getName());
+			try {
+				moveDown(contents.get(i).getName());
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 					
 			getRecursiveMediaItems(media, video, audio, images, typeName);
 		
@@ -144,7 +157,7 @@ public abstract class FileUtils implements LocationInterface {
 			
 			MediaItem diskMedia = new MediaItem();
 			
-			diskMedia.setUri(curFile.getLocation().getURL());
+			diskMedia.setUri(curFile.getLocation().getEncodedURL());
 			diskMedia.setFileName(curFile.getName());
 			diskMedia.setSizeBytes(curFile.getSizeBytes());
 			
@@ -164,9 +177,14 @@ public abstract class FileUtils implements LocationInterface {
 		
 		
 	}
+	
+	public Location getLocation() {
 		
+		return(location);
+	}
+/*		
 	@Override
-	public void setPath(String path) throws MalformedURLException {
+	public void setPath(String path) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
 		location.setPath(path);
 	}
@@ -184,13 +202,13 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public void setFilename(String filename) throws MalformedURLException {
+	public void setFilename(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
 		location.setFilename(filename);
 	}
 	
 	@Override
-	public void setFilenameWithoutExtension(String filename) throws MalformedURLException {
+	public void setFilenameWithoutExtension(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
 		location.setFilenameWithoutExtension(filename);
 	}
@@ -208,7 +226,7 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public void setExtension(String extension) throws MalformedURLException {
+	public void setExtension(String extension) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
 		location.setExtension(extension);
 	}
@@ -226,21 +244,21 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public String getLocation() {
+	public String getDecodedURL() {
 		
-		return(location.getLocation());
+		return(location.getDecodedURL());
 	}
 
 	@Override
-	public String getLocationWithoutFilename() {
+	public String getDecodedURLWithoutFilename() {
 	
-		return(location.getLocationWithoutFilename());	
+		return(location.getDecodedURLWithoutFilename());	
 	}
 	
 	@Override
-	public String getURL() {
+	public String getEncodedURL() {
 		
-		return(location.getURL());
+		return(location.getEncodedURL());
 	}
 	
 	@Override
@@ -250,10 +268,10 @@ public abstract class FileUtils implements LocationInterface {
 	}
 	
 	@Override
-	public void setHost(String host) throws MalformedURLException {
+	public void setHost(String host) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 	
 		location.setHost(host);
 	}
-	
+*/	
 }
 

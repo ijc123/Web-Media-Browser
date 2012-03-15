@@ -458,7 +458,7 @@ public class MediaEJB {
 		
 		settingsEJB.setSettings(settings);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

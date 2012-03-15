@@ -71,7 +71,7 @@ public class Decoder {
 		
 		if(success < 0) {
 
-			throw new RuntimeException("XUGGLER DECODER: could not open input: " + input.getLocation().getLocation()); 
+			throw new RuntimeException("XUGGLER DECODER: could not open input: " + input.getLocation().getDecodedURL()); 
 		}
 
 		for(int streamIndex = 0; streamIndex < container.getNumStreams(); streamIndex++) {
@@ -156,7 +156,7 @@ public class Decoder {
 		if(success < 0) {
 
 			throw new RuntimeException("XUGGLER DECODER: could not open video decoder for container: "
-					+ input.getLocation().getLocation());
+					+ input.getLocation().getDecodedURL());
 		}
 				
 		IAudioSamples decodeSamples = null;
@@ -167,7 +167,7 @@ public class Decoder {
 			if(success < 0) {
 
 				throw new RuntimeException("XUGGLER DECODER: could not open audio decoder for container: "
-						+ input.getLocation().getLocation());
+						+ input.getLocation().getDecodedURL());
 			}
 			
 			decodeSamples = IAudioSamples.make(1024, audioStream.getChannels());			
@@ -210,7 +210,7 @@ public class Decoder {
 					int bytesDecoded = videoStream.decodeVideo(decodePicture, packet, offset);
 					if(bytesDecoded < 0) {
 
-						throw new RuntimeException("XUGGLER: error decoding video in: " + input.getLocation().getLocation());
+						throw new RuntimeException("XUGGLER: error decoding video in: " + input.getLocation().getDecodedURL());
 					}
 
 					if(decodePicture.getTimeStamp() != Global.NO_PTS) {

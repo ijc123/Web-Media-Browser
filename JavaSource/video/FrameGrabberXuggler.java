@@ -110,7 +110,7 @@ public class FrameGrabberXuggler extends Decoder {
 			
 			if(success < 0) {
 				
-				throw new RuntimeException("FRAME GRABBER: " + IError.errorNumberToType(success) + " " + input.getLocation().getLocation()); 
+				throw new RuntimeException("FRAME GRABBER: " + IError.errorNumberToType(success) + " " + input.getLocation().getDecodedURL()); 
 			}
 					
 		} catch (IOException e) {

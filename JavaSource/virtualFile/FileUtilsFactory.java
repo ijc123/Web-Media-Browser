@@ -1,11 +1,13 @@
 package virtualFile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 
 public class FileUtilsFactory {
 
-	static public FileUtils create(String location) throws MalformedURLException {
+	static public FileUtils create(String location) throws IOException, URISyntaxException {
 		
 		FileUtils fileUtils;
 		
@@ -21,14 +23,14 @@ public class FileUtilsFactory {
 		return(fileUtils);
 	}
 		
-	static public FileUtils create(Location location) {
+	static public FileUtils create(Location location) throws IOException, URISyntaxException {
 		
 		FileUtils fileUtils = null;
 		
 		if(!location.getProtocol().equals("file")) {
 			
 			try {
-				fileUtils = new FileUtilsRemote(location.getURL());
+				fileUtils = new FileUtilsRemote(location.getEncodedURL());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -37,7 +39,7 @@ public class FileUtilsFactory {
 		} else {
 			
 			try {
-				fileUtils = new FileUtilsLocal(location.getURL());
+				fileUtils = new FileUtilsLocal(location.getEncodedURL());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

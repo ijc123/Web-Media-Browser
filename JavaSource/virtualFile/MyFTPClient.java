@@ -1,7 +1,6 @@
 package virtualFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 
@@ -28,7 +27,7 @@ public class MyFTPClient extends FTPClient {
 			password = location.getPassword();
 			port = url.getPort();
 			
-		} catch (MalformedURLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

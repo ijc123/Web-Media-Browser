@@ -14,7 +14,7 @@ public class LocalInputFile extends VirtualInputFile {
 		
 		this.location = location;
 		
-		info = new File(location.getLocation());
+		info = new File(location.getDiskPath());
 		
 		file = new RandomAccessFile(info, "r");
 		

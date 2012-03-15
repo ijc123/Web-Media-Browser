@@ -2,10 +2,11 @@ package virtualFile;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.URISyntaxException;
 
 public class VirtualInputFileFactory {
 
-	static public VirtualInputFile create(String location) throws SocketException, IOException {
+	static public VirtualInputFile create(String location) throws SocketException, IOException, URISyntaxException {
 		
 		VirtualInputFile inputFile;
 		

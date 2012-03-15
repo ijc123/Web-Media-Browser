@@ -151,7 +151,7 @@ public class LoadDataSegmentServlet extends HttpServlet {
             length = file.length();
             lastModified = file.lastModified();
                      	
-        } catch (IOException e) {
+        } catch (Exception e) {
             
             // Do your thing if the file appears to be non-existing.
             // Throw an exception, or send 404, or show default/warning page, or just ignore it.

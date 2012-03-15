@@ -1,6 +1,5 @@
 package database;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +8,10 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import utils.ImagePreviewBuilder;
-import video.FrameGrabber;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
@@ -74,39 +75,43 @@ public class MediaPreviewEJB {
 	}
 	
 	private void buildVideoPreviewImages(final MediaItem inputMedia) {
-		
-		if(!getSmallPreviewImagesList(inputMedia).isEmpty()) {
+
+		if (!getSmallPreviewImagesList(inputMedia).isEmpty()) {
 
 			// preview images already exist
 			return;
 		}
 
+		String inputPath = inputMedia.getPath();
 		String outputPath = getMediaPreviewPath(inputMedia);
-		
-		FrameGrabber frameGrabber = new FrameGrabber();
-		ImagePreviewBuilder previewBuilder = new ImagePreviewBuilder();
-		
+
 		try {
 
 			FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
 			f.createDirectory(outputPath);
 			f.moveDown(outputPath);
+
 			
-			Location inputLocation = new Location(inputMedia.getUri());
-						
-			f.setFilename(inputLocation.getFilename());
+			String batch = String
+					.format("H:/mtn-200808a-win32/mtn -c 2 -r 32 -w 800 -P -I -f %s -O \"%s\" \"%s\"",
+							f.getLocation().getDiskPath(), inputPath);
+
+			CommandLine cmdLine = CommandLine.parse(batch);
+
+			DefaultExecutor executor = new DefaultExecutor();
+
+			ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
+			executor.setWatchdog(watchdog);
 			
-			Location outputLocation = new Location(f.getURL());
-							
-			frameGrabber.start(inputLocation, 400, outputLocation, 60);
-			previewBuilder.start(outputLocation);
+
+			executor.execute(cmdLine);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
-		}
-		
+
+		} 
 	}
 
 	public List<String> getSmallPreviewImagesList(final MediaItem inputMedia) {
@@ -136,12 +141,14 @@ public class MediaPreviewEJB {
 
 				FileInfo imageFile = previewImagesList.get(i);
 				
-				f.setFilename(imageFile.getName());
+				Location imageLocation = (Location)f.getLocation().clone();
 				
-				previewImagesPath.add(f.getLocation());
+				imageLocation.setFilename(imageFile.getName());
+				
+				previewImagesPath.add(imageLocation.getEncodedURL());
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -161,20 +168,22 @@ public class MediaPreviewEJB {
 
 			f.moveDown(outputPath);
 			
-			f.setFilename(inputMedia.getFileName());
+			Location outputLocation = (Location)f.getLocation().clone();
+			
+			outputLocation.setFilename(inputMedia.getFileName());
 		
-			String newFilename = f.getFilenameWithoutExtension() + "_s";
+			String newFilename = outputLocation.getFilenameWithoutExtension() + "_s";
 			
-			f.setFilenameWithoutExtension(newFilename);
-			f.setExtension("jpg");
+			outputLocation.setFilenameWithoutExtension(newFilename);
+			outputLocation.setExtension("jpg");
 			
-			if(!f.exists(f.getFilename())) return(null);
+			if(!f.exists(outputLocation.getFilename())) return(null);
 			else {
 
-				return(f.getLocation());
+				return(outputLocation.getEncodedURL());
 			}
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return(null);

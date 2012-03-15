@@ -1,9 +1,8 @@
 package virtualFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.SocketException;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -13,11 +12,11 @@ public class FileUtilsRemote extends FileUtils {
 	
 	MyFTPClient ftp;
 	
-	public FileUtilsRemote(String location) throws MalformedURLException {
+	public FileUtilsRemote(String location) throws IOException, URISyntaxException {
 		
 		super(location);
 		
-		URL url = URI.create(this.location.getURL()).toURL();
+		URL url = new URL(this.location.getEncodedURL());
 		
 		ftp = new MyFTPClient(url);
 		
@@ -85,8 +84,17 @@ public class FileUtilsRemote extends FileUtils {
 						
 			String name = fileList[i].getName();			
 			long sizeBytes = fileList[i].getSize();		
-			location.setFilename(name);
-			Location fileLocation = (Location)location.clone();
+			
+			Location fileLocation = null;
+			
+			try {
+				location.setFilename(name);
+				fileLocation = (Location)location.clone();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			boolean isDirectory = fileList[i].isDirectory();
 			
 			FileInfo info = new FileInfo(name, fileLocation, sizeBytes, isDirectory);

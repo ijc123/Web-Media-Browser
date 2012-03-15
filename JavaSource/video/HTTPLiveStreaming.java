@@ -200,7 +200,7 @@ public class HTTPLiveStreaming {
 				f.deleteFile(oldTsFiles.get(i).getName());
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

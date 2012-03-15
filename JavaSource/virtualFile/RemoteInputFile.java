@@ -3,7 +3,6 @@ package virtualFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 
@@ -26,7 +25,7 @@ public class RemoteInputFile extends VirtualInputFile {
 			throw new IOException("no remote input file specified");
 		}
 		
-		URL url = URI.create(location.getURL()).toURL();
+		URL url = new URL(location.getEncodedURL());
 		
 		ftp = new MyFTPClient(url);
 		
@@ -39,7 +38,7 @@ public class RemoteInputFile extends VirtualInputFile {
 		
 		if(temp.length == 0) {
 			
-			throw new IOException("remote file does not exist: " + location.getLocation());
+			throw new IOException("remote file does not exist: " + location.getDecodedURL());
 		}
 		
 		file = temp[0];

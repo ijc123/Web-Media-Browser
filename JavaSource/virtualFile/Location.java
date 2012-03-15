@@ -1,6 +1,7 @@
 package virtualFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -17,37 +18,28 @@ import java.net.URLEncoder;
  * @author Ilja
  * 
  */
-public class Location implements LocationInterface, Cloneable {
+public class Location implements Cloneable {
 
 	private URL url;
 	private String filepath;
 				
-	public Location(String location) throws MalformedURLException {
-			
+	public Location(String location) throws IOException, URISyntaxException {
+				
 		if(location.startsWith("file")) {
 			
 			if(!location.startsWith("file:///")) {
 			
 				throw new MalformedURLException();
 			}
-			
-			try {
-				
-				//String fuckyoucunt = URLDecoder.decode("%20", "UTF-8");
-				
-				String filepath = URLDecoder.decode(location, "UTF-8");
-				filepath = filepath.substring(8);
-				setFilepath(filepath);
-				
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+							
+			String filepath = URLDecoder.decode(location, "UTF-8");
+			filepath = filepath.substring(8);
+			setFilepath(filepath);
 						
 		} else if(location.startsWith("ftp")) {
 			
-			filepath = null;
-			url = URI.create(location).toURL();
+			filepath = null;			
+			createURL(location);
 					
 		} else {
 			
@@ -57,8 +49,9 @@ public class Location implements LocationInterface, Cloneable {
 		}
 		
 	}
-				
-	public String getURL() {
+		
+	
+	public String getEncodedURL() {
 		
 		String urlString = url.toString();
 		
@@ -70,39 +63,44 @@ public class Location implements LocationInterface, Cloneable {
 		return(urlString);
 	}
 	
-	public String getLocation() {
+	
+	public String getDecodedURL() {
 		
-		String location;
+		String seperator = "://";
 		
-		if(filepath != null) {
+		if(url.getProtocol().equals("file")) {
 			
-			location = getHost() + getPath() + getFilename();
-					
-		} else {
-		
-			String seperator = "://";
-			
-			if(url.getProtocol().equals("file")) {
-				
-				seperator += "/";
-			}
-			
-			location = url.getProtocol() + seperator + getUserInfo() + 
-					getHost() + getPath() + getFilename() + getQuery();
-						
+			seperator += "/";
 		}
 		
-		return(location);
+		String urlString = getProtocol() + seperator + getUserInfo() + 
+				getHost() + getPath() + getFilename() + getQuery();
+		
+		return(urlString);
 	}
 		
-	public void setUsername(String username) throws MalformedURLException {
+	
+	public String getDiskPath() {
+		
+		if(filepath == null) return(null);
+		
+		String diskPath = getHost() + getPath() + getFilename();
+						
+		return(diskPath);
+	}
+		
+	
+	public void setUsername(String username) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 		
 		if(url.getProtocol().equals("file")) throw new MalformedURLException();
 				
-		String newURL = url.getProtocol() + "://" + username + ":" + getPassword() + "@" + getHost() + getPath() + getFilename() + getQuery();
+		String userInfo = username + ":" + getPassword();
 		
-		url = URI.create(newURL).toURL();
+		createURL(url.getProtocol(), userInfo, url.getHost(), url.getPort(),
+				url.getPath(), url.getQuery());
+				
 	}
+	
 	
 	public String getUsername() {
 		
@@ -119,14 +117,17 @@ public class Location implements LocationInterface, Cloneable {
 		
 	}
 	
-	public void setPassword(String password) throws MalformedURLException {
-		
-		if(url.getProtocol().equals("file")) throw new MalformedURLException();
+	
+	public void setPassword(String password) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 			
-		String newURL = url.getProtocol() + "://" + getUsername() + ":" + password + "@" + getHost() + getPath() + getFilename() + getQuery();
+		if(url.getProtocol().equals("file")) throw new MalformedURLException();
 		
-		url = URI.create(newURL).toURL();
+		String userInfo = getUsername() + ":" + password;
+		
+		createURL(url.getProtocol(), userInfo, url.getHost(), url.getPort(),
+				url.getPath(), url.getQuery());
 	}
+
 	
 	public String getPassword() {
 		
@@ -142,10 +143,7 @@ public class Location implements LocationInterface, Cloneable {
 		return(password);
 	}
 	
-	/** 
-	 * In case of a local location returns the drive letter
-	 * Otherwise the remote host is returned
-	 */
+	
 	public String getHost() {
 		
 		String host;
@@ -169,11 +167,8 @@ public class Location implements LocationInterface, Cloneable {
 		
 	}
 	
-	/** 
-	 * In case of a local location sets the drive letter
-	 * Otherwise the remote host is set
-	 */
-	public void setHost(String host) throws MalformedURLException {
+	
+	public void setHost(String host) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 		
 		if(filepath != null) {
 			
@@ -181,15 +176,14 @@ public class Location implements LocationInterface, Cloneable {
 			
 		} else {
 						
-			String newURL = url.getProtocol() + "://" + getUserInfo() + host + getPath() + getFilename() + getQuery();
-			
-			url = URI.create(newURL).toURL();
+			createURL(url.getProtocol(), url.getUserInfo(), host, 
+					url.getPort(), url.getPath(), url.getQuery());
 		}
 	
 	}
 	
 	
-	public void setPath(String path) throws MalformedURLException {
+	public void setPath(String path) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 
 		if(filepath != null) {
 		
@@ -204,12 +198,16 @@ public class Location implements LocationInterface, Cloneable {
 			
 			if(!path.startsWith("/")) path = "/" + path;
 			if(!path.endsWith("/")) path = path + "/";
-									
-			createURL(path + getFilename());
+					
+			String newPath = path + getFilename();
+			
+			createURL(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+					newPath, url.getQuery());
 		}
 	
 				
 	}
+	
 	
 	public String getPath() {
 		
@@ -241,17 +239,22 @@ public class Location implements LocationInterface, Cloneable {
 		return(path);
 	}
 		
-	public void setFilename(String filename) throws MalformedURLException {
+	
+	public void setFilename(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 		
 		if(filepath != null) {
 			
 			setFilepath( getHost() + getPath() + filename );
 					
 		} else {
-						
-			createURL(getPath() + filename);
+					
+			String newPath = getPath() + filename;
+			
+			createURL(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+					newPath, url.getQuery());
 		}
 	}
+	
 	
 	public String getFilename() {
 
@@ -281,18 +284,23 @@ public class Location implements LocationInterface, Cloneable {
 		
 	}
 	
-	public void setFilenameWithoutExtension(String filename) throws MalformedURLException {
+	
+	public void setFilenameWithoutExtension(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 				
 		if(filepath != null) {
 			
 			setFilepath( getHost() + getPath() + filename + getExtension() );
 											
 		} else {
-						
-			createURL(getPath() + filename + getExtension());
+				
+			String newPath = getPath() + filename + getExtension();
+			
+			createURL(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+					newPath, url.getQuery());
 		}
 	}
 
+	
 	public String getFilenameWithoutExtension() {
 		
 		String filename = getFilename();
@@ -308,7 +316,8 @@ public class Location implements LocationInterface, Cloneable {
 		return(filename);
 	}
 	
-	public void setExtension(String extension) throws MalformedURLException {
+	
+	public void setExtension(String extension) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException  {
 	
 		if(extension.startsWith(".")) {
 			
@@ -321,6 +330,7 @@ public class Location implements LocationInterface, Cloneable {
 	
 	}
 	
+	
 	public String getExtension() {
 		
 		String filename = getFilename();
@@ -330,21 +340,12 @@ public class Location implements LocationInterface, Cloneable {
 		return(extension);
 	}
 	
+	
 	public boolean isWithoutFilename() {
 		
 		return(getFilename().isEmpty());
 	}
 	
-	private String getUserInfo() {
-		
-		String userInfo = url.getUserInfo();
-		
-		if(userInfo != null) {
-			
-			return(userInfo += "@");
-			
-		} else return("");
-	}
 	
 	public String getQuery() {
 		
@@ -364,29 +365,41 @@ public class Location implements LocationInterface, Cloneable {
 		} else return("");
 	}
 	
-	public String getProtocol() {
 	
-		return(url.getProtocol());
-	}
-	
-	@Override
-	public String getLocationWithoutFilename() {
+	public String getDiskPathWithouthFilename() {
 		
-		String location = getLocation();
+		String diskPath = getDiskPath();
 		String filename = getFilename();
 		
-		location = location.substring(0, location.length() - filename.length());
+		diskPath = diskPath.substring(0, diskPath.length() - filename.length());
 		
-		return(location);
+		return(diskPath);
 	}
 
-	@Override
+	
 	public String getPathWithFilename() {
 
 		return(getPath() + getFilename());
 			
 	}
 	
+	
+	public String getProtocol() {
+	
+		return(url.getProtocol());
+	}
+	
+	private String getUserInfo() {
+		
+		String userInfo = url.getUserInfo();
+		
+		if(userInfo != null) {
+			
+			return(userInfo += "@");
+			
+		} else return("");
+	}
+		
 	private void setFilepath(String filepath) throws MalformedURLException {
 		
 		this.filepath = filepath.toLowerCase().replace('\\', '/');
@@ -396,40 +409,27 @@ public class Location implements LocationInterface, Cloneable {
 		
 	}
 	
-	private void createURL(String path) throws MalformedURLException {
+	private void createURL(String url) throws IOException, URISyntaxException {
 		
-		try {
-			
-			String scheme = url.getProtocol();
-			
-			String userInfo = null;
-			
-			if(!getUsername().isEmpty()) {
-				
-				userInfo = getUsername() + ":" + getPassword();
-			}
-			
-			String host = url.getHost();
-			
-			int port = url.getPort();
-			
-			String query = url.getQuery();
-			if(query != null) {
-			
-				query = URLEncoder.encode(query, "UTF-8");
-			}
-			
-			url = new URI(scheme, userInfo , host, port, path, query, null).toURL();
-			
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		URL temp = new URL(url);
+	
+		createURL(temp.getProtocol(), temp.getUserInfo(), temp.getHost(),
+				temp.getPort(), temp.getPath(), temp.getQuery());
+	
 	}
 	
+
+	private void createURL(String protocol, String userInfo, String host, 
+			int port, String path, String query) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
+		
+		if(query != null) {
+			
+			query = URLEncoder.encode(query, "UTF-8");
+		}
+		
+		url = new URI(protocol, userInfo , host, port, path, query, null).toURL();
+	}
+		
 	@Override
 	public Object clone() {
 		
@@ -445,4 +445,6 @@ public class Location implements LocationInterface, Cloneable {
 	
 	
 }
+	
+
 
