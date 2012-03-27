@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 
 import database.UserItem;
 import database.UserEJB;
@@ -25,6 +26,9 @@ public class LoginBean implements Serializable {
 
     @Inject
     private UserEJB userEJB;
+    
+    @Inject
+    private FacesContext facesContext;
 
     private UserItem currentUser;
 
@@ -34,32 +38,42 @@ public class LoginBean implements Serializable {
        if (user != null) {
     	   
           this.currentUser = user;
+          
+          // store the logged in user in the httpsession 
+          HttpSession session = (HttpSession)facesContext.getExternalContext().getSession(false);
+          session.setAttribute("loggedInUser", currentUser);
+                    
           return("login success");
           
        } else {
     	   
-    	   FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Login Failed"));
+    	   facesContext.addMessage(null, new FacesMessage("Login Failed"));
     	   return("login failure");
        }
     }
 
     public void logout() {
-       FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Goodbye, " + currentUser.getName()));
-       currentUser = null;
-       
-       try {
-    	   FacesContext.getCurrentInstance().getExternalContext().redirect("/mijngod/pages/login.jsf");
+
+    	// remove loggedinuser from httpsession
+		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+		session.removeAttribute("loggedInUser");
+
+		facesContext.addMessage(null, new FacesMessage("Goodbye, " + currentUser.getName()));
+		currentUser = null;
+
+		try {
+			facesContext.getExternalContext().redirect("/mijngod/pages/login.jsf");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
+	}
 
     public boolean isLoggedIn() {
        return currentUser != null;
     }
 
-    @Produces
+    @Produces @LoggedIn
     public UserItem getCurrentUser() {
        return currentUser;
     }

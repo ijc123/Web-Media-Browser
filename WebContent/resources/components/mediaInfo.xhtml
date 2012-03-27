@@ -19,11 +19,11 @@
 <composite:implementation>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="playmedia" target="_blank"
 	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.video || cc.attrs.media.audio}">
-		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
+		<f:param name="mediaId" value="#{cc.attrs.media.id}"/>
 	</h:link>
 	<h:link value="#{cc.attrs.media.fileName}" outcome="showpreview" target="_blank"
 	 style="font-size: 1.5em;" rendered="#{cc.attrs.media.image}">
-		<f:param name="uri" value="#{cc.attrs.media.uri}"/>
+		<f:param name="mediaId" value="#{cc.attrs.media.id}"/>
 	</h:link>
 	<rich:tabPanel id="tabPanel" activeItem="#{cc.attrs.media.selectedTab}" 
 	switchType="ajax" itemChangeListener="#{queryTableBean.processItemChange}">        	        	

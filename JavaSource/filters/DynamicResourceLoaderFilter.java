@@ -47,7 +47,7 @@ public class DynamicResourceLoaderFilter implements Filter {
 			}
 			
 			if(debugOutput) {
-        		System.out.println("DynamicResourceLoaderFilter: " +  httpRequest.getRequestURL() + " " +
+        		Output.info(this, "DynamicResourceLoaderFilter: " +  httpRequest.getRequestURL() + " " +
         				httpRequest.getMethod() + " ");
         	}
 	

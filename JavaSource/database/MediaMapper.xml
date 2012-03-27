@@ -6,6 +6,7 @@
 
 	<sql id="selectMedia">
 		SELECT
+			media.id AS media_id,
 			media.uri AS media_uri,
 			media.filename AS media_filename,
 			media.sizebytes AS media_sizebytes,
@@ -30,6 +31,7 @@
 	
 	<resultMap id="mediaItemResults" type="MediaItem"> 		
   		<id property="uri" column="media_uri"/>
+  		<result property="id" column="media_id"/>
   		<result property="fileName" column="media_filename"/>   
   		<result property="sizeBytes" column="media_sizebytes"/> 
   		<result property="creation" column="media_creation"/>  
@@ -61,6 +63,7 @@
 		)	-->	
 	<select id="getMediaByTagQuery" parameterType="Map" resultMap="mediaItemResults">
 		SELECT 
+			temp.id AS media_id,
 			temp.uri AS media_uri,
 			temp.filename AS media_filename,
 			temp.sizebytes AS media_sizebytes,
@@ -114,6 +117,12 @@
 	<select id="getMediaByUri" parameterType="Map" resultMap="mediaItemResults">
 		<include refid="selectMedia"/>
 		WHERE media.uri = #{uri}
+		AND <include refid="accessTypesFilter"/> 	
+	</select>
+	
+	<select id="getMediaById" parameterType="Map" resultMap="mediaItemResults">
+		<include refid="selectMedia"/>
+		WHERE media.id = #{id}
 		AND <include refid="accessTypesFilter"/> 	
 	</select>
 

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -19,15 +20,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import utils.MimeType;
 import video.HTTPLiveStreaming;
+import virtualFile.Location;
 import database.MediaEJB;
 import database.TagEJB;
 import database.ImageItem;
+import debug.Output;
 
 
 public class DynamicResourcePhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = 1L;
-	private static final boolean debugOutput = true;
 
 	public PhaseId getPhaseId() {
 		return PhaseId.RESTORE_VIEW;
@@ -46,7 +48,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String tagName = external.getRequestParameterMap().get("id");
 
-			if(debugOutput) System.out.println("Loading Tag Image: " + tagName);
+			Output.info(this, "Loading Tag Image: " + tagName);
 
 			TagEJB tagEJB = null;
 
@@ -68,7 +70,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String path = external.getRequestParameterMap().get("id");
 
-			if(debugOutput) System.out.println("Loading Preview Image: " + path);
+			Output.info(this, "Loading Preview Image: " + path);
 
 			generateBinaryResponse(context, servletResponse, path, "image/jpeg");
 
@@ -76,7 +78,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String path = external.getRequestParameterMap().get("id");
 
-			if(debugOutput) System.out.println("Loading Video: " + path);
+			Output.info(this, "Loading Video: " + path);
 
 			String mimeType = MimeType.getMimeTypeFromExt(path);
 
@@ -92,7 +94,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			//String path = "g:/transcode/" + file;
 
-			if(debugOutput) System.out.println("Loading IOS Video Segment: " + path);
+			Output.info(this, "Loading IOS Video Segment: " + path);
 
 			if(file.endsWith("m3u8")) {
 
@@ -108,7 +110,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String uri = external.getRequestParameterMap().get("id");
 
-			if(debugOutput) System.out.println("Loading Thumbnail Image: " + uri);
+			Output.info(this, "Loading Thumbnail Image: " + uri);
 
 			MediaEJB mediaEJB = null;
 
@@ -140,11 +142,13 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 		try {
 
-			File dataFile = new File(path);
+			Location location = new Location(path);
+			
+			File dataFile = new File(location.getDiskPath());
 
 			if(!dataFile.exists()) {
 
-				System.out.println("DynamicResourcePhaseListner: " + path + " not found");
+				Output.info(this, path + " not found");
 
 				servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, path + " not found");
 
@@ -155,6 +159,9 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 			input = new FileInputStream(dataFile);
 
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

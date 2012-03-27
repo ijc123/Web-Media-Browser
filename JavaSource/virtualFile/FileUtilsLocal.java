@@ -20,8 +20,8 @@ public class FileUtilsLocal extends FileUtils {
 		
 		File dir = new File(location.getDiskPathWithouthFilename() + name);
 		
-		boolean success = dir.mkdir();
-				
+		boolean success = dir.mkdir();			
+		
 		return(success);
 	}
 	
@@ -112,6 +112,12 @@ public class FileUtilsLocal extends FileUtils {
 		}
 	
 		return(rootPath);
+	}
+
+	@Override
+	public void close() {
+	
+		
 	}
 
 

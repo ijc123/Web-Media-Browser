@@ -42,16 +42,16 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 	}
 	
 	@Override
-	public void setUri(String uri) {
+	public void setMediaId(int id) {
 				
-		super.setUri(uri);
+		super.setMediaId(id);
 		
 		//PreviewImages previewImages = new PreviewImages();
 		
 		if(media.isVideo()) {
 		
-			largeImagePath = mediaPreviewEJB.getLargePreviewImage(media);
-			smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesList(media);
+			largeImagePath = mediaPreviewEJB.getLargePreviewImageURL(media);
+			smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesURLList(media);
 		
 		} else if(media.isImage()) {
 			

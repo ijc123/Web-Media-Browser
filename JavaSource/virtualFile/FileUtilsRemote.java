@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.net.ftp.FTPFile;
 
+import debug.Output;
+
 public class FileUtilsRemote extends FileUtils {
 	
 	MyFTPClient ftp;
@@ -20,28 +22,27 @@ public class FileUtilsRemote extends FileUtils {
 		
 		ftp = new MyFTPClient(url);
 		
+		ftp.connect();
+		
+		ftp.setListHiddenFiles(true);
 	}
 	
 	@Override
 	public boolean createDirectory(final String name) throws IOException {
 		
-		connect();
+		setPath();
 		
 		boolean success = ftp.makeDirectory(name);
-		
-		disconnect();
-				
+						
 		return(success);
 	}
 	
 	@Override
 	public boolean exists(String name) throws IOException {
 		
-		connect();
+		setPath();
 		
 		FTPFile[] file = ftp.listFiles(name);
-		
-		disconnect();
 		
 		return(file.length == 0 ? true : false);
 	}
@@ -49,11 +50,9 @@ public class FileUtilsRemote extends FileUtils {
 	@Override
 	public boolean deleteFile(String name) throws IOException {
 				
-		connect();
+		setPath();
 		
 		boolean success = ftp.deleteFile(name);
-		
-		disconnect();
 				
 		return(success);
 		
@@ -62,11 +61,9 @@ public class FileUtilsRemote extends FileUtils {
 	@Override
 	public boolean renameFile(final String oldName, final String newName) throws IOException {
 	
-		connect();
+		setPath();
 		
-		boolean success = ftp.rename(oldName, newName);
-				
-		disconnect();
+		boolean success = ftp.rename(oldName, newName);			
 		
 		return(success);
 	
@@ -75,14 +72,33 @@ public class FileUtilsRemote extends FileUtils {
 	@Override
 	public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException 
 	{
-			
-		connect();
+
+		// if we cannot set the current path (no permission?) return a 
+		// empty directory
+		if(setPath() == false) return;
 		
+		// when multiple ftp commands are run too fast in succession 
+		// some FTP servers will kill the connection.
+		// so in that case we sleep a little while in between
+		try {
+			Thread.sleep(getTimeout());
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+				
 		FTPFile[] fileList = ftp.listFiles();
 				
 		for(int i = 0; i < fileList.length; i++) {
 						
-			String name = fileList[i].getName();			
+			String name = fileList[i].getName();	
+			
+			// skip useless directories
+			if(name.equals(".")) continue;
+			if(name.equals("..")) continue;		
+			
+			Output.info(this, name);
+			
 			long sizeBytes = fileList[i].getSize();		
 			
 			Location fileLocation = null;
@@ -101,33 +117,44 @@ public class FileUtilsRemote extends FileUtils {
 			
 			contents.add(info);
 						
-		}
-			
-		disconnect();
+		}	
+		
 	}
 
 	@Override
 	public boolean deleteDirectory(String name) throws IOException {
 		
-		connect();
+		setPath();
 		
 		boolean success = ftp.removeDirectory(name);
-		
-		disconnect();
 				
 		return(success);
 		
 	}
 
-	private void connect() throws SocketException, IOException {
+	private boolean setPath() throws SocketException, IOException {
 		
-		ftp.connect();
-		ftp.cwd(location.getPath());
+		String path = location.getPath();
+		
+		int status = ftp.cwd(path);
+		
+		Output.info(this, path);
+		
+		if(status != 250) {
+		
+			// can be incorrect path or incorrect permissions etc
+			return(false);
+		
+		}
+		
+		return(true);
 	}
 	
-	private void disconnect() {
+	@Override
+	public void close() {
 		
 		ftp.disconnect();
+		
 	}
 	
 

@@ -20,11 +20,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
+import debug.Output;
+
 import utils.ImageUtil;
 import utils.MapArgument;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
-import beans.user.LoginBean;
+import beans.user.LoggedIn;
 
 
 @Stateless
@@ -36,8 +38,7 @@ public class MediaEJB {
 	@Inject
 	TagEJB tagEJB;
 	
-	@Inject
-	LoginBean loginBean;
+	@Inject @LoggedIn UserItem user;
 	
 	
 	@SuppressWarnings("unchecked")
@@ -47,7 +48,7 @@ public class MediaEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"tags", tag,
@@ -104,7 +105,7 @@ public class MediaEJB {
 		
 		// make sure to clone the accesstypes before editing them 
 		List<String> accessTypes = 
-				new ArrayList<String>(loginBean.getCurrentUser().getAccessTypes());
+				new ArrayList<String>(user.getAccessTypes());
 		
 		if(excludeTypes != null) {
 			
@@ -125,7 +126,7 @@ public class MediaEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"uri", uri,
@@ -140,12 +141,37 @@ public class MediaEJB {
 		
 	}
 	
+	public MediaItem getMediaById(int id) {
+		
+		return(getMediaById(id, user));
+			
+	}
+	
+	public MediaItem getMediaById(int id, UserItem user) {
+		
+		SqlSession session = MyBatis.getSession().openSession(); 
+		
+		List<String> accessTypes = user.getAccessTypes();
+		
+		Map<String, Object> map = MapArgument.create(		
+				"id", Integer.valueOf(id),
+				"accessTypes", accessTypes
+				);
+		
+		MediaItem media  = (MediaItem) session.selectOne("database.MediaMapper.getMediaById", map);
+		
+		session.close();
+		
+		return(media);	
+		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<MediaItem> getAllMedia() {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"accessTypes", accessTypes
@@ -400,67 +426,76 @@ public class MediaEJB {
 
 	public void synchronize(SettingsItem settings) {
 
-			
+		FileUtils f = null;
+
 		try {
-					
-		// update last synchronized date to now
-		java.util.Date curDate = Calendar.getInstance().getTime();
-		Timestamp now = new Timestamp(curDate.getTime());
-		
-		settings.setSynchronized(now);
-		
-		List<MediaLocationItem> mediaLocation = settings.getMediaLocations();
-		
-		ArrayList<MediaItem> diskMedia = new ArrayList<MediaItem>();
-		
-		for(int i = 0; i < mediaLocation.size(); i++)  {
-		
-			MediaLocationItem m = mediaLocation.get(i);
-			String typeName = m.getTypeName();
-			
-			FileUtils f = FileUtilsFactory.create(m.getLocation());
-					
-			f.getRecursiveMediaItems(diskMedia, m.isVideo(), m.isAudio(), m.isImages(), typeName);
-		
-		}
-		
-		//SqlSession session = MyBatis.getSession().openSession(); 
-		SqlSession session = MyBatis.getSession().openSession(); 
-							
-		session.update("database.MediaMapper.dropTempTableNewMedia");
-		session.update("database.MediaMapper.dropTempTableDiskMedia");
-		session.update("database.MediaMapper.createTempTableDiskMedia");
-		
-		for(int i = 0; i < diskMedia.size(); i++) {
 
-			Map<String, String> map = new HashMap<String, String>();
-			
-			map.put("uri", diskMedia.get(i).getUri());
-			map.put("fileName", diskMedia.get(i).getFileName());
-			map.put("sizeBytes", diskMedia.get(i).getSizeBytes().toString());
-			map.put("typeName", diskMedia.get(i).getTypeNames().get(0));
-			
-			session.insert("database.MediaMapper.setMediaTempTable", map);	
+			// update last synchronized date to now
+			java.util.Date curDate = Calendar.getInstance().getTime();
+			Timestamp now = new Timestamp(curDate.getTime());
 
-		}
+			settings.setSynchronized(now);
 
-		session.update("database.MediaMapper.synchronize");
-			
-		int nrMediaItems = (Integer)session.selectOne("database.MediaMapper.nrRowsInMedia");
-				
-		settings.setNrMediaItems(nrMediaItems);
-		
-		session.close();
+			List<MediaLocationItem> mediaLocation = settings.getMediaLocations();
 
-		System.out.println("done synchronizing database, counting tag usage");
-		
-		tagEJB.setTagUsedCounters();
-		
-		settingsEJB.setSettings(settings);
+			ArrayList<MediaItem> diskMedia = new ArrayList<MediaItem>();
+
+			for(int i = 0; i < mediaLocation.size(); i++)  {
+
+				MediaLocationItem m = mediaLocation.get(i);
+				String typeName = m.getTypeName();
+
+				f = FileUtilsFactory.create(m.getLocation());
+
+				f.getRecursiveMediaItems(diskMedia, m.isVideo(), m.isAudio(), m.isImages(), typeName);
+
+			}
+
+			//SqlSession session = MyBatis.getSession().openSession(); 
+			SqlSession session = MyBatis.getSession().openSession(); 
+
+			session.update("database.MediaMapper.dropTempTableNewMedia");
+			session.update("database.MediaMapper.dropTempTableDiskMedia");
+			session.update("database.MediaMapper.createTempTableDiskMedia");
+
+			for(int i = 0; i < diskMedia.size(); i++) {
+
+				Map<String, String> map = new HashMap<String, String>();
+
+				map.put("uri", diskMedia.get(i).getUri());
+				map.put("fileName", diskMedia.get(i).getFileName());
+				map.put("sizeBytes", diskMedia.get(i).getSizeBytes().toString());
+				map.put("typeName", diskMedia.get(i).getTypeNames().get(0));
+
+				session.insert("database.MediaMapper.setMediaTempTable", map);	
+
+			}
+
+			session.update("database.MediaMapper.synchronize");
+
+			int nrMediaItems = (Integer)session.selectOne("database.MediaMapper.nrRowsInMedia");
+
+			settings.setNrMediaItems(nrMediaItems);
+
+			session.close();
+
+			Output.info(this, "done synchronizing database, counting tag usage");
+
+			tagEJB.setTagUsedCounters();
+
+			settingsEJB.setSettings(settings);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+			// TODO Auto-generated catch block			
 			e.printStackTrace();
+			
+		} finally {
+
+			if(f != null) {
+
+				f.close();
+			}
 		}
 	
 	}

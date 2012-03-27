@@ -24,6 +24,7 @@ public class MediaTableItem extends MediaItem {
 		setVersion(m.getVersion());
 		setTagNames(m.getTagNames());
 		setTypeNames(m.getTypeNames());
+		setId(m.getId());
 		
 		selected = false;
 		selectedTab = "tags";	
@@ -39,7 +40,7 @@ public class MediaTableItem extends MediaItem {
 		setVersion(m.getVersion());
 		setTagNames(m.getTagNames());
 		setTypeNames(m.getTypeNames());
-				
+		setId(m.getId());		
 	}
 	
 	public void setSelected(boolean selected) {

@@ -20,7 +20,7 @@ public abstract class Taggable extends MultiTagPickerSupport {
 		media = null;
 	}
 	
-	public void setUri(String uri) {
+	public void setMediaId(int mediaId) {
 		
 		if(media != null) return;
 		
@@ -30,7 +30,7 @@ public abstract class Taggable extends MultiTagPickerSupport {
 			
 			mediaEJB = (MediaEJB) new InitialContext().lookup("java:module/MediaEJB");
 				
-			media = mediaEJB.getMediaByUri(uri);	
+			media = mediaEJB.getMediaById(mediaId);	
 			
 		} catch (NamingException e) {
 			
@@ -39,15 +39,15 @@ public abstract class Taggable extends MultiTagPickerSupport {
 				
 	}
 	
-	public String getUri() {
+	public int getMediaId() {
 		
 		if(media == null) {
 			
-			return("");
+			return(-1);
 		
 		} else {
 			
-			return(media.getUri());
+			return(media.getId());
 		}
 		
 	}

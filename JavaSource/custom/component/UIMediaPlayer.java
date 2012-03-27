@@ -10,10 +10,12 @@ import javax.faces.context.ResponseWriter;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import servlet.LoadDataSegmentServlet;
 import video.HTTPLiveStreaming;
-import database.MediaItem;
 import database.MediaEJB;
+import database.MediaItem;
 
 
 @FacesComponent("custom.component.UIMediaPlayer")
@@ -21,13 +23,17 @@ public class UIMediaPlayer extends UIOutput {
 
 	static video.Transcode transcode;
 	
+	protected enum Properties {
+		id,
+		mediaId,
+		autoStart, 
+		rendered,
+		width, 
+		height
+	}
+	
 	//private String uri;
-	private String id;
-	private String localHost;
-	private Boolean autostart;
-	private Boolean rendered;
-	private Integer width;
-	private Integer height;
+	private static String localHost = "0:0:0:0:0:0:0:1";
 
 	static {
 
@@ -37,28 +43,12 @@ public class UIMediaPlayer extends UIOutput {
 	public UIMediaPlayer() {
 
 		super();
-		//uri = "";
-		autostart = false;
-		rendered = true;
-		id = "mediaPlayer";
-		width = 640;
-		height = 480;
-		localHost = "0:0:0:0:0:0:0:1";
+		
 	}
 	
-	private String getMediaDataUrl(String path) {
-		
-		FacesContext context = FacesContext.getCurrentInstance();
-		ViewHandler handler = context.getApplication().getViewHandler();
-		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
-		
-		String location = actionURL + "?path=" + path;
-		
-		return(location);
-	}
-
-	protected void renderFireFox(ResponseWriter rw, String clientId, String id, MediaItem media, 
-			Boolean autostart, String ipAddress) throws IOException 
+	
+	protected void renderFireFox(ResponseWriter rw, String id, MediaItem media, 
+			String ipAddress, FacesContext context) throws IOException 
 	{
 
 		String location;
@@ -71,30 +61,32 @@ public class UIMediaPlayer extends UIOutput {
 			
 		} else {
 			
-			location = getMediaDataUrl(media.getPath());
+			HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
+			
+			location = LoadDataSegmentServlet.getMediaDataURL(media, session.getId());
 		}
 		
 		rw.startElement("embed", this);
 
-		rw.writeAttribute("id", clientId + ":" + id, null);
+		rw.writeAttribute("id", id, null);
 		rw.writeAttribute("type","application/x-mplayer2",null);
 
 		rw.writeAttribute("src", location, null);
-		rw.writeAttribute("width", width.toString(), null);
-		rw.writeAttribute("height", height.toString(), null);
+		rw.writeAttribute("width", Integer.toString(getWidth()), null);
+		rw.writeAttribute("height", Integer.toString(getHeight()), null);
 
 		rw.writeAttribute("showcontrols", "1", null);
 		rw.writeAttribute("showstatusbar", "0", null);
 		rw.writeAttribute("showdisplay", "0", null);
 
-		rw.writeAttribute("autostart", autostart == true ? "1" : "0", null);
+		rw.writeAttribute("autostart", isAutoStart() == true ? "1" : "0", null);
 
 		rw.endElement("embed");
 
 	}
 
-	protected void renderInternetExplorer(ResponseWriter rw, String clientId, String id, MediaItem media, 
-			Boolean autostart, String ipAddress) throws IOException 
+	protected void renderInternetExplorer(ResponseWriter rw, String id, MediaItem media, 
+			String ipAddress) throws IOException 
 	{
 		/*
 		 	<OBJECT ID="vidObj" WIDTH=320 HEIGHT=240 CLASSID="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">
@@ -122,17 +114,17 @@ public class UIMediaPlayer extends UIOutput {
 			
 		} else {
 			
-			//location = getMediaDataUrl(media.getPath());
-			location = media.getPath();
+			location = LoadDataSegmentServlet.getMediaDataURL(media);
+		
 		}
 		
 		rw.startElement("object", this);
 
-		rw.writeAttribute("id", clientId + ":" + id, null);
+		rw.writeAttribute("id", id, null);
 		rw.writeAttribute("classid","CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6",null);
 		
-		rw.writeAttribute("width", width.toString(), null);
-		rw.writeAttribute("height", height.toString(), null);
+		rw.writeAttribute("width", Integer.toString(getWidth()), null);
+		rw.writeAttribute("height", Integer.toString(getHeight()), null);
 		
 		rw.startElement("param", this);	
 		rw.writeAttribute("name", "url", null);
@@ -166,15 +158,15 @@ public class UIMediaPlayer extends UIOutput {
 		
 		rw.startElement("param", this);	
 		rw.writeAttribute("name", "autostart", null);
-		rw.writeAttribute("value", autostart == true ? "1" : "0", null);
+		rw.writeAttribute("value", isAutoStart() == true ? "1" : "0", null);
 		rw.endElement("param");
 
 		rw.endElement("object");
 
 	}
 
-	protected void renderSafari(ResponseWriter rw, String clientId, String id, MediaItem media, 
-			Boolean autostart, String ipAddress) throws IOException 
+	protected void renderSafari(ResponseWriter rw, String id, MediaItem media, 
+			String ipAddress) throws IOException 
 	{
 		/*
 		 	<OBJECT classid='clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B' width="320" height="240" codebase='http://www.apple.com/qtactivex/qtplugin.cab'>
@@ -188,15 +180,15 @@ public class UIMediaPlayer extends UIOutput {
 			</OBJECT>
 		 */
 		
-		String location = getMediaDataUrl(media.getPath());
+		String location = LoadDataSegmentServlet.getMediaDataURL(media);
 				
 		rw.startElement("object", this);
 
-		rw.writeAttribute("id", clientId + ":" + id, null);
+		rw.writeAttribute("id", id, null);
 		rw.writeAttribute("classid","clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B",null);
 		
-		rw.writeAttribute("width", width.toString(), null);
-		rw.writeAttribute("height", height.toString(), null);
+		rw.writeAttribute("width", Integer.toString(getWidth()), null);
+		rw.writeAttribute("height", Integer.toString(getHeight()), null);
 		rw.writeAttribute("codebase", "http://www.apple.com/qtactivex/qtplugin.cab", null);
 		
 		rw.startElement("param", this);	
@@ -216,7 +208,7 @@ public class UIMediaPlayer extends UIOutput {
 
 		rw.startElement("param", this);	
 		rw.writeAttribute("name", "autoplay", null);
-		rw.writeAttribute("value", autostart == true ? "1" : "0", null);
+		rw.writeAttribute("value", isAutoStart() == true ? "1" : "0", null);
 		rw.endElement("param");
 
 		////////////////////////////////
@@ -224,9 +216,9 @@ public class UIMediaPlayer extends UIOutput {
 		rw.startElement("embed", this);
 
 		rw.writeAttribute("src", location, null);
-		rw.writeAttribute("width", width.toString(), null);
-		rw.writeAttribute("height", height.toString(), null);
-		rw.writeAttribute("autoplay", autostart == true ? "1" : "0", null);
+		rw.writeAttribute("width", Integer.toString(getWidth()), null);
+		rw.writeAttribute("height", Integer.toString(getHeight()), null);
+		rw.writeAttribute("autoplay", isAutoStart() == true ? "1" : "0", null);
 		rw.writeAttribute("controller", "1", null);
 		rw.writeAttribute("loop", "0", null);
 		rw.writeAttribute("pluginspage", "http://www.apple.com/quicktime/download/", null);
@@ -237,8 +229,7 @@ public class UIMediaPlayer extends UIOutput {
 
 	}
 	
-	protected void renderMobileSafari(ResponseWriter rw, String clientId, String id, MediaItem media, 
-			Boolean autostart) throws IOException 
+	protected void renderMobileSafari(ResponseWriter rw, String id, MediaItem media) throws IOException 
 	{
 
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -271,8 +262,8 @@ public class UIMediaPlayer extends UIOutput {
 
 	}
 	
-	protected void renderHTML5Video(ResponseWriter rw, String clientId, String id, MediaItem media, 
-			Boolean autostart, String ipAddress) throws IOException {
+	protected void renderHTML5Video(ResponseWriter rw, String id, MediaItem media, 
+			String ipAddress) throws IOException {
 		/*
 		<video width="320" height="240" controls="controls">
 		  <source src="movie.mp4" type="video/mp4" />
@@ -281,13 +272,13 @@ public class UIMediaPlayer extends UIOutput {
 		</video>
 	 	*/
 		
-		String location = getMediaDataUrl(media.getPath());
+		String location = LoadDataSegmentServlet.getMediaDataURL(media);
 		
 		rw.startElement("video", this);
 		
 		rw.writeAttribute("controls", "controls", null);
-		rw.writeAttribute("width", width.toString(), null);
-		rw.writeAttribute("height", height.toString(), null);
+		rw.writeAttribute("width", Integer.toString(getWidth()), null);
+		rw.writeAttribute("height", Integer.toString(getHeight()), null);
 		
 		rw.startElement("source", this);	
 		rw.writeAttribute("src", location, null);
@@ -301,22 +292,12 @@ public class UIMediaPlayer extends UIOutput {
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 
-		if(rendered == false) return;
+		if(isRendered() == false) return;
 		
-		String clientId = getClientId(context);
+		String id = getClientId(context) + ":" + getId();
 
 		ResponseWriter rw = context.getResponseWriter();
 		
-		String uri = (String) getAttributes().get("uri");
-/*
-		String 
-		String id = (String) getAttributes().get("id");
-		if(id == null) id = "mediaPlayer";
-
-		Boolean autostart = Boolean.parseBoolean((String) getAttributes().get("autostart"));
-
-		Boolean rendered = Boolean.parseBoolean((String) getAttributes().get("rendered"));
-*/
 		MediaEJB mediaEJB = null;
 
 		try {
@@ -325,7 +306,7 @@ public class UIMediaPlayer extends UIOutput {
 			e.printStackTrace();
 		}
 
-		MediaItem media = mediaEJB.getMediaByUri(uri);
+		MediaItem media = mediaEJB.getMediaById(getMediaId());
 		
 		HttpServletRequest request=
 				(HttpServletRequest) context.getExternalContext().getRequest();
@@ -341,78 +322,103 @@ public class UIMediaPlayer extends UIOutput {
 			
 			//renderHTML5Video(rw, clientId, id, media, autostart, ipAddress);
 
-			renderInternetExplorer(rw, clientId, id, media, autostart, ipAddress);
+			renderInternetExplorer(rw, id, media, ipAddress);
 
 		} else if(useragent.indexOf("firefox") != -1) {
 		
-			renderFireFox(rw, clientId, id, media, autostart, ipAddress);
+			renderFireFox(rw, id, media, ipAddress, context);
 
 		} else if(useragent.indexOf("mobile") != -1 && useragent.indexOf("safari") != -1) { 
 
-			renderMobileSafari(rw, clientId, id, media, autostart);
+			renderMobileSafari(rw, id, media);
 			
 		} else if(useragent.indexOf("safari") != -1) {
 	
 			//renderHTML5Video(rw, clientId, id, media, autostart, ipAddress);
-			renderSafari(rw, clientId, id, media, autostart, ipAddress);
+			renderSafari(rw, id, media, ipAddress);
 			
 		} else {
 			
-			renderFireFox(rw, clientId, id, media, autostart, ipAddress);
+			renderFireFox(rw, id, media, ipAddress, context);
 			
 		}
 
 
 	}
-/*
-	public String getUri() {
-		return uri;
+
+	public void setMediaId(int mediaId) {
+		
+		getStateHelper().put(Properties.mediaId, mediaId);
+	}
+	
+	public int getMediaId() {
+		
+		int value = (Integer)getStateHelper().eval(Properties.mediaId);
+		return value;
 	}
 
-	public void setUri(String uri) {
-		this.uri = uri;
+	public void setAutoStart(boolean autoStart) {
+		
+		getStateHelper().put(Properties.autoStart, autoStart);
+		
 	}
-*/
-	public Boolean getAutostart() {
-		return autostart;
-	}
-
-	public void setAutostart(Boolean autostart) {
-		this.autostart = autostart;
-	}
-
-	public Boolean getRendered() {
-		return rendered;
+	
+	public boolean isAutoStart() {
+		
+		boolean value = (Boolean)getStateHelper().eval(Properties.autoStart, false);
+		return value;
+	
 	}
 
-	public void setRendered(Boolean rendered) {
-		this.rendered = rendered;
+	public void setRendered(boolean rendered) {
+		
+		getStateHelper().put(Properties.rendered, rendered);
+		
 	}
-
-	public String getId() {
-		return id;
+	
+	public boolean isRendered() {
+		
+		boolean value = (Boolean)getStateHelper().eval(Properties.rendered, true);
+		return value;
+		
 	}
 
 	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Integer getWidth() {
-		return width;
-	}
-
-	public void setWidth(Integer width) {
-		this.width = width;
-	}
-
-	public Integer getHeight() {
-		return height;
-	}
-
-	public void setHeight(Integer height) {
-		this.height = height;
+		
+		getStateHelper().put(Properties.id, id);
+		
 	}
 	
+	public String getId() {
+		
+		String value = (String)getStateHelper().eval(Properties.id, "mediaPlayer");
+		return value;
+	}
+
+	public void setWidth(int width) {
+		
+		getStateHelper().put(Properties.width, width);
+	}
+	
+	public int getWidth() {
+		
+		int value = (Integer)getStateHelper().eval(Properties.width, 640);
+		return value;
+	}
+
+	public void setHeight(int height) {
+		
+		getStateHelper().put(Properties.height, height);
+
+	}
+	
+	public int getHeight() {
+		
+		int value = (Integer)getStateHelper().eval(Properties.height, 480);
+		return value;
+		
+	}
+
 	private String getClientIpAddr(HttpServletRequest request) {
 		
         String ip = request.getHeader("X-Forwarded-For");

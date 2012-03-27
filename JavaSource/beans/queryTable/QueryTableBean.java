@@ -299,7 +299,7 @@ public class QueryTableBean extends MultiTagPickerSupport
 		 // is a preview image
 		 if(event.getNewItemName().equals("preview")) {
 			 			 
-			 mediaPreviewEJB.build(mediaTableItem);
+			 mediaPreviewEJB.generatePreview(mediaTableItem);
 		 }
 		 
 		 // update the mediaitem with the latest version from the database				

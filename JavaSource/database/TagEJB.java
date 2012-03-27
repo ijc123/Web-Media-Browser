@@ -17,11 +17,12 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
-//import org.jboss.ejb3.annotation.IgnoreDependency;
+
+import debug.Output;
 
 import utils.ImageUtil;
 import utils.MapArgument;
-import beans.user.LoginBean;
+import beans.user.LoggedIn;
 
 @Stateless
 public class TagEJB {
@@ -30,8 +31,7 @@ public class TagEJB {
 	//@IgnoreDependency
 	private MediaEJB mediaEJB;
 	
-	@Inject
-	private LoginBean loginBean;
+	@Inject @LoggedIn UserItem user;
 			
 	public TagItem getTagByName(String name) {
 		
@@ -62,7 +62,7 @@ public class TagEJB {
 							
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(
 				"name", name,
@@ -115,7 +115,7 @@ public class TagEJB {
 			
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(
 				"category", category,
@@ -135,7 +135,7 @@ public class TagEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(
 				"accessTypes", accessTypes
@@ -182,7 +182,7 @@ public class TagEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(
 				"name", name + "%",
@@ -362,7 +362,7 @@ public class TagEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = user.getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(
 				"children", children, 
@@ -525,11 +525,11 @@ public class TagEJB {
 						
 		} catch (MalformedURLException mue) {
 
-			System.out.println(mue.getMessage());
+			Output.error(this, mue.getMessage());
 
 		} catch (IOException ioe) {
 
-			System.out.println(ioe.getMessage());
+			Output.error(this, ioe.getMessage());
 
 		} finally {
 

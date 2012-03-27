@@ -1,95 +1,73 @@
 package video;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
+
+import servlet.LoadDataSegmentServlet;
+import utils.SystemConstants;
 import virtualFile.Location;
+import database.MediaItem;
 
-/**
- * A simple application to generate a single thumbnail image from a media file.
- * <p>
- * This application shows how to implement the "vlc-thumb" sample (written in
- * "C") that is part of the vlc code-base.
- * <p>
- * The original "C" implementation is available in the vlc code-base here:
- * 
- * <pre>
- *   /vlc/doc/libvlc/vlc-thumb.c
- * </pre>
- * 
- * This implementation tries to stick as closely to the original "C"
- * implementation as possible, but uses a different synchronisation technique.
- * <p>
- * Since this is a test, the implementation is not very tolerant to errors.
- */
 public class FrameGrabber {
 
-	private static final String[] VLC_ARGS = { "--intf", "dummy", /* no interface */
-	"--vout", "dummy", /* we don't want video (output) */
-	"--no-audio", /* we don't want audio (decoding) */
-	"--no-video-title-show", /* nor the filename displayed */
-	"--no-stats", /* no stats */
-	"--no-sub-autodetect-file", /* we don't want subtitles */
-	"--no-disable-screensaver", /* we don't want interfaces */
-	"--no-snapshot-preview", /* no blending in dummy vout */
-	};
+	private VideoInfo videoInfo;
+	
+	public void start(final MediaItem video, final Location output, int frameWidth, int nrFrames) throws ExecuteException, IOException, URISyntaxException {
+		
+		VideoInfoParser videoInfoParser = new VideoInfoParser();
+		
+		videoInfo = videoInfoParser.start(video);
+		
+		float scale = frameWidth / (float)videoInfo.getWidth();
+		int frameHeight = (int)(videoInfo.getHeight() * scale);
+		
+		String frameRes = Integer.toString(frameWidth) + "x" + Integer.toString(frameHeight);
+		
+		String port = Integer.toString(SystemConstants.getJbossPort());
+		
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+				
+		String mediaURL = "http://127.0.0.1:" + port + LoadDataSegmentServlet.getMediaDataURL(video, session.getId());
+		
+		output.setFilename(video.getFileName());
+		
+		for(int i = 0; i < nrFrames; i++) {
 
+			int frameTimeSeconds = (int)(videoInfo.getDurationSeconds() / nrFrames * i); 
+			
+			String frameNr = String.format("%04d", Integer.valueOf(i));
+						
+			String outputFrameName = output.getDiskPathWithouthFilename() +
+					output.getFilenameWithoutExtension() + frameNr + ".png";
+						
+			String batch = String.format("avconv -ss %s -i \"%s\" -vframes 1 -loglevel quiet -s %s \"%s\"", 
+					Integer.toString(frameTimeSeconds), mediaURL, frameRes, outputFrameName);
 
-	public void start(Location inputVideoName, int imageWidth, Location outputImageName, int nrFrames) throws Exception {
+			CommandLine cmdLine = CommandLine.parse(batch);
+
+			DefaultExecutor executor = new DefaultExecutor();			
+			
+			ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
+			executor.setWatchdog(watchdog);
+
+			executor.execute(cmdLine);
+
+		}
+		
+	}
+
+	public VideoInfo getVideoInfo() {
+		
+		return videoInfo;
+	}
 
 	
-		MediaPlayerFactory factory = new MediaPlayerFactory(VLC_ARGS);
-		MediaPlayer mediaPlayer = factory.newHeadlessMediaPlayer();
-
-		MediaPlayerBarrier barrier = new MediaPlayerBarrier();
-		
-		FrameGrabberEventListener e = new FrameGrabberEventListener(barrier, nrFrames);
-
-		mediaPlayer.addMediaPlayerEventListener(e);
-		
-		String inputLocation = inputVideoName.getEncodedURL();
-					
-		if(mediaPlayer.startMedia(inputLocation)) {
-
-			for(int i = 0; i < nrFrames; i++) {
-							
-				float snapShotPos = i / (float)nrFrames;
-				
-				mediaPlayer.setPosition(snapShotPos);
-				MediaPlayerBarrier.Event event = barrier.waitForEvent(MediaPlayerBarrier.Event.POSITION_CHANGE_DONE); 
-				
-				if(event == MediaPlayerBarrier.Event.ERROR) {
-					
-					mediaPlayer.stop();
-					mediaPlayer.release();
-					factory.release();
-					throw new Exception("Error while grabbing frames");					
-				}
-				
-				String frameNr = String.format("%04d", Integer.valueOf(i));
-				
-				String frameName = outputImageName.getDiskPathWithouthFilename() +
-						outputImageName.getFilenameWithoutExtension() + frameNr + ".png";
-				
-				File snapshotFile = new File(frameName);
-				
-				mediaPlayer.saveSnapshot(snapshotFile, imageWidth, 0);
-				event = barrier.waitForEvent(MediaPlayerBarrier.Event.SNAPSHOT_DONE); 
-				
-				if(event == MediaPlayerBarrier.Event.ERROR) {
-					
-					mediaPlayer.stop();
-					mediaPlayer.release();
-					factory.release();
-					throw new Exception("Error while grabbing frames");
-				}
-			}
-
-			mediaPlayer.stop();
-		}
-
-		mediaPlayer.release();
-		factory.release();
-	}
 }

@@ -147,20 +147,44 @@
 		<tag-name>mediaPlayer</tag-name>
 		<component>
 			<description>
-   	Plays a video using the windows media player plugin
-   		available tags: 
-   		filePath = path to the file to be displayed
-   </description>
+	   			Plays video/audio using the appropriate plugin for the
+	   			clients browser
+	   		</description>
 			<component-type>custom.component.UIMediaPlayer</component-type>
 			<handler-class />
 		</component>
+		<attribute>
+            <name>mediaId</name>
+            <required>true</required>
+            <type>int</type>            
+        </attribute>
+        <attribute>
+            <name>autoStart</name>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <name>width</name>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <name>height</name>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
 	</tag>
 	<tag>
 		<tag-name>tagInfo</tag-name>
 		<component>
 			<description>
-	   	Creates a graphic representation of a suplied list of tags
-   </description>
+		   	Creates a graphic representation of a suplied list of tags
+	   </description>
 			<component-type>custom.component.UITagInfo</component-type>
 			<handler-class />
 		</component>

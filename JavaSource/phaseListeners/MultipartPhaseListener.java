@@ -22,11 +22,12 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
+import debug.Output;
+
 public class MultipartPhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
-	private static final boolean bDebug = false;
 
 	public PhaseId getPhaseId() {
 		return PhaseId.RESTORE_VIEW;
@@ -35,7 +36,7 @@ public class MultipartPhaseListener implements PhaseListener {
 
 	public void afterPhase(PhaseEvent event) {
 
-		if(bDebug) System.out.println("PhaseListener afterphase: " + event.getPhaseId());
+		//Output.info(this, "afterphase: " + event.getPhaseId());
 			
 	}
 
@@ -52,8 +53,8 @@ public class MultipartPhaseListener implements PhaseListener {
 
 		HttpServletRequest httpServletRequest = (HttpServletRequest) requestObject;
 		
-		if(bDebug) System.out.println("PhaseListener beforephase: " +   httpServletRequest.getRequestURL() + " " +
-				 httpServletRequest.getMethod() + " ");
+		//Output.info(this, "beforephase: " +   httpServletRequest.getRequestURL() + " " +
+	//			 httpServletRequest.getMethod() + " ");
 			
 				
 		if (ServletFileUpload.isMultipartContent(httpServletRequest)) {

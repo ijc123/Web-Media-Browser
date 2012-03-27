@@ -19,19 +19,34 @@ package servlet;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+import javax.faces.application.ViewHandler;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import virtualFile.VirtualInputFile;
 import virtualFile.VirtualInputFileFactory;
+import webListener.WebDebugListener;
+import database.MediaEJB;
+import database.MediaItem;
+import database.UserItem;
+import debug.Output;
+
+//import org.jboss.weld.context.SerializableContextualInstanceImpl;
+
+
 
 
 /**
@@ -55,6 +70,9 @@ public class LoadDataSegmentServlet extends HttpServlet {
     protected static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     protected static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     
+    @Inject
+    MediaEJB mediaEJB;
+      
     // Properties ---------------------------------------------------------------------------------
 
     //private String basePath;
@@ -125,19 +143,102 @@ public class LoadDataSegmentServlet extends HttpServlet {
         (HttpServletRequest request, HttpServletResponse response, boolean content)
             throws IOException
     {
+    	
+    	// make sure a valid httpsession exists with a logged in user 
+    	// before handling the request
+    	
+    	HttpSession session = request.getSession(false);
+    	
+    	UserItem loggedInUser = null;
+    	
+    	if(session == null) {
+    		
+    		// no active httpsession found for this request
+    		
+    		String sessionId = request.getParameter("sessionId");
+    		
+    		if(sessionId == null) {
+    			
+    			// no httpsession parameter supplied for this request either
+    			
+    			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    			Output.error(this, "trying to download resource without a valid session");
+    			return;
+    			
+    		} else {
+    			
+    			// httpsession supplied for this request, look it up
+    			
+    			session = WebDebugListener.getSession(sessionId);
+    			
+    			if(session == null) {
+    				
+    				Output.error(this, "supplied sessionId: " + sessionId + " not in sessionMap");
+    				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    				return;
+    			}
+	    		
+    			loggedInUser = (UserItem)session.getAttribute("loggedInUser");
+    			
+    			if(loggedInUser == null) {
+    				
+    				// user is not logged in
+    				
+    				response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    				Output.error(this, "trying to download resource when user is not logged in");
+        			return;
+    			}
+    			        	  
+    		}
+    	}
+    	
+    	
         // Validate the requested file ------------------------------------------------------------
 
+        	
         // Get requested file by path info.
     	String requestedFile = request.getParameter("path");
-        	    	
+    	
+    	//Get a media item
+    	String mediaId = request.getParameter("mediaId");
+    	
+    	 	        
         // Check if file is actually supplied to the request URL.
-        if (requestedFile == null) {
+        if(requestedFile == null) {
             // Do your thing if the file is not supplied to the request URL.
-            // Throw an exception, or send 404, or show default/warning page, or just ignore it.
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
+            // Throw an exception, or send 404, or show default/warning page, or just ignore it.        	
+        	if(mediaId == null) {
+        		
+        		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        		Output.error(this, "no mediaId specified");
+        		return;
+        		
+        	} else {
+        		
+        		int id = Integer.parseInt(mediaId);
+        		
+        		MediaItem media = null;
+        		
+        		if(loggedInUser != null) {
+        			        		
+        			media = mediaEJB.getMediaById(id, loggedInUser);
+        			
+        		} else {
+        			        		
+        			media = mediaEJB.getMediaById(id);
+        		}
+        		
+        		if(media == null) {
+        			
+        			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        			Output.error(this, "media forbidden");
+            		return;        			
+        		}
+        		
+        		requestedFile = media.getUri();        		
+        	}
         }
-
+        
         // URL-decode the file name (might contain spaces and on) and prepare file object.
         VirtualInputFile file = null;
         String fileName;
@@ -156,6 +257,7 @@ public class LoadDataSegmentServlet extends HttpServlet {
             // Do your thing if the file appears to be non-existing.
             // Throw an exception, or send 404, or show default/warning page, or just ignore it.
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            Output.error(this, "opening resource: " + mediaId);
             return;
         }
         
@@ -432,6 +534,8 @@ public class LoadDataSegmentServlet extends HttpServlet {
         throws IOException
     {
     	   	
+    	Output.info(this, "Start: " + Long.toString(start) + " Length: " + Long.toString(length));
+    	
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int read;
                    
@@ -497,5 +601,47 @@ public class LoadDataSegmentServlet extends HttpServlet {
         }
 
     }
+    
+    public static String getMediaDataURL(MediaItem media) {
+           
+		return(getMediaDataURL(media,null));
+    }
+        
+    public static String getMediaDataURL(MediaItem media, String sessionId) {
+    
+    	FacesContext context = FacesContext.getCurrentInstance();
+		ViewHandler handler = context.getApplication().getViewHandler();
+		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
+		
+		String url = actionURL + "?mediaId=" + Integer.toString(media.getId());
+		
+		if(sessionId != null) {
+							
+			try {
+				
+				sessionId = URLEncoder.encode(sessionId, "UTF-8");
+				url += "&sessionId=" + sessionId;
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+									
+		}
+    
+		return(url);
+    }
+    
+    public static String getBinaryDataURL(String path) {
+        
+    	FacesContext context = FacesContext.getCurrentInstance();
+		ViewHandler handler = context.getApplication().getViewHandler();
+		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
+		
+		String url = actionURL + "?path=" + path;
+		
+		return(url);
+    }
 
+ 
 }

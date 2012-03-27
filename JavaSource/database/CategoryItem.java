@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.validation.constraints.Size;
 
+import debug.Output;
+
 public class CategoryItem implements Cloneable, Comparable<CategoryItem>, Serializable {
 
 	/**
@@ -97,7 +99,7 @@ public class CategoryItem implements Cloneable, Comparable<CategoryItem>, Serial
 		} 
 		catch (CloneNotSupportedException cnse) 
 		{
-			System.out.println("CloneNotSupportedException thrown " + cnse);
+			Output.error(this, "CloneNotSupportedException thrown " + cnse);
 			throw new CloneNotSupportedException();
 		}
 	}

@@ -7,6 +7,8 @@ import java.net.URL;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
+import debug.Output;
+
 public class MyFTPClient extends FTPClient {
 
 	String host;
@@ -21,6 +23,7 @@ public class MyFTPClient extends FTPClient {
 		Location location;
 		
 		try {
+			
 			location = new Location(url.toString());
 			host = location.getHost();
 			username = location.getUsername();
@@ -39,7 +42,7 @@ public class MyFTPClient extends FTPClient {
 		if(isConnected()) return;
 		
 		try {
-			
+						
 			if(port == -1) {
 			
 				super.connect(host);
@@ -60,6 +63,7 @@ public class MyFTPClient extends FTPClient {
 				throw new IOException("FTP server refused connection: " + host);			
 			}
 			
+			Output.info(this, "FTP CONNECTED");
 			
 		} catch(IOException e) {
 
@@ -77,6 +81,8 @@ public class MyFTPClient extends FTPClient {
 			try {
 				
 				super.disconnect();
+				
+				Output.info(this, "FTP DISCONNECT");
 				
 			} catch(IOException ioe) {
 				// do nothing

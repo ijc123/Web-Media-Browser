@@ -8,10 +8,8 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
-
+import utils.ImagePreviewBuilder;
+import video.FrameGrabber;
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
@@ -39,19 +37,7 @@ public class MediaPreviewEJB {
 		previewRoot = settings.getSettings().getPreviewRootDirectory();
 	}
 
-	private String getMediaPreviewPath(final MediaItem inputVideo) {
-
-		String hashSource = 
-				inputVideo.getFileName() + Long.toString(inputVideo.getSizeBytes());
-
-		String hash = Integer.toString( hashSource.hashCode() );
-
-		String path = inputVideo.getFileName() + " " + hash;
-
-		return(path);
-	}
-
-	public void build(final MediaItem inputMedia) {
+	public void generatePreview(final MediaItem inputMedia) {
 
 		if(inputMedia.isVideo()) {
 			
@@ -65,7 +51,19 @@ public class MediaPreviewEJB {
 
 	}
 	
-	
+	private String getMediaPreviewPath(final MediaItem inputVideo) {
+
+		String hashSource = 
+				inputVideo.getFileName() + Long.toString(inputVideo.getSizeBytes());
+
+		String hash = Integer.toString( hashSource.hashCode() );
+
+		String path = inputVideo.getFileName() + " " + hash;
+
+		return(path);
+	}
+
+
 	public void buildImageThumbnail(final MediaItem inputMedia) {
 		
 		if(mediaEJB.hasMediaThumbnail(inputMedia)) return;
@@ -76,49 +74,44 @@ public class MediaPreviewEJB {
 	
 	private void buildVideoPreviewImages(final MediaItem inputMedia) {
 
-		if (!getSmallPreviewImagesList(inputMedia).isEmpty()) {
+		if(!getSmallPreviewImagesURLList(inputMedia).isEmpty()) {
 
 			// preview images already exist
 			return;
 		}
-
-		String inputPath = inputMedia.getPath();
+		
 		String outputPath = getMediaPreviewPath(inputMedia);
-
+		
 		try {
-
+			
 			FileUtilsLocal f = new FileUtilsLocal(previewRoot);
 
 			f.createDirectory(outputPath);
 			f.moveDown(outputPath);
-
 			
-			String batch = String
-					.format("H:/mtn-200808a-win32/mtn -c 2 -r 32 -w 800 -P -I -f %s -O \"%s\" \"%s\"",
-							f.getLocation().getDiskPath(), inputPath);
-
-			CommandLine cmdLine = CommandLine.parse(batch);
-
-			DefaultExecutor executor = new DefaultExecutor();
-
-			ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
-			executor.setWatchdog(watchdog);
+			Location outputLocation = f.getLocation();
 			
-
-			executor.execute(cmdLine);
-
+			FrameGrabber frameGrabber = new FrameGrabber();
+			
+			frameGrabber.start(inputMedia, outputLocation, 333, 60);
+			
+			ImagePreviewBuilder imagePreview = new ImagePreviewBuilder();
+			
+			imagePreview.start(outputLocation);
+			
 		} catch (Exception e) {
-
+			
 			e.printStackTrace();
-
-		} 
+		}
+	
 	}
-
-	public List<String> getSmallPreviewImagesList(final MediaItem inputMedia) {
-
+	
+	public List<String> getSmallPreviewImagesURLList(final MediaItem inputMedia) {
 		
 		ArrayList<String> previewImagesPath = new ArrayList<String>();
 
+		FileUtils f = null;
+		
 		try {
 
 			ArrayList<FileInfo> previewImagesList = new ArrayList<FileInfo>();
@@ -127,15 +120,13 @@ public class MediaPreviewEJB {
 
 			if(!inputMedia.getMimeType().startsWith("video")) return(result);
 
-			FileUtils f = FileUtilsFactory.create(previewRoot);
+			f = FileUtilsFactory.create(previewRoot);
 
 			String outputPath = getMediaPreviewPath(inputMedia);
 
 			f.moveDown(outputPath);
 
 			f.getDirectoryContents(previewImagesList, "*.png");
-
-			if(previewImagesList.size() == 0) return(previewImagesPath);
 			
 			for(int i = 0; i < previewImagesList.size(); i++) {
 
@@ -151,44 +142,44 @@ public class MediaPreviewEJB {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
+		} finally {
+			
+			if(f != null) {
+				
+				f.close();
+			}
+			
 		}
 
 		return(previewImagesPath);
 	}
 
-	public String getLargePreviewImage(final MediaItem inputMedia) {
+	public String getLargePreviewImageURL(final MediaItem inputMedia) {
 
 		if(!inputMedia.getMimeType().startsWith("video")) return(null);
 
 		try {
 			
-			FileUtils f = FileUtilsFactory.create(previewRoot);
-
-			String outputPath = getMediaPreviewPath(inputMedia);
-
-			f.moveDown(outputPath);
+			Location location = new Location(previewRoot);
 			
-			Location outputLocation = (Location)f.getLocation().clone();
+			String previewPath = getMediaPreviewPath(inputMedia);
+
+			location.moveDown(previewPath);
 			
-			outputLocation.setFilename(inputMedia.getFileName());
+			location.setFilename(inputMedia.getFileName());
 		
-			String newFilename = outputLocation.getFilenameWithoutExtension() + "_s";
+			location.setExtension("jpg");
 			
-			outputLocation.setFilenameWithoutExtension(newFilename);
-			outputLocation.setExtension("jpg");
-			
-			if(!f.exists(outputLocation.getFilename())) return(null);
-			else {
-
-				return(outputLocation.getEncodedURL());
-			}
+			return(location.getEncodedURL());
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return(null);
+			
 		}
-
+		
+		return(null);
 
 	}
 

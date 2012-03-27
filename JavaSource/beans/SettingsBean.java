@@ -1,8 +1,6 @@
 package beans;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.SocketException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -12,13 +10,8 @@ import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import utils.ImagePreviewBuilder;
-import video.FrameGrabber;
-import virtualFile.FileUtilsLocal;
-import virtualFile.Location;
-
-import database.MediaLocationItem;
 import database.MediaEJB;
+import database.MediaLocationItem;
 import database.SettingsEJB;
 
 
@@ -55,9 +48,7 @@ public class SettingsBean implements Serializable {
 	}
 
 	public void synchronize() {
-			
-		System.out.println(settings.getPreviewRootDirectory());
-		
+					
 		mediaEJB.synchronize(settings);
 
 /*	

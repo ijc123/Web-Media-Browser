@@ -1,5 +1,6 @@
 package virtualFile;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 import database.MediaItem;
 
-public abstract class FileUtils {
+public abstract class FileUtils implements Closeable {
 
 	protected Location location;
 	
@@ -17,66 +18,28 @@ public abstract class FileUtils {
 	abstract public boolean deleteFile(final String name) throws IOException;
 	abstract public boolean deleteDirectory(final String name) throws IOException;
 	abstract public boolean renameFile(final String oldName, final String newName) throws IOException;	
+	abstract public void close();
 	
 	abstract public void getDirectoryContents(ArrayList<FileInfo> contents) throws IOException; 
 		
+	private int timeout;
 		
 	protected FileUtils(String location) throws IOException, URISyntaxException {
 		
 		this.location = new Location(location);
+		timeout = 0;
 	}
 			
 	// move a directory up in the tree
 	public boolean moveUp() {
 		
-		String curPath = location.getPath();
-		
-		int pos = curPath.substring(0, curPath.length() - 1).lastIndexOf("/");
-		
-		if(pos == -1) return(false);
-		
-		StringBuffer s = new StringBuffer(curPath);
-		
-		curPath = s.delete(pos + 1, curPath.length()).toString();
-		
-		try {
-			location.setPath(curPath);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return(true);
+		return(location.moveUp());
 	}
 	
 	// move a directory down in the tree
 	public void moveDown(final String directory) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
 		
-		if(directory == null) return;
-		
-		String downDir = directory.replace('\\','/');
-		
-		if(!downDir.endsWith("/")) {
-			
-			downDir = downDir  + "/";			
-		}
-		
-		if(downDir.startsWith("/")) {
-			
-			downDir = downDir.substring(1);
-		}
-		
-		String curPath = location.getPath();
-		
-		curPath = curPath + downDir;
-	
-		location.setPath(curPath);
+		location.moveDown(directory);
 	}
 	
 	public void getDirectoryContents(ArrayList<FileInfo> contents, String wildCard) throws IOException
@@ -128,6 +91,8 @@ public abstract class FileUtils {
 		throws IOException
 	{
 				
+		setTimeout(200);
+		
 		ArrayList<FileInfo> contents = new ArrayList<FileInfo>();
 				
 		getDirectoryContents(contents);
@@ -135,7 +100,7 @@ public abstract class FileUtils {
 		for(int i = 0; i < contents.size(); i++) {
 			
 			if(!contents.get(i).isDirectory()) continue;
-			
+						
 			try {
 				moveDown(contents.get(i).getName());
 			} catch (URISyntaxException e) {
@@ -173,105 +138,27 @@ public abstract class FileUtils {
 			{				
 				media.add(diskMedia);
 			}
+						
 		}
 		
-		
+		setTimeout(0);
 	}
 	
 	public Location getLocation() {
 		
 		return(location);
 	}
-/*		
-	@Override
-	public void setPath(String path) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-		
-		location.setPath(path);
-	}
-	
-	@Override
-	public String getPath() {
-	
-		return(location.getPath());
-	}
-	
-	@Override
-	public String getPathWithFilename() {
-		
-		return(location.getPathWithFilename());
-	}
-	
-	@Override
-	public void setFilename(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-		
-		location.setFilename(filename);
-	}
-	
-	@Override
-	public void setFilenameWithoutExtension(String filename) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-		
-		location.setFilenameWithoutExtension(filename);
-	}
-	
-	@Override
-	public String getFilenameWithoutExtension() {
-		
-		return(location.getFilenameWithoutExtension());
-	}
-	
-	@Override
-	public String getFilename() {
-		
-		return(location.getFilename());
-	}
-	
-	@Override
-	public void setExtension(String extension) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-		
-		location.setExtension(extension);
-	}
-	
-	@Override
-	public String getExtension() {
-		
-		return(location.getExtension());
-	}
-	
-	@Override
-	public boolean isWithoutFilename() {
-		
-		return(location.isWithoutFilename());
-	}
-	
-	@Override
-	public String getDecodedURL() {
-		
-		return(location.getDecodedURL());
-	}
 
-	@Override
-	public String getDecodedURLWithoutFilename() {
-	
-		return(location.getDecodedURLWithoutFilename());	
-	}
-	
-	@Override
-	public String getEncodedURL() {
+	protected void setTimeout(int timeout) {
 		
-		return(location.getEncodedURL());
+		this.timeout = timeout;
 	}
 	
-	@Override
-	public String getHost() {
+	protected int getTimeout() {
 	
-		return(location.getHost());	
+		return(timeout);
+	
 	}
-	
-	@Override
-	public void setHost(String host) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-	
-		location.setHost(host);
-	}
-*/	
 }
+
 

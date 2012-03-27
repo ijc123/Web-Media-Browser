@@ -18,6 +18,7 @@ import utils.MimeType;
 public class MediaItem implements Serializable, Cloneable {
 	
 	private static final long serialVersionUID = 1L;
+	private int id;
 	private String uri;
 	private long sizeBytes;
 	private String fileName;
@@ -49,7 +50,6 @@ public class MediaItem implements Serializable, Cloneable {
 	public String getMimeType() {
 	
 		return MimeType.getMimeTypeFromExt(getFileName());
-
 	}	
 	
 	public void setUri(String uri) {
@@ -161,6 +161,7 @@ public class MediaItem implements Serializable, Cloneable {
 		MediaItem media = (MediaItem)other;
 
 		return (uri.equals(media.getUri()) &&
+				id == media.getId() &&
 				sizeBytes == media.getSizeBytes() &&
 				fileName.equals(media.getFileName()) &&
 				creation.equals(media.getCreation()) &&
@@ -217,4 +218,15 @@ public class MediaItem implements Serializable, Cloneable {
 		Collections.sort(tagItem, TAG_CATEGORY_ORDER);
 		
 	}
+
+	public int getId() {
+	
+		return id;
+	}
+
+	public void setId(int id) {
+		
+		this.id = id;
+	}
+
 }

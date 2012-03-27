@@ -450,45 +450,39 @@ public class UIFileSelectRenderer extends Renderer {
 		
 		UIFileSelectOne fileSelect = (UIFileSelectOne)component;
 		String clientId = fileSelect.getClientId(context);
-						
-		String location = fileSelect.getLocation();
-		
-		FileUtils f;
-		
+					
 		try {
 			
-			// initialize rootdrive
+			Location location = new Location(fileSelect.getLocation());
 			
-			f = FileUtilsFactory.create(location);
+			// initialize rootdrive
 
-			if (f.getLocation().getProtocol().equals("file")) {
+			if(location.getProtocol().equals("file")) {
 
-				fileSelect.setRootDrive(f.getLocation().getHost() + "/");
+				fileSelect.setRootDrive(location.getHost() + "/");
 
-			} else {
+			} else if(fileSelect.getRootDrive() == null) {
 
-				if (fileSelect.getRootDrive() == null) {
-
-					fileSelect.setRootDrive(FileUtilsLocal.getRootPaths().get(0));
-				}
+				fileSelect.setRootDrive(FileUtilsLocal.getRootPaths().get(0));
+				
 			}
 
+			// changed directory?
+			
 			Map<String, String> requestMap = 
 					context.getExternalContext().getRequestParameterMap();
-
-			// changed directory?
 
 			String selected = requestMap.get(clientId + ":selectFile");
 
 			if(selected != null && selected.endsWith("/")) {
 
-				if (selected.equals("../")) {
+				if(selected.equals("../")) {
 					
-					f.moveUp();
+					location.moveUp();
 
 				} else {
 
-					f.moveDown(selected);
+					location.moveDown(selected);
 				}
 
 			} else {
@@ -501,7 +495,7 @@ public class UIFileSelectRenderer extends Renderer {
 						!selectDrive.equals(fileSelect.getRootDrive())) {
 
 					fileSelect.setRootDrive(selectDrive);
-					f = FileUtilsFactory.create(selectDrive);
+					location = new Location(selectDrive);				
 
 				}
 
@@ -509,7 +503,7 @@ public class UIFileSelectRenderer extends Renderer {
 
 				String source = requestMap.get("javax.faces.source");
 
-				if (source != null && source.equals(clientId + ":ftpConnect")) {
+				if(source != null && source.equals(clientId + ":ftpConnect")) {
 
 					String ftpServer = requestMap.get(clientId + ":ftpAdress");
 
@@ -523,19 +517,16 @@ public class UIFileSelectRenderer extends Renderer {
 
 					fileSelect.setFtpPassword(ftpPassword);
 
-					Location l;
-
-					l = new Location(ftpServer);
-					l.setUsername(ftpUsername);
-					l.setPassword(ftpPassword);
-
-					f = FileUtilsFactory.create(l);
+					location = new Location(ftpServer);
+					location.setUsername(ftpUsername);
+					location.setPassword(ftpPassword);
 
 				}
 
 			}
 
-			fileSelect.setLocation(f.getLocation().getDecodedURL());
+			fileSelect.setLocation(location.getDecodedURL());		
+			
 			getContents(fileSelect);
 
 		} catch (Exception e1) {
@@ -545,14 +536,8 @@ public class UIFileSelectRenderer extends Renderer {
 	}
 	
 	private void getContents(UIFileSelectOne fileSelect) {
-/*		
-		if(fileSelect.isFirstRender()) {
 		
-			fileSelect.setLocation((String)fileSelect.getValue());
-			
-		}
-*/				
-		String location = (String) fileSelect.getLocation();
+		String location = fileSelect.getLocation();
 		
 		List<String> roots = FileUtilsLocal.getRootPaths();		
 		fileSelect.setRoots(roots);
@@ -568,9 +553,11 @@ public class UIFileSelectRenderer extends Renderer {
 		ArrayList<FileInfo> contents = new ArrayList<FileInfo>();
 		ArrayList<String> sortedContents = new ArrayList<String>();
 		
+		FileUtils f = null;
+		
 		try {
-			
-			FileUtils f = FileUtilsFactory.create(location);
+						 
+			f = FileUtilsFactory.create(location);
 			
 			if(f.getLocation().getProtocol().equals("file")) {
 				
@@ -615,9 +602,18 @@ public class UIFileSelectRenderer extends Renderer {
 			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} catch (URISyntaxException e) {
+			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
+		} finally {
+			
+			if(f != null) {
+				
+				f.close();
+			}
 		}
 		
 	}

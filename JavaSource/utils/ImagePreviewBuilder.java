@@ -36,12 +36,14 @@ public class ImagePreviewBuilder {
 	
 	
 	public void start(Location output) {
-				
+			
+		FileUtils source = null;
+		
 		try {
 		
 			output.setExtension("jpg");
 			
-			FileUtils source = FileUtilsFactory.create(output);
+			source = FileUtilsFactory.create(output);
 			
 			ArrayList<FileInfo> thumbs = new ArrayList<FileInfo>();
 			
@@ -55,7 +57,7 @@ public class ImagePreviewBuilder {
 			
 				FileInfo f = thumbs.get(i);
 								
-				File thumbImgFile = new File(f.getLocation().getEncodedURL());
+				File thumbImgFile = new File(f.getLocation().getDiskPath());
 				
 				BufferedImage thumbImg = ImageIO.read(thumbImgFile);
 				
@@ -104,6 +106,13 @@ public class ImagePreviewBuilder {
 		} catch (Exception e) {
 			
 			e.printStackTrace();
+			
+		} finally {
+			
+			if(source != null) {
+				
+				source.close();
+			}
 		}
 	}
 }

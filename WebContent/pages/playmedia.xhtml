@@ -8,14 +8,14 @@
 	xmlns:cc="http://java.sun.com/jsf/composite/components">
 <h:head>	
 	<f:metadata>
-		<f:viewParam name="uri" value="#{playMediaBean.uri}"/> 
+		<f:viewParam name="mediaId" value="#{playMediaBean.mediaId}"/> 
 	</f:metadata>
 	<title>#{playMediaBean.fileName}</title>
 </h:head>
 <h:body>
 	<h:outputScript library="javascript" name="AC_QuickTime.js" target="head"/>
 	<cc:navigationToolbar/>	
-	<my:mediaPlayer uri="#{playMediaBean.uri}" autostart="true"/>
+	<my:mediaPlayer mediaId="#{playMediaBean.mediaId}" autoStart="true"/>
 	<h:form>
 		<rich:panel id="modifyTag" header="Modify Tags">		
 			<cc:multiTagPicker2 taggableBean="#{playMediaBean}"/>

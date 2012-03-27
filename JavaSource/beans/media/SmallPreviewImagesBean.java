@@ -54,7 +54,7 @@ public class SmallPreviewImagesBean {
 		
 		if(media == null) return(new ArrayList<String>());
 
-		List<String> images = mediaPreviewEJB.getSmallPreviewImagesList(media);
+		List<String> images = mediaPreviewEJB.getSmallPreviewImagesURLList(media);
 		
 		for(int i = 0; i < images.size(); i++) {
 		

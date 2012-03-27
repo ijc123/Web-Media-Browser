@@ -382,11 +382,60 @@ public class Location implements Cloneable {
 		return(getPath() + getFilename());
 			
 	}
-	
-	
+		
 	public String getProtocol() {
 	
 		return(url.getProtocol());
+	}
+	
+	public boolean moveUp()  {
+		
+		String curPath = getPath();
+		
+		int pos = curPath.substring(0, curPath.length() - 1).lastIndexOf("/");
+		
+		if(pos == -1) return(false);
+		
+		StringBuffer s = new StringBuffer(curPath);
+		
+		String newPath = s.delete(pos + 1, curPath.length()).toString();
+		
+		try {
+			setPath(newPath);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return(true);
+	}
+	
+	// move a directory down in the tree
+	public void moveDown(final String directory) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
+		
+		if(directory == null) return;
+		
+		String downDir = directory.replace('\\','/');
+		
+		if(!downDir.endsWith("/")) {
+			
+			downDir = downDir  + "/";			
+		}
+		
+		if(downDir.startsWith("/")) {
+			
+			downDir = downDir.substring(1);
+		}
+				
+		String newPath = getPath() + downDir;
+	
+		setPath(newPath);
 	}
 	
 	private String getUserInfo() {
@@ -411,7 +460,9 @@ public class Location implements Cloneable {
 	
 	private void createURL(String url) throws IOException, URISyntaxException {
 		
-		URL temp = new URL(url);
+		// if the url is already encoded, decode it first to make sure
+		// it is not encoded twice
+		URL temp = new URL(URLDecoder.decode(url, "UTF-8"));
 	
 		createURL(temp.getProtocol(), temp.getUserInfo(), temp.getHost(),
 				temp.getPort(), temp.getPath(), temp.getQuery());
