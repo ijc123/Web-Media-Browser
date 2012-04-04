@@ -30,14 +30,14 @@ public class LoginBean implements Serializable {
     @Inject
     private FacesContext facesContext;
 
-    private UserItem currentUser;
+    private UserData currentUser;
 
     public String login() throws Exception {
        
        UserItem user = userEJB.getUser(credentials.getUsername(), credentials.getPassword());
        if (user != null) {
     	   
-          this.currentUser = user;
+          currentUser = new UserData(user);
           
           // store the logged in user in the httpsession 
           HttpSession session = (HttpSession)facesContext.getExternalContext().getSession(false);
@@ -58,7 +58,10 @@ public class LoginBean implements Serializable {
 		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
 		session.removeAttribute("loggedInUser");
 
-		facesContext.addMessage(null, new FacesMessage("Goodbye, " + currentUser.getName()));
+		facesContext.addMessage(null, new FacesMessage("Goodbye, " + currentUser.getUserItem().getName()));
+		
+		// stop any transcoding for this user
+		currentUser.getHttpLiveTranscoder().Stop();
 		currentUser = null;
 
 		try {
@@ -74,12 +77,19 @@ public class LoginBean implements Serializable {
     }
 
     @Produces @LoggedIn
-    public UserItem getCurrentUser() {
-       return currentUser;
+    public UserItem getCurrentUserItem() {
+    
+    	if(currentUser == null) return(null);
+    	else return(currentUser.getUserItem());
+    }
+    
+    public UserData getCurrentUserData() {
+        
+    	return(currentUser);
     }
 
-    public void updateCurrentUser() {
+    public void updateCurrentUserItem() {
     	
-    	currentUser = userEJB.getUserByName(currentUser.getName());
+    	currentUser.setUserItem(userEJB.getUserByName(currentUser.getUserItem().getName()));
     }
 }

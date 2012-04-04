@@ -18,7 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import debug.Output;
+import debug.Log;
 
 import utils.ImageUtil;
 import utils.MapArgument;
@@ -525,11 +525,11 @@ public class TagEJB {
 						
 		} catch (MalformedURLException mue) {
 
-			Output.error(this, mue.getMessage());
+			Log.error(this, mue.getMessage());
 
 		} catch (IOException ioe) {
 
-			Output.error(this, ioe.getMessage());
+			Log.error(this, ioe.getMessage());
 
 		} finally {
 

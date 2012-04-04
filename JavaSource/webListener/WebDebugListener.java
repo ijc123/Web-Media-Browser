@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import debug.Output;
+import debug.Log;
 
 @WebListener
 public class WebDebugListener implements HttpSessionListener {
@@ -23,7 +23,7 @@ public class WebDebugListener implements HttpSessionListener {
     @Override
     public void sessionCreated(HttpSessionEvent event) {
         
-    	Output.info(this, "session created: " + event.getSession().getId());
+    	Log.info(this, "session created: " + event.getSession().getId());
            
     	sessions.put(event.getSession().getId(), event.getSession());
             
@@ -32,7 +32,7 @@ public class WebDebugListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent event) {
     	
-    	Output.info(this, "session destroyed: " + event.getSession().getId());
+    	Log.info(this, "session destroyed: " + event.getSession().getId());
        
         sessions.remove(event.getSession().getId());
     }

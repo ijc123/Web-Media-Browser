@@ -1,8 +1,6 @@
 package database;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -20,13 +18,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
-import debug.Output;
-
 import utils.ImageUtil;
 import utils.MapArgument;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
+import virtualFile.VirtualInputFile;
+import virtualFile.VirtualInputFileFactory;
 import beans.user.LoggedIn;
+import debug.Log;
 
 
 @Stateless
@@ -479,7 +478,7 @@ public class MediaEJB {
 
 			session.close();
 
-			Output.info(this, "done synchronizing database, counting tag usage");
+			Log.info(this, "done synchronizing database, counting tag usage");
 
 			tagEJB.setTagUsedCounters();
 
@@ -560,18 +559,18 @@ public class MediaEJB {
 
 		if(media == null || !media.isImage()) return;
 
-		File imagefile = new File(media.getPath());
-		FileInputStream fileInput = null;
+		VirtualInputFile imagefile = null;
 		ByteArrayOutputStream byteOutput = null;
 
 		ImageItem tagImage;
 
 		try {
 
-			fileInput = new FileInputStream(imagefile);
+			imagefile = VirtualInputFileFactory.create(media.getPath());
+			
 			byteOutput = new ByteArrayOutputStream();
 
-			IOUtils.copy(fileInput, byteOutput);	
+			IOUtils.copy(imagefile, byteOutput);	
 
 			ImageUtil imageUtil = new ImageUtil();
 			
@@ -591,7 +590,7 @@ public class MediaEJB {
 		} finally {
 
 			try {
-				if(fileInput != null) fileInput.close();
+				if(imagefile != null) imagefile.close();
 				if(byteOutput != null) byteOutput.close();
 			} catch (IOException ioe) {
 

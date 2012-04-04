@@ -8,7 +8,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 /**
  * Specifies a resource location, which can be either a local
@@ -36,7 +35,7 @@ public class Location implements Cloneable {
 			filepath = filepath.substring(8);
 			setFilepath(filepath);
 						
-		} else if(location.startsWith("ftp")) {
+		} else if(location.startsWith("ftp") || location.startsWith("http")) {
 			
 			filepath = null;			
 			createURL(location);
@@ -462,7 +461,9 @@ public class Location implements Cloneable {
 		
 		// if the url is already encoded, decode it first to make sure
 		// it is not encoded twice
-		URL temp = new URL(URLDecoder.decode(url, "UTF-8"));
+		String decodedURL = URLDecoder.decode(url, "UTF-8");
+		
+		URL temp = new URL(decodedURL);
 	
 		createURL(temp.getProtocol(), temp.getUserInfo(), temp.getHost(),
 				temp.getPort(), temp.getPath(), temp.getQuery());
@@ -472,12 +473,12 @@ public class Location implements Cloneable {
 
 	private void createURL(String protocol, String userInfo, String host, 
 			int port, String path, String query) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
-		
+/*		
 		if(query != null) {
 			
 			query = URLEncoder.encode(query, "UTF-8");
 		}
-		
+*/		
 		url = new URI(protocol, userInfo , host, port, path, query, null).toURL();
 	}
 		

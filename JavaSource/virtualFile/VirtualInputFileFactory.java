@@ -8,7 +8,7 @@ public class VirtualInputFileFactory {
 
 	static public VirtualInputFile create(String location) throws SocketException, IOException, URISyntaxException {
 		
-		VirtualInputFile inputFile;
+		VirtualInputFile inputFile = null;
 		
 		if(location.startsWith("ftp://")) {
 			
@@ -20,5 +20,21 @@ public class VirtualInputFileFactory {
 		}
 		
 		return(inputFile);
+	}
+	
+	static public VirtualInputFile create(final Location location) throws IOException, URISyntaxException {
+		
+		VirtualInputFile fileUtils = null;
+		
+		if(location.getProtocol().equals("file")) {
+			
+			fileUtils = new LocalInputFile((Location)location.clone());
+			
+		} else {
+						
+			fileUtils = new RemoteInputFile((Location)location.clone());
+		}
+		
+		return(fileUtils);
 	}
 }

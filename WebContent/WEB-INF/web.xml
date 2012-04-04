@@ -24,12 +24,20 @@
   <url-pattern>*.jsf</url-pattern>
  </servlet-mapping>
  <servlet>
-   <servlet-name>Load Data Segment</servlet-name>
-   <servlet-class>servlet.LoadDataSegmentServlet</servlet-class>
+   <servlet-name>Load Media</servlet-name>
+   <servlet-class>servlet.LoadMediaServlet</servlet-class>
  </servlet>
  <servlet-mapping>
-   <servlet-name>Load Data Segment</servlet-name>
-   <url-pattern>/loaddatasegment</url-pattern>
+   <servlet-name>Load Media</servlet-name>
+   <url-pattern>/loadmedia</url-pattern>
+ </servlet-mapping>
+ <servlet>
+   <servlet-name>HTTP Live Streaming</servlet-name>
+   <servlet-class>servlet.HTTPLiveStreamingServlet</servlet-class>
+ </servlet>
+ <servlet-mapping>
+   <servlet-name>HTTP Live Streaming</servlet-name>
+   <url-pattern>/httplivestreaming</url-pattern>
  </servlet-mapping>
  <mime-mapping>
   <extension>M3U8</extension>

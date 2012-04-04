@@ -1,19 +1,25 @@
 package custom.component;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
-import javax.faces.application.ViewHandler;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import servlet.LoadDataSegmentServlet;
-import video.HTTPLiveStreaming;
+import beans.user.LoginBean;
+
+import servlet.HTTPLiveStreamingServlet;
+import servlet.LoadMediaServlet;
+import utils.SystemConstants;
+import video.HTTPLiveStreaming2;
+import virtualFile.Location;
 import database.MediaEJB;
 import database.MediaItem;
 
@@ -21,7 +27,8 @@ import database.MediaItem;
 @FacesComponent("custom.component.UIMediaPlayer")
 public class UIMediaPlayer extends UIOutput {
 
-	static video.Transcode transcode;
+	@Inject
+	LoginBean loginBean;
 	
 	protected enum Properties {
 		id,
@@ -35,17 +42,11 @@ public class UIMediaPlayer extends UIOutput {
 	//private String uri;
 	private static String localHost = "0:0:0:0:0:0:0:1";
 
-	static {
-
-		transcode = null;
-	}
-
 	public UIMediaPlayer() {
 
 		super();
 		
 	}
-	
 	
 	protected void renderFireFox(ResponseWriter rw, String id, MediaItem media, 
 			String ipAddress, FacesContext context) throws IOException 
@@ -63,7 +64,7 @@ public class UIMediaPlayer extends UIOutput {
 			
 			HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
 			
-			location = LoadDataSegmentServlet.getMediaDataURL(media, session.getId());
+			location = LoadMediaServlet.getMediaDataURL(media, session.getId());
 		}
 		
 		rw.startElement("embed", this);
@@ -114,7 +115,7 @@ public class UIMediaPlayer extends UIOutput {
 			
 		} else {
 			
-			location = LoadDataSegmentServlet.getMediaDataURL(media);
+			location = LoadMediaServlet.getMediaDataURL(media);
 		
 		}
 		
@@ -180,7 +181,7 @@ public class UIMediaPlayer extends UIOutput {
 			</OBJECT>
 		 */
 		
-		String location = LoadDataSegmentServlet.getMediaDataURL(media);
+		String location = LoadMediaServlet.getMediaDataURL(media);
 				
 		rw.startElement("object", this);
 
@@ -232,33 +233,30 @@ public class UIMediaPlayer extends UIOutput {
 	protected void renderMobileSafari(ResponseWriter rw, String id, MediaItem media) throws IOException 
 	{
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		ViewHandler handler = context.getApplication().getViewHandler();
-		String actionURL = handler.getActionURL(context, "/iosvideo");
+		Location publishURL;
+		
+		try {
+			
+			publishURL = new Location(SystemConstants.getWanAdress() + HTTPLiveStreamingServlet.getURL());
+			
+			HTTPLiveStreaming2 transcoder = loginBean.getCurrentUserData().getHttpLiveTranscoder();
+			
+			transcoder.publish(media, publishURL, HTTPLiveStreaming2.Profile.IPOD_HIGH_RES);
+			
+			String indexURL = publishURL.getEncodedURL() + transcoder.getIndexFileName(media);
+			
+			rw.startElement("video", this);
+			rw.writeAttribute("src", indexURL, null);
+			rw.writeAttribute("height", "300", null);
+			rw.writeAttribute("width", "400", null);
 
-		String location = "http://192.168.1.4:8080" + actionURL + "?id=";
-		//String outputDir = "g://transcode//";
-
-		HTTPLiveStreaming.publish(media.getPath(), location);
-		/*		
-		if(transcode != null) {
-
-			transcode.stopRunning();
+			rw.endElement("video");
+			
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		transcode = new video.Transcode("Transcoding Thread", media.getPath(), 
-				outputDir, location);
-		//transcode = new video.Transcode("Transcoding Thread", media.getPath(), 
-		//		outputDir + "output.ts");
-		transcode.start();
-		 */		
-		rw.startElement("video", this);
-		rw.writeAttribute("src", location + "index.m3u8", null);
-		rw.writeAttribute("height", "300", null);
-		rw.writeAttribute("width", "400", null);
-
-
-		rw.endElement("video");
+			
 
 	}
 	
@@ -272,7 +270,7 @@ public class UIMediaPlayer extends UIOutput {
 		</video>
 	 	*/
 		
-		String location = LoadDataSegmentServlet.getMediaDataURL(media);
+		String location = LoadMediaServlet.getMediaDataURL(media);
 		
 		rw.startElement("video", this);
 		

@@ -24,7 +24,7 @@ import virtualFile.Location;
 import database.MediaEJB;
 import database.TagEJB;
 import database.ImageItem;
-import debug.Output;
+import debug.Log;
 
 
 public class DynamicResourcePhaseListener implements PhaseListener {
@@ -48,7 +48,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String tagName = external.getRequestParameterMap().get("id");
 
-			Output.info(this, "Loading Tag Image: " + tagName);
+			Log.info(this, "Loading Tag Image: " + tagName);
 
 			TagEJB tagEJB = null;
 
@@ -70,7 +70,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String path = external.getRequestParameterMap().get("id");
 
-			Output.info(this, "Loading Preview Image: " + path);
+			Log.info(this, "Loading Preview Image: " + path);
 
 			generateBinaryResponse(context, servletResponse, path, "image/jpeg");
 
@@ -78,7 +78,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String path = external.getRequestParameterMap().get("id");
 
-			Output.info(this, "Loading Video: " + path);
+			Log.info(this, "Loading Video: " + path);
 
 			String mimeType = MimeType.getMimeTypeFromExt(path);
 
@@ -94,7 +94,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			//String path = "g:/transcode/" + file;
 
-			Output.info(this, "Loading IOS Video Segment: " + path);
+			Log.info(this, "Loading IOS Video Segment: " + path);
 
 			if(file.endsWith("m3u8")) {
 
@@ -110,7 +110,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String uri = external.getRequestParameterMap().get("id");
 
-			Output.info(this, "Loading Thumbnail Image: " + uri);
+			Log.info(this, "Loading Thumbnail Image: " + uri);
 
 			MediaEJB mediaEJB = null;
 
@@ -148,7 +148,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			if(!dataFile.exists()) {
 
-				Output.info(this, path + " not found");
+				Log.info(this, path + " not found");
 
 				servletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, path + " not found");
 

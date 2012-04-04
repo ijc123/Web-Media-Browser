@@ -50,8 +50,17 @@ public class SettingsBean implements Serializable {
 	public void synchronize() {
 					
 		mediaEJB.synchronize(settings);
-
-/*	
+/*		
+		MediaItem media = mediaEJB.getMediaById(729);
+		
+		try {
+			HTTPLiveStreaming2.publish(media, "http://localhost/", HTTPLiveStreaming2.Profile.IPOD_HIGH_RES);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+*/
+/*
 		FrameGrabber frameGrabber = new FrameGrabber();
 		ImagePreviewBuilder previewBuilder = new ImagePreviewBuilder();
 		
@@ -71,7 +80,7 @@ public class SettingsBean implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-*/		
+*/	
 	}
 	
 	public DataModel<MediaLocationItem> getDataModel() {

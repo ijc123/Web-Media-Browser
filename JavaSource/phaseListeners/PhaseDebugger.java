@@ -7,7 +7,7 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import debug.Output;
+import debug.Log;
 
 public class PhaseDebugger implements PhaseListener {
 
@@ -26,7 +26,7 @@ public class PhaseDebugger implements PhaseListener {
 
 	public void beforePhase(PhaseEvent event) {
 			
-		Output.info(this, "Current phase: " + event.getPhaseId());					
+		Log.info(this, event.getPhaseId().toString());					
 			
 	}
 

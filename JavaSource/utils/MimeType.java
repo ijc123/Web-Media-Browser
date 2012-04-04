@@ -87,6 +87,7 @@ public class MimeType {
 		extToMime.put("m13","application/x-msmediaview");
 		extToMime.put("m14","application/x-msmediaview");
 		extToMime.put("m3u","audio/x-mpegurl");
+		extToMime.put("m3u8","application/x-mpegURL");
 		extToMime.put("m4v","video/x-m4v");
 		extToMime.put("man","application/x-troff-man");
 		extToMime.put("mdb","application/x-msaccess");
@@ -175,6 +176,7 @@ public class MimeType {
 		extToMime.put("tiff","image/tiff");
 		extToMime.put("tr","application/x-troff");
 		extToMime.put("trm","application/x-msterminal");
+		extToMime.put("ts", "video/mp2t");
 		extToMime.put("tsv","text/tab-separated-values");
 		extToMime.put("txt","text/plain");
 		extToMime.put("uls","text/iuls");
@@ -214,13 +216,13 @@ public class MimeType {
 		String ext = fileName.substring(dot + 1).toLowerCase();
 		
 		String mimeType = extToMime.get(ext);
-		
+/*		
 		if(mimeType == null) {
 			
 			mimeType = "application/octet-stream";
 			
 		}
-	
+*/	
 		return(mimeType);
 	}
 }

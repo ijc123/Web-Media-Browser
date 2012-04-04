@@ -89,9 +89,9 @@ public class TypeEJB {
 		
 		// make sure the changes to the root user types are propagated 
 		// into the current session
-		if(loginBean.getCurrentUser().getName().equals("root")) {
+		if(loginBean.getCurrentUserItem().getName().equals("root")) {
 			
-			loginBean.updateCurrentUser();
+			loginBean.updateCurrentUserItem();
 		}
 		
 		// remove all tags which are now without a category 
@@ -147,7 +147,7 @@ public class TypeEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = loginBean.getCurrentUserItem().getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"accessTypes", accessTypes

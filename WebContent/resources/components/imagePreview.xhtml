@@ -19,7 +19,7 @@
 <composite:implementation>
 		<h:link outcome="showpreview" target="_blank" rendered="#{cc.attrs.rendered}">		
 			<h:graphicImage id="tagImage" url="#{smallPreviewImagesBean.getThumbnailURL(cc.attrs.media)}" style="height: 150px" />
-			<f:param name="uri" value="#{cc.attrs.media.uri}"/>
+			<f:param name="mediaId" value="#{cc.attrs.media.id}"/>
 		</h:link>
 </composite:implementation>
 </body>

@@ -4,18 +4,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.faces.application.ViewHandler;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import servlet.LoadMediaServlet;
 
 import com.google.gson.Gson;
 
@@ -23,7 +21,7 @@ import database.MediaPreviewEJB;
 
 @ViewScoped
 @Named
-public class LargePreviewImageBean extends Taggable implements Serializable {
+public class LargePreviewImageBean extends PlayMediaBean implements Serializable {
 	
 	@Inject
 	MediaPreviewEJB mediaPreviewEJB;
@@ -46,8 +44,6 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 				
 		super.setMediaId(id);
 		
-		//PreviewImages previewImages = new PreviewImages();
-		
 		if(media.isVideo()) {
 		
 			largeImagePath = mediaPreviewEJB.getLargePreviewImageURL(media);
@@ -58,30 +54,12 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 			largeImagePath = media.getPath();
 		}
 		
-		FacesContext context = FacesContext.getCurrentInstance();
-		ViewHandler handler = context.getApplication().getViewHandler();
-		String actionURL = handler.getActionURL(context, "/loaddatasegment").replace(".jsf", "");
+		previewURL = LoadMediaServlet.getMediaDataURL(media);
+				
+		int index = previewURL.substring(1).indexOf('/');
 		
-		previewURL = "";
-		
-		try {
-					
-			String path = URLEncoder.encode(largeImagePath, "UTF-8");
-			
-			String fullURL = actionURL + "?path=" + path;
-			
-			fullURL = fullURL.substring(1);
-			fullURL = fullURL.substring(fullURL.indexOf('/'));
-			
-			previewURL = fullURL;
-		
-		
-		} catch (UnsupportedEncodingException e) {
-		
-			e.printStackTrace();
+		previewURL = previewURL.substring(index + 1);
 	
-		}
-		
 	}
 
 		
@@ -95,9 +73,6 @@ public class LargePreviewImageBean extends Taggable implements Serializable {
 		return(previewURL);
 	}
 
-	public String getFileName() {
-		return(media.getFileName());
-	}
 	
 	public String getImageInfo() {
 				

@@ -11,7 +11,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 
-import servlet.LoadDataSegmentServlet;
+import servlet.LoadMediaServlet;
 import utils.SystemConstants;
 import virtualFile.Location;
 import database.MediaItem;
@@ -30,12 +30,10 @@ public class FrameGrabber {
 		int frameHeight = (int)(videoInfo.getHeight() * scale);
 		
 		String frameRes = Integer.toString(frameWidth) + "x" + Integer.toString(frameHeight);
-		
-		String port = Integer.toString(SystemConstants.getJbossPort());
-		
+			
 		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
 				
-		String mediaURL = "http://127.0.0.1:" + port + LoadDataSegmentServlet.getMediaDataURL(video, session.getId());
+		String mediaURL = SystemConstants.getLanAdress() + LoadMediaServlet.getMediaDataURL(video, session.getId());
 		
 		output.setFilename(video.getFileName());
 		

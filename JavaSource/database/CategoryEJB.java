@@ -29,7 +29,7 @@ public class CategoryEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = loginBean.getCurrentUserItem().getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"typeName", typeName,
@@ -49,7 +49,7 @@ public class CategoryEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+		List<String> accessTypes = loginBean.getCurrentUserItem().getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"accessTypes", accessTypes
@@ -123,7 +123,7 @@ public class CategoryEJB {
 			
 			SqlSession session = MyBatis.getSession().openSession(); 
 			
-			List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
+			List<String> accessTypes = loginBean.getCurrentUserItem().getAccessTypes();
 			
 			Map<String, Object> map = MapArgument.create(	
 					"category", parent,

@@ -69,7 +69,7 @@ public abstract class FileUtils implements Closeable {
         String [] cards = pattern.split("\\*");
 
         // Iterate over the cards.
-        for (String card : cards)
+        for(String card : cards)
         {
             int idx = text.indexOf(card);
             
@@ -132,9 +132,13 @@ public abstract class FileUtils implements Closeable {
 			
 			diskMedia.setTypeNames(typeNames);
 					
-			if((video && diskMedia.getMimeType().startsWith("video")) ||
-			   (audio && diskMedia.getMimeType().startsWith("audio")) ||
-			   (images && diskMedia.getMimeType().startsWith("image")))
+			String mimeType = diskMedia.getMimeType();
+			
+			if(mimeType == null) continue;
+			
+			if((video && mimeType.startsWith("video")) ||
+			   (audio && mimeType.startsWith("audio")) ||
+			   (images && mimeType.startsWith("image")))
 			{				
 				media.add(diskMedia);
 			}

@@ -14,7 +14,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 
-import servlet.LoadDataSegmentServlet;
+import servlet.LoadMediaServlet;
 import utils.SystemConstants;
 import database.MediaItem;
 
@@ -22,11 +22,9 @@ public class VideoInfoParser {
 
 	public VideoInfo start(final MediaItem video) throws ExecuteException, IOException {
 				
-		String port = Integer.toString(SystemConstants.getJbossPort());
-		
 		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
 		
-		String mediaURL = "http://127.0.0.1:" + port + LoadDataSegmentServlet.getMediaDataURL(video, session.getId());
+		String mediaURL = SystemConstants.getLanAdress() + LoadMediaServlet.getMediaDataURL(video, session.getId());
 		
 		String batch = String.format("avprobe -show_format -show_streams -loglevel quiet \"%s\"", mediaURL);
 

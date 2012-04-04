@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.net.ftp.FTPFile;
 
-import debug.Output;
+import debug.Log;
 
 public class FileUtilsRemote extends FileUtils {
 	
@@ -96,8 +96,8 @@ public class FileUtilsRemote extends FileUtils {
 			// skip useless directories
 			if(name.equals(".")) continue;
 			if(name.equals("..")) continue;		
-			
-			Output.info(this, name);
+									
+			Log.info(this, name);
 			
 			long sizeBytes = fileList[i].getSize();		
 			
@@ -138,7 +138,7 @@ public class FileUtilsRemote extends FileUtils {
 		
 		int status = ftp.cwd(path);
 		
-		Output.info(this, path);
+		Log.info(this, path);
 		
 		if(status != 250) {
 		

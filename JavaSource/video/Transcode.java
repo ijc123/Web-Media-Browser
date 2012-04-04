@@ -25,7 +25,7 @@ import com.xuggle.xuggler.IStreamCoder;
 import com.xuggle.xuggler.IVideoPicture;
 import com.xuggle.xuggler.IVideoResampler;
 
-import debug.Output;
+import debug.Log;
 
 public class Transcode extends Thread {
 
@@ -106,7 +106,7 @@ public class Transcode extends Thread {
 
 		running = true;
 		
-		Output.info(this, "Transcoding: " + inputVideoFile + " to " + publishURL);
+		Log.info(this, "Transcoding: " + inputVideoFile + " to " + publishURL);
 
 		IContainer decoderContainer = IContainer.make();
 
@@ -433,7 +433,7 @@ public class Transcode extends Thread {
 				
 				segmentInfo.addSegmentToIndexFile(isFinalSegment);
 				
-				Output.info(this,"Finished segment " + Integer.toString(segmentInfo.segmentNr) +
+				Log.info(this,"Finished segment " + Integer.toString(segmentInfo.segmentNr) +
 						" at :" + Double.toString(segmentTime) + " seconds.");
 				
 				segmentInfo.segmentNr++;

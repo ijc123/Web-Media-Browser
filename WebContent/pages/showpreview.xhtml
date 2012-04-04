@@ -9,7 +9,7 @@
 	xmlns:a4j="http://richfaces.org/a4j">
 <h:head>	
 	<f:metadata>
-		<f:viewParam name="uri" value="#{largePreviewImageBean.uri}"/> 
+		<f:viewParam name="mediaId" value="#{largePreviewImageBean.mediaId}"/> 
 	</f:metadata>
 	<title>#{largePreviewImageBean.fileName}</title>
 </h:head>
@@ -34,7 +34,7 @@
                     X
             </h:outputLink>
         </f:facet>
-       <my:mediaPlayer id="mediaPlayer" uri="#{largePreviewImageBean.uri}" autostart="false"/>
+       <my:mediaPlayer id="mediaPlayer" mediaId="#{largePreviewImageBean.mediaId}" autostart="false"/>
     </rich:popupPanel>
 	<h:form>
 		<rich:panel id="modifyTag" header="Modify Tags">		

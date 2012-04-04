@@ -3,8 +3,6 @@ package servlet;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -12,13 +10,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class LoadDataServlet extends HttpServlet {
+import debug.Log;
+
+import utils.MimeType;
+import virtualFile.VirtualInputFile;
+
+public abstract class LoadDataServlet extends HttpServlet {
 
     // Constants ----------------------------------------------------------------------------------
 	private static final long serialVersionUID = 1L;
 
 	protected static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 
+	abstract protected VirtualInputFile getInputFile(HttpServletRequest request, 
+    		HttpServletResponse response) throws IOException;
+	
     // Properties ---------------------------------------------------------------------------------
 
     //private String imagePath;
@@ -41,34 +47,18 @@ public class LoadDataServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        // Get requested image by path info.
-    	String requestedFile = request.getParameter("path");
-
-        // Check if file name is actually supplied to the request URI.
-        if (requestedFile == null) {
-            // Do your thing if the image is not supplied to the request URI.
-            // Throw an exception, or send 404, or show default/warning image, or just ignore it.
-            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
-            return;
-        }
-
+    
         // Decode the file name (might contain spaces and on) and prepare file object.
-        File data = new File(requestedFile);
-
-        // Check if file actually exists in filesystem.
-        if (!data.exists()) {
-            // Do your thing if the file appears to be non-existing.
-            // Throw an exception, or send 404, or show default/warning image, or just ignore it.
-            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
-            return;
-        }
-
+        VirtualInputFile data = getInputFile(request, response);
+        if(data == null) return;
+      
         // Get content type by filename.
-        String contentType = getServletContext().getMimeType(data.getName());
+        String contentType = MimeType.getMimeTypeFromExt(data.getName());
 
         // Check if file is actually an image (avoid download of other files by hackers!).
         // For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
         if (contentType == null) {
+        	Log.error(this, "No mime type found for: " + data.getName());
             // Do your thing if the file appears not being a real image.
             // Throw an exception, or send 404, or show default/warning image, or just ignore it.
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
@@ -81,7 +71,7 @@ public class LoadDataServlet extends HttpServlet {
       
     }
 
-    protected void initServletResponse(HttpServletResponse response, File data, String contentType) {
+    protected void initServletResponse(HttpServletResponse response, VirtualInputFile data, String contentType) throws IOException {
     	
     	response.reset();
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -90,7 +80,7 @@ public class LoadDataServlet extends HttpServlet {
         response.setHeader("Content-Disposition", "inline; filename=\"" + data.getName() + "\"");	
     }
     
-    protected void writeOutputData(HttpServletResponse response, File data) throws IOException {
+    protected void writeOutputData(HttpServletResponse response, VirtualInputFile data) throws IOException {
     	
     	  // Prepare streams.
         BufferedInputStream input = null;
@@ -98,7 +88,7 @@ public class LoadDataServlet extends HttpServlet {
 
         try {
             // Open streams.
-            input = new BufferedInputStream(new FileInputStream(data), DEFAULT_BUFFER_SIZE);
+            input = new BufferedInputStream(data, DEFAULT_BUFFER_SIZE);
             output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
 
             // Write file contents to response.

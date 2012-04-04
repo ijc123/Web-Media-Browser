@@ -1,6 +1,6 @@
 package video;
 
-import debug.Output;
+import debug.Log;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 
@@ -33,7 +33,7 @@ public class FrameGrabberEventListener extends MediaPlayerEventAdapter {
 	@Override
 	public void error(MediaPlayer mediaPlayer) {
 		
-		Output.error(this, "in media while grabbing frames");
+		Log.error(this, "in media while grabbing frames");
 		barrier.eventDone(MediaPlayerBarrier.Event.ERROR);
 		
 	}
@@ -41,13 +41,13 @@ public class FrameGrabberEventListener extends MediaPlayerEventAdapter {
 	@Override
 	public void finished(MediaPlayer mediaPlayer) {
 		
-		Output.error(this, "media end reached while grabbing frames");
+		Log.error(this, "media end reached while grabbing frames");
 		barrier.eventDone(MediaPlayerBarrier.Event.ERROR);
 	}
 	
 	@Override
 	public void snapshotTaken(MediaPlayer mediaPlayer, String filename) {
-		Output.info(this, "snapshotTaken(filename=" + filename + ")");
+		Log.info(this, "snapshotTaken(filename=" + filename + ")");
 		barrier.eventDone(MediaPlayerBarrier.Event.SNAPSHOT_DONE);		
 	}
 }
