@@ -39,6 +39,14 @@
    <servlet-name>HTTP Live Streaming</servlet-name>
    <url-pattern>/httplivestreaming</url-pattern>
  </servlet-mapping>
+ <servlet>
+   <servlet-name>Load Resource</servlet-name>
+   <servlet-class>servlet.LoadResourceServlet</servlet-class>
+ </servlet>
+ <servlet-mapping>
+   <servlet-name>Load Resource</servlet-name>
+   <url-pattern>/loadresource</url-pattern>
+ </servlet-mapping>
  <mime-mapping>
   <extension>M3U8</extension>
   <mime-type>application/x-mpegURL</mime-type>

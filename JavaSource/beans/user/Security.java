@@ -63,7 +63,7 @@ public class Security {
 		// Check if we have the correct accesslevel to acces this page
 		Integer i = pageAccessLevel.get(currentPage);
 		
-		if(i != null && i != loginSession.getCurrentUserItem().getLevel()) {
+		if(i != null && i != loginSession.getCurrentUser().getLevel()) {
 			
 			try {
 				externalContext.redirect("/mijngod/pages/accessdenied.jsf");

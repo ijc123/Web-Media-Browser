@@ -7,19 +7,17 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import beans.user.LoginBean;
-
 import servlet.HTTPLiveStreamingServlet;
 import servlet.LoadMediaServlet;
 import utils.SystemConstants;
-import video.HTTPLiveStreaming2;
+import video.HTTPLiveStreaming;
 import virtualFile.Location;
+import beans.user.UserData;
 import database.MediaEJB;
 import database.MediaItem;
 
@@ -27,9 +25,7 @@ import database.MediaItem;
 @FacesComponent("custom.component.UIMediaPlayer")
 public class UIMediaPlayer extends UIOutput {
 
-	@Inject
-	LoginBean loginBean;
-	
+
 	protected enum Properties {
 		id,
 		mediaId,
@@ -40,7 +36,7 @@ public class UIMediaPlayer extends UIOutput {
 	}
 	
 	//private String uri;
-	private static String localHost = "0:0:0:0:0:0:0:1";
+	//private static String localHost = "0:0:0:0:0:0:0:1";
 
 	public UIMediaPlayer() {
 
@@ -51,22 +47,11 @@ public class UIMediaPlayer extends UIOutput {
 	protected void renderFireFox(ResponseWriter rw, String id, MediaItem media, 
 			String ipAddress, FacesContext context) throws IOException 
 	{
-
-		String location;
-		
-		if(ipAddress.equals(localHost)) {
-		
-			// we are on the local machine, no need to transcode the video's 
-			// just load them directly
-			location = media.getPath();
 			
-		} else {
-			
-			HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
-			
-			location = LoadMediaServlet.getMediaDataURL(media, session.getId());
-		}
+		HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
 		
+		String location = LoadMediaServlet.getMediaDataURL(media, session.getId());
+	
 		rw.startElement("embed", this);
 
 		rw.writeAttribute("id", id, null);
@@ -104,20 +89,7 @@ public class UIMediaPlayer extends UIOutput {
 			</OBJECT>
 		 */
 		
-		String location;
-		
-		if(ipAddress.equals(localHost)) {
-		
-			// we are on the local machine, no need to stream the video's 
-			// just load them directly
-			location = media.getPath();
-			//location = getMediaDataUrl(media.getPath());
-			
-		} else {
-			
-			location = LoadMediaServlet.getMediaDataURL(media);
-		
-		}
+		String location = LoadMediaServlet.getMediaDataURL(media);
 		
 		rw.startElement("object", this);
 
@@ -230,7 +202,8 @@ public class UIMediaPlayer extends UIOutput {
 
 	}
 	
-	protected void renderMobileSafari(ResponseWriter rw, String id, MediaItem media) throws IOException 
+	protected void renderMobileSafari(ResponseWriter rw, String id, MediaItem media,
+			 FacesContext context) throws IOException 
 	{
 
 		Location publishURL;
@@ -239,11 +212,15 @@ public class UIMediaPlayer extends UIOutput {
 			
 			publishURL = new Location(SystemConstants.getWanAdress() + HTTPLiveStreamingServlet.getURL());
 			
-			HTTPLiveStreaming2 transcoder = loginBean.getCurrentUserData().getHttpLiveTranscoder();
+			HttpSession session = (HttpSession) context.getExternalContext().getSession(false);
 			
-			transcoder.publish(media, publishURL, HTTPLiveStreaming2.Profile.IPOD_HIGH_RES);
+			UserData userData = (UserData)session.getAttribute("currentUser");
 			
-			String indexURL = publishURL.getEncodedURL() + transcoder.getIndexFileName(media);
+			HTTPLiveStreaming transcoder = userData.getHttpLiveTranscoder();
+			
+			transcoder.publish(media, publishURL, HTTPLiveStreaming.Profile.IPOD_HIGH_RES, userData.getUserItem());
+			
+			String indexURL = publishURL.getEncodedURL() + transcoder.getIndexFileName(userData.getUserItem(), media);
 			
 			rw.startElement("video", this);
 			rw.writeAttribute("src", indexURL, null);
@@ -328,7 +305,7 @@ public class UIMediaPlayer extends UIOutput {
 
 		} else if(useragent.indexOf("mobile") != -1 && useragent.indexOf("safari") != -1) { 
 
-			renderMobileSafari(rw, id, media);
+			renderMobileSafari(rw, id, media, context);
 			
 		} else if(useragent.indexOf("safari") != -1) {
 	

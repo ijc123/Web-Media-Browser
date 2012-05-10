@@ -11,7 +11,7 @@ import javax.ejb.Startup;
 
 import debug.Log;
 
-import video.HTTPLiveStreaming2;
+import video.HTTPLiveStreaming;
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
 import virtualFile.FileUtilsFactory;
@@ -26,7 +26,7 @@ public class StartStop {
 		// remove lingering transcoded video files
 		try {
 			
-			FileUtils f = FileUtilsFactory.create(HTTPLiveStreaming2.getOutputPath());
+			FileUtils f = FileUtilsFactory.create(HTTPLiveStreaming.getOutputPath());
 			
 			Log.info(this, "Deleting *.ts and *.m3u8 files in: " + f.getLocation().getDecodedURL());
 						

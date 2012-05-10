@@ -31,8 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import utils.MimeType;
+import virtualFile.Location;
 import virtualFile.VirtualInputFile;
+import virtualFile.VirtualInputFileFactory;
 import debug.Log;
+import diskCache.DiskCacheManager;
 
 //import org.jboss.weld.context.SerializableContextualInstanceImpl;
 
@@ -55,14 +58,35 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	// Constants ----------------------------------------------------------------------------------
 
-    protected static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
-    //protected static final int DEFAULT_BUFFER_SIZE = 1048576;
+    //protected static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
+    protected static final int DEFAULT_BUFFER_SIZE = 65536;
     protected static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     protected static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     
-    abstract protected VirtualInputFile getInputFile(HttpServletRequest request, 
+    protected class InputData {
+    	
+    	public Location location;
+    	String name;
+    	long sizeBytes;
+    	long lastModified;
+    	
+    	boolean enableCache;
+    	
+    	public InputData(Location location, String name, long sizeBytes, long lastModified, boolean enableCache) {
+    		this.location = location;
+    		this.name = name;
+    		this.sizeBytes = sizeBytes;
+    		this.lastModified = lastModified;
+    		this.enableCache = enableCache;    		
+    	}
+    }
+    
+    abstract protected InputData getInputData(HttpServletRequest request, 
     		HttpServletResponse response) throws IOException;
     
+    private DiskCacheManager diskCache;
+    
+    public static timer.Profiler profiler = new timer.Profiler();
       
     // Properties ---------------------------------------------------------------------------------
 
@@ -97,6 +121,9 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
             }
         }
 */        
+    	
+    	diskCache = DiskCacheManager.getInstance();
+    
     }
 
     /**
@@ -130,26 +157,28 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
      * @param content Whether the request body should be written (GET) or not (HEAD).
      * @throws IOException If something fails at I/O level.
      */
-    protected void processRequest
-        (HttpServletRequest request, HttpServletResponse response, boolean content)
-            throws IOException
+    protected void processRequest(HttpServletRequest request, 
+    		HttpServletResponse response, boolean content) throws IOException
     {
     	
-     
-        VirtualInputFile file = null;
+        InputData input = null;
         String fileName;
         long length;
         long lastModified;
       
+       
+        
         try {
         	        
-        	file = getInputFile(request, response);
+        	profiler.startCounter(Thread.currentThread().getId(), "getInputData()");
+        	input = getInputData(request, response);
+        	profiler.stopCounter(Thread.currentThread().getId(), "getInputData()");
         	
-        	if(file == null) return;
-        	
-        	fileName = file.getName();
-            length = file.length();
-            lastModified = file.lastModified();
+        	if(input == null) return;
+        	        	
+        	fileName = input.name;
+            length = input.sizeBytes;
+            lastModified = input.lastModified;
                      	
         } catch (Exception e) {
             
@@ -270,7 +299,7 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
         // If content type is unknown, then set the default value.
         // For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
         // To add new content types, add new mime-mapping entry in web.xml.
-        if (contentType == null) {
+        if(contentType == null) {
         	Log.error(this, "No mime type found for: " + fileName);
             contentType = "application/octet-stream";
         }
@@ -285,7 +314,7 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
 
         // Else, expect for images, determine content disposition. If content type is supported by
         // the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
-        else if (!contentType.startsWith("image")) {
+        else if(!contentType.startsWith("image")) {
             String accept = request.getHeader("Accept");
             disposition = accept != null && accepts(accept, contentType) ? "inline" : "attachment";
         }
@@ -303,16 +332,22 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
         // Send requested file (part(s)) to client ------------------------------------------------
 
         // Prepare streams.
-        VirtualInputFile input = file;
+       
         OutputStream output = null;
-
+        VirtualInputFile inputFile = null;
+        
         try {
             // Open streams.
             output = response.getOutputStream();
+            //inputFile = VirtualInputFileFactory.create(input.location);
                         
-            if (ranges.isEmpty() || ranges.get(0) == full) {
+            if(ranges.isEmpty() || ranges.get(0) == full) {
 
-                // Return full file.
+            	profiler.startCounter(Thread.currentThread().getId(), "full range");
+            	 
+                // Return full file
+            	inputFile = VirtualInputFileFactory.create(input.location);
+            	
                 Range r = full;
                 response.setContentType(contentType);
                 response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
@@ -328,24 +363,31 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
                         response.setHeader("Content-Length", String.valueOf(r.length));
                     }
 
-                    // Copy full range.
-                    copy(input, output, r.start, r.length);
+                    // Copy full range, do not use cache
+                    copy(inputFile, output, r.start, r.length);
                 }
 
-            } else if (ranges.size() == 1) {
+                profiler.stopCounter(Thread.currentThread().getId(), "full range");
+                
+            } else if(ranges.size() == 1) {
 
+            	profiler.startCounter(Thread.currentThread().getId(), "partial range");
+            	
                 // Return single part of file.
                 Range r = ranges.get(0);
                 response.setContentType(contentType);
                 response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
                 response.setHeader("Content-Length", String.valueOf(r.length));
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
-
+             
                 if (content) {
-                    // Copy single part range.
-                    copy(input, output, r.start, r.length);
+                    // Copy single part range. Test if data is in cache first
+                    diskCache.copy(input.location, output, r.start, r.length);
+                    //copy(inputFile, output, r.start, r.length);
                 }
-
+                
+                profiler.stopCounter(Thread.currentThread().getId(), "partial range");
+                
             } else {
 
                 // Return multiple parts of file.
@@ -355,7 +397,7 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
                 if (content) {
                     // Cast back to ServletOutputStream to get the easy println methods.
                     ServletOutputStream sos = (ServletOutputStream) output;
-
+                                
                     // Copy multi part range.
                     for (Range r : ranges) {
                         // Add multipart boundary and header fields for every range.
@@ -365,7 +407,8 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
                         sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
 
                         // Copy single part range of multi part range.
-                        copy(input, output, r.start, r.length);
+                        diskCache.copy(input.location, output, r.start, r.length);
+                        //copy(inputFile, output, r.start, r.length);
                     }
 
                     // End with multipart boundary.
@@ -373,10 +416,14 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
                     sos.println("--" + MULTIPART_BOUNDARY + "--");
                 }
             }
-        } finally {
+        } catch(Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
             // Gently close streams.
             close(output);
-            close(input);
+            if(inputFile != null) close(inputFile);
+            
         }
     }
 
@@ -433,7 +480,7 @@ public abstract class LoadDataSegmentServlet extends HttpServlet {
     protected void copy(VirtualInputFile input, OutputStream output, long start, long length)
         throws IOException
     {
-    	   	
+
     	Log.info(this, "Start: " + Long.toString(start) + " Length: " + Long.toString(length));
     	
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];

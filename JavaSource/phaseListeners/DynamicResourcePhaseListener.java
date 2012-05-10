@@ -19,7 +19,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletResponse;
 
 import utils.MimeType;
-import video.HTTPLiveStreaming;
+import video.HTTPLiveStreamingXuggler;
 import virtualFile.Location;
 import database.MediaEJB;
 import database.TagEJB;
@@ -90,7 +90,7 @@ public class DynamicResourcePhaseListener implements PhaseListener {
 
 			String file = external.getRequestParameterMap().get("id");
 
-			String path = HTTPLiveStreaming.getOutputDir() + file;
+			String path = HTTPLiveStreamingXuggler.getOutputDir() + file;
 
 			//String path = "g:/transcode/" + file;
 

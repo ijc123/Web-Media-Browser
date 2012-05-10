@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import debug.Log;
 
-import video.HTTPLiveStreaming2;
+import video.HTTPLiveStreaming;
 import virtualFile.Location;
 import virtualFile.VirtualInputFile;
 import virtualFile.VirtualInputFileFactory;
@@ -44,7 +44,7 @@ public class HTTPLiveStreamingServlet extends LoadDataServlet {
 		
 		try {
 			
-			inputLocation = new Location(HTTPLiveStreaming2.getOutputPath() + file);
+			inputLocation = new Location(HTTPLiveStreaming.getOutputPath() + file);
 			
 			Log.info(this, "Requesting: " + inputLocation.getDecodedURL());
 						

@@ -22,8 +22,8 @@
 		rendered="#{cc.attrs.rendered}">
 		<rich:panel>
 			<h:link outcome="showpreview" target="_blank" >		
-				<h:graphicImage id="tagImage" url="#{url}" style="height: 150px" />
-				<f:param name="uri" value="#{cc.attrs.media.uri}"/>
+				<h:graphicImage id="tagImage" url="#{url}" style="width: 225px" />
+				<f:param name="mediaId" value="#{cc.attrs.media.id}"/>
 			</h:link>
 		</rich:panel>
 		<f:facet name="footer">

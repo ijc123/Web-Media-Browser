@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -13,7 +15,8 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import servlet.LoadMediaServlet;
+import servlet.LoadResourceServlet;
+import virtualFile.Location;
 
 import com.google.gson.Gson;
 
@@ -27,14 +30,14 @@ public class LargePreviewImageBean extends PlayMediaBean implements Serializable
 	MediaPreviewEJB mediaPreviewEJB;
 	
 	private static final long serialVersionUID = 1L;
-	private String largeImagePath;
-	private List<String> smallImagesPath;
+	private Location largeImageLocation;
+	private List<Location> smallImageLocation;
 	private String previewURL;
 
 	public LargePreviewImageBean() {
 		
-		largeImagePath = null;
-		smallImagesPath = null;
+		largeImageLocation = null;
+		smallImageLocation = null;
 		previewURL = null;
 	
 	}
@@ -43,22 +46,37 @@ public class LargePreviewImageBean extends PlayMediaBean implements Serializable
 	public void setMediaId(int id) {
 				
 		super.setMediaId(id);
-		
-		if(media.isVideo()) {
-		
-			largeImagePath = mediaPreviewEJB.getLargePreviewImageURL(media);
-			smallImagesPath = mediaPreviewEJB.getSmallPreviewImagesURLList(media);
-		
-		} else if(media.isImage()) {
 			
-			largeImagePath = media.getPath();
-		}
-		
-		previewURL = LoadMediaServlet.getMediaDataURL(media);
+		try {
+			
+			if(media.isVideo()) {
+			
+				largeImageLocation = new Location(mediaPreviewEJB.getLargePreviewImageURL(media));
 				
-		int index = previewURL.substring(1).indexOf('/');
-		
-		previewURL = previewURL.substring(index + 1);
+				List<String> urlList = mediaPreviewEJB.getSmallPreviewImagesURLList(media);
+				
+				smallImageLocation = new ArrayList<Location>();
+				
+				for(int i = 0; i < urlList.size(); i++) {
+				
+					smallImageLocation.add(new Location(urlList.get(i)));
+				}
+			} 
+			
+			previewURL = LoadResourceServlet.getMediaPreviewURL(media);
+					
+			int index = previewURL.substring(1).indexOf('/');
+			
+			previewURL = previewURL.substring(index + 1);
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
 	
 	}
 
@@ -76,11 +94,11 @@ public class LargePreviewImageBean extends PlayMediaBean implements Serializable
 	
 	public String getImageInfo() {
 				
-		if(largeImagePath == null) return("");
-		if(smallImagesPath == null) return("");
-		if(smallImagesPath.size() == 0) return("");
+		if(largeImageLocation == null) return("");
+		if(smallImageLocation == null) return("");
+		if(smallImageLocation.size() == 0) return("");
 		
-		File []input = {new File(largeImagePath), new File(smallImagesPath.get(0))};
+		File []input = {new File(largeImageLocation.getDiskPath()), new File(smallImageLocation.get(0).getDiskPath())};
 				
 		// grab image dimensions
 		List<String> imageInfo = new ArrayList<String>();
@@ -104,9 +122,9 @@ public class LargePreviewImageBean extends PlayMediaBean implements Serializable
 		// grab snapshot times in seconds
 		Pattern p = Pattern.compile("_");
 
-		for(int i = 0; i < smallImagesPath.size(); i++) {
+		for(int i = 0; i < smallImageLocation.size(); i++) {
 			
-			 String[] result = p.split(smallImagesPath.get(i));
+			 String[] result = p.split(smallImageLocation.get(i).getDiskPath());
 			 
 			 if(result.length < 4) continue;
 			 

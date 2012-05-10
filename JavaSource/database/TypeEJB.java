@@ -89,7 +89,7 @@ public class TypeEJB {
 		
 		// make sure the changes to the root user types are propagated 
 		// into the current session
-		if(loginBean.getCurrentUserItem().getName().equals("root")) {
+		if(loginBean.getCurrentUser().getName().equals("root")) {
 			
 			loginBean.updateCurrentUserItem();
 		}
@@ -147,7 +147,7 @@ public class TypeEJB {
 		
 		SqlSession session = MyBatis.getSession().openSession(); 
 		
-		List<String> accessTypes = loginBean.getCurrentUserItem().getAccessTypes();
+		List<String> accessTypes = loginBean.getCurrentUser().getAccessTypes();
 		
 		Map<String, Object> map = MapArgument.create(		
 				"accessTypes", accessTypes

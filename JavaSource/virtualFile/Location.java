@@ -1,7 +1,6 @@
 package virtualFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -22,7 +21,7 @@ public class Location implements Cloneable {
 	private URL url;
 	private String filepath;
 				
-	public Location(String location) throws IOException, URISyntaxException {
+	public Location(String location) throws URISyntaxException, MalformedURLException {
 				
 		if(location.startsWith("file")) {
 			
@@ -31,9 +30,16 @@ public class Location implements Cloneable {
 				throw new MalformedURLException();
 			}
 							
-			String filepath = URLDecoder.decode(location, "UTF-8");
-			filepath = filepath.substring(8);
-			setFilepath(filepath);
+			try {
+				
+				String filepath = URLDecoder.decode(location, "UTF-8");
+				filepath = filepath.substring(8);
+				setFilepath(filepath);
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 						
 		} else if(location.startsWith("ftp") || location.startsWith("http")) {
 			
@@ -457,16 +463,23 @@ public class Location implements Cloneable {
 		
 	}
 	
-	private void createURL(String url) throws IOException, URISyntaxException {
+	private void createURL(String url) throws URISyntaxException, MalformedURLException {
 		
 		// if the url is already encoded, decode it first to make sure
 		// it is not encoded twice
-		String decodedURL = URLDecoder.decode(url, "UTF-8");
-		
-		URL temp = new URL(decodedURL);
-	
-		createURL(temp.getProtocol(), temp.getUserInfo(), temp.getHost(),
-				temp.getPort(), temp.getPath(), temp.getQuery());
+		try {
+			
+			String decodedURL = URLDecoder.decode(url, "UTF-8");
+			
+			URL temp = new URL(decodedURL);
+
+			createURL(temp.getProtocol(), temp.getUserInfo(), temp.getHost(),
+					temp.getPort(), temp.getPath(), temp.getQuery());
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 	}
 	

@@ -12,14 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import virtualFile.Location;
+import webListener.WebDebugListener;
+import beans.user.UserData;
 import database.MediaEJB;
 import database.MediaItem;
-import database.UserItem;
 import debug.Log;
-
-import virtualFile.VirtualInputFile;
-import virtualFile.VirtualInputFileFactory;
-import webListener.WebDebugListener;
 
 public class LoadMediaServlet extends LoadDataSegmentServlet {
 
@@ -32,12 +30,12 @@ public class LoadMediaServlet extends LoadDataSegmentServlet {
 	MediaEJB mediaEJB;
 
 	@Override
-	protected VirtualInputFile getInputFile(HttpServletRequest request,
+	protected InputData getInputData(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
 		HttpSession session = request.getSession(false);
 
-		UserItem loggedInUser = null;
+		UserData loggedInUser = null;
 
 		if(session == null) {
 
@@ -66,7 +64,7 @@ public class LoadMediaServlet extends LoadDataSegmentServlet {
 					return(null);
 				}
 
-				loggedInUser = (UserItem)session.getAttribute("loggedInUser");
+				loggedInUser = (UserData)session.getAttribute("currentUser");
 
 				if(loggedInUser == null) {
 
@@ -104,7 +102,7 @@ public class LoadMediaServlet extends LoadDataSegmentServlet {
 
 		if(loggedInUser != null) {
 
-			media = mediaEJB.getMediaById(id, loggedInUser);
+			media = mediaEJB.getMediaById(id, loggedInUser.getUserItem());
 
 		} else {
 
@@ -118,16 +116,20 @@ public class LoadMediaServlet extends LoadDataSegmentServlet {
 			return(null);       			
 		}
 
-		VirtualInputFile inputFile = null;
-
+		InputData input = null;
+		
 		try {
-			inputFile = VirtualInputFileFactory.create(media.getUri());
+			
+			Location location = new Location(media.getPath());
+			input = new InputData(location, media.getFileName(), 
+					media.getSizeBytes(), 0, true);
+			
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return(inputFile);
+	
+		return(input);
 	}
 
 	public static String getMediaDataURL(MediaItem media) {

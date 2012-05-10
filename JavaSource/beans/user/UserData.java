@@ -1,18 +1,18 @@
 package beans.user;
 
-import video.HTTPLiveStreaming2;
+import video.HTTPLiveStreaming;
 import database.UserItem;
 
 // per user data
 public class UserData {
 
 	private UserItem userItem;
-	private HTTPLiveStreaming2 httpLiveTranscoder;
+	private HTTPLiveStreaming httpLiveTranscoder;
 	
 	public UserData(UserItem userItem) {
 		
 		this.userItem = userItem;
-		httpLiveTranscoder = new HTTPLiveStreaming2();
+		httpLiveTranscoder = new HTTPLiveStreaming();
 	}
 
 	public UserItem getUserItem() {
@@ -23,7 +23,7 @@ public class UserData {
 		this.userItem = userItem;
 	}
 		
-	public HTTPLiveStreaming2 getHttpLiveTranscoder() {
+	public HTTPLiveStreaming getHttpLiveTranscoder() {
 		return httpLiveTranscoder;
 	}
 	

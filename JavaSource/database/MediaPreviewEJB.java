@@ -8,7 +8,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import utils.ImagePreviewBuilder;
+import servlet.LoadDataSegmentServlet;
 import video.FrameGrabber;
 import virtualFile.FileInfo;
 import virtualFile.FileUtils;
@@ -51,16 +51,9 @@ public class MediaPreviewEJB {
 
 	}
 	
-	private String getMediaPreviewPath(final MediaItem inputVideo) {
+	public static String getMediaPreviewPath(final MediaItem media) {
 
-		String hashSource = 
-				inputVideo.getFileName() + Long.toString(inputVideo.getSizeBytes());
-
-		String hash = Integer.toString( hashSource.hashCode() );
-
-		String path = inputVideo.getFileName() + " " + hash;
-
-		return(path);
+		return(Integer.toString(media.getId()));
 	}
 
 
@@ -88,17 +81,21 @@ public class MediaPreviewEJB {
 
 			f.createDirectory(outputPath);
 			f.moveDown(outputPath);
-			
+		
 			Location outputLocation = f.getLocation();
+			
+			outputLocation.setFilename(inputMedia.getFileName());
 			
 			FrameGrabber frameGrabber = new FrameGrabber();
 			
-			frameGrabber.start(inputMedia, outputLocation, 333, 60);
+			LoadDataSegmentServlet.profiler.startCounter(0, "Overall");
 			
-			ImagePreviewBuilder imagePreview = new ImagePreviewBuilder();
+			frameGrabber.start(inputMedia, outputLocation);
 			
-			imagePreview.start(outputLocation);
+			LoadDataSegmentServlet.profiler.stopCounter(0, "Overall");
 			
+			LoadDataSegmentServlet.profiler.printResults(true, true);
+							
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -126,9 +123,9 @@ public class MediaPreviewEJB {
 
 			f.moveDown(outputPath);
 
-			f.getDirectoryContents(previewImagesList, "*.png");
+			f.getDirectoryContents(previewImagesList, "*.jpg");
 			
-			for(int i = 0; i < previewImagesList.size(); i++) {
+			for(int i = 1; i < previewImagesList.size(); i++) {
 
 				FileInfo imageFile = previewImagesList.get(i);
 				

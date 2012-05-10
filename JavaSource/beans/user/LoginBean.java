@@ -41,7 +41,7 @@ public class LoginBean implements Serializable {
           
           // store the logged in user in the httpsession 
           HttpSession session = (HttpSession)facesContext.getExternalContext().getSession(false);
-          session.setAttribute("loggedInUser", currentUser);
+          session.setAttribute("currentUser", currentUser);
                     
           return("login success");
           
@@ -56,12 +56,12 @@ public class LoginBean implements Serializable {
 
     	// remove loggedinuser from httpsession
 		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-		session.removeAttribute("loggedInUser");
+		session.removeAttribute("currentUser");
 
 		facesContext.addMessage(null, new FacesMessage("Goodbye, " + currentUser.getUserItem().getName()));
 		
 		// stop any transcoding for this user
-		currentUser.getHttpLiveTranscoder().Stop();
+		//currentUser.getHttpLiveTranscoder().Stop();
 		currentUser = null;
 
 		try {
@@ -77,7 +77,7 @@ public class LoginBean implements Serializable {
     }
 
     @Produces @LoggedIn
-    public UserItem getCurrentUserItem() {
+    public UserItem getCurrentUser() {
     
     	if(currentUser == null) return(null);
     	else return(currentUser.getUserItem());
